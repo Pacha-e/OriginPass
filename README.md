@@ -32,7 +32,7 @@ All project documentation lives in the [Wiki](https://github.com/Pacha-e/OriginP
 | [Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) | Entities, relationships and state machines |
 | [Deliverable 1](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-1) | Project definition and software requirements specification |
 
-Requirements are tracked as issues in the [Backlog](https://github.com/Pacha-e/OriginPass/projects).
+Requirements are tracked as issues in the [Backlog](https://github.com/users/Pacha-e/projects/1).
 
 ## Technology
 

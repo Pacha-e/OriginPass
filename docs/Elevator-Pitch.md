@@ -1,6 +1,6 @@
 # OriginPass Elevator Pitch
 
-When you are about to buy something, how do you really know it is authentic?
+How can you be sure that what you are buying is actually authentic?
 
 The truth is that, in most cases, there is no easy way to prove it. Everything comes down to trust: trusting what the seller says, the label, or the packaging.
 

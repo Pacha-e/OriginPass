@@ -62,6 +62,16 @@ python manage.py runserver
 
 The application is then served at http://127.0.0.1:8000/.
 
+To look at the interface with something in it, or to record the deliverable
+walkthrough, populate a demo dataset of five companies, one in each status:
+
+```bash
+python manage.py seed_demo
+```
+
+Every account it creates shares one known password, which it prints, so it refuses
+to run unless `DEBUG` is on.
+
 Generate a secret key with:
 
 ```bash

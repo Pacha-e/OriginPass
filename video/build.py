@@ -1,11 +1,13 @@
 """Build the deliverable video from end to end.
 
-    python video/build.py
+    python video/build.py             the finished video, narrated by you
+    python video/build.py --preview   a silent preview, to check the visuals
+                                      before recording anything
 
-Runs the four stages in order. Each writes into `video/build/`, which is not
-tracked, so the whole video can be rebuilt from the scripts alone.
+Stages write into `video/build/`, which is not tracked, so the whole video can
+be rebuilt from the scripts alone.
 
-The walkthrough stage needs the application running:
+The walkthrough stage drives the real application, so it needs the server up:
 
     docker compose up -d db
     python manage.py migrate
@@ -23,13 +25,6 @@ from pathlib import Path
 HERE = Path(__file__).parent
 BASE = "http://127.0.0.1:8765"
 
-STAGES = [
-    ("narrate.py", "narration", False),
-    ("slides.py", "slides", False),
-    ("record_demo.py", "walkthrough", True),
-    ("assemble.py", "final video", False),
-]
-
 
 def server_is_up():
     try:
@@ -41,22 +36,42 @@ def server_is_up():
         return False
 
 
+def run(filename, label, args=()):
+    print(f"\n=== {label} ===")
+    started = time.perf_counter()
+    result = subprocess.run([sys.executable, str(HERE / filename), *args])
+    if result.returncode != 0:
+        return result.returncode
+    print(f"{label} took {time.perf_counter() - started:.0f} s")
+    return 0
+
+
 def main():
-    for filename, label, needs_server in STAGES:
+    preview = "--preview" in sys.argv
+
+    stages = [("slides.py", "slides", (), False)]
+
+    if preview:
+        stages.append(("reference.py", "reference pace and recording guide", (), False))
+    else:
+        stages.append(("voiceover.py", "your recordings", (), False))
+
+    stages.append(("record_demo.py", "walkthrough", (), True))
+    stages.append(("assemble.py", "final video", ("--silent",) if preview else (), False))
+
+    for filename, label, args, needs_server in stages:
         if needs_server and not server_is_up():
             print(f"\n{label}: no server answering at {BASE}.")
             print("Start it with:  python manage.py runserver 8765")
             return 1
 
-        print(f"\n=== {label} ===")
-        started = time.perf_counter()
-        result = subprocess.run([sys.executable, str(HERE / filename)])
-        if result.returncode != 0:
-            print(f"{label} failed")
-            return result.returncode
-        print(f"{label} took {time.perf_counter() - started:.0f} s")
+        code = run(filename, label, args)
+        if code != 0:
+            print(f"\n{label} failed")
+            return code
 
-    print("\nDone. video/build/OriginPass-Entrega-1.mp4")
+    name = "OriginPass-Entrega-1-preview.mp4" if preview else "OriginPass-Entrega-1.mp4"
+    print(f"\nDone. video/build/{name}")
     return 0
 
 

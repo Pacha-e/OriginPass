@@ -4,9 +4,15 @@ Each section lasts exactly as long as its own narration plus a short gap, so
 nothing has to be timed by hand. The walkthrough is stretched or compressed to
 the length of the narration that plays over it, which keeps what is being said
 lined up with what is on screen.
+
+    python video/assemble.py            uses the recordings in video/voice/
+    python video/assemble.py --silent   builds a preview with no audio, timed
+                                        to the reference pace, for checking the
+                                        visuals before recording anything
 """
 
 import json
+import re
 import sys
 from datetime import timedelta
 from pathlib import Path
@@ -24,10 +30,7 @@ from script import GAP, SECTIONS  # noqa: E402
 
 BUILD = Path(__file__).parent / "build"
 SLIDES = BUILD / "slides"
-AUDIO = BUILD / "audio"
 DEMO = BUILD / "demo.webm"
-OUT = BUILD / "OriginPass-Entrega-1.mp4"
-SRT_OUT = BUILD / "OriginPass-Entrega-1.srt"
 
 WIDTH, HEIGHT = 1920, 1080
 FPS = 30
@@ -37,29 +40,24 @@ def srt_time(seconds):
     delta = timedelta(seconds=seconds)
     hours, rest = divmod(delta.seconds, 3600)
     minutes, secs = divmod(rest, 60)
-    millis = delta.microseconds // 1000
-    return f"{hours:02}:{minutes:02}:{secs:02},{millis:03}"
+    return f"{hours:02}:{minutes:02}:{secs:02},{delta.microseconds // 1000:03}"
 
 
-def shift_srt(text, offset, start_index):
-    """Move one section's subtitles onto the timeline of the whole video."""
-    blocks, index = [], start_index
-    for raw in text.strip().split("\n\n"):
-        lines = raw.splitlines()
-        if len(lines) < 3:
-            continue
-        start, end = lines[1].split(" --> ")
+def cues_for(text, start, duration, index):
+    """Split a section's text into sentence cues across its own duration.
 
-        def parse(stamp):
-            clock, millis = stamp.strip().split(",")
-            hours, minutes, secs = clock.split(":")
-            return int(hours) * 3600 + int(minutes) * 60 + int(secs) + int(millis) / 1000
+    Each sentence gets a share of the time proportional to its length. It is an
+    approximation of where the words fall, which is enough for subtitles and
+    needs no speech recognition.
+    """
+    sentences = [s.strip() for s in re.split(r"(?<=[.:?!])\s+", text.strip()) if s.strip()]
+    total_chars = sum(len(s) for s in sentences) or 1
 
-        blocks.append(
-            f"{index}\n"
-            f"{srt_time(parse(start) + offset)} --> {srt_time(parse(end) + offset)}\n"
-            + "\n".join(lines[2:])
-        )
+    blocks, offset = [], start
+    for sentence in sentences:
+        span = duration * len(sentence) / total_chars
+        blocks.append(f"{index}\n{srt_time(offset)} --> {srt_time(offset + span)}\n{sentence}")
+        offset += span
         index += 1
     return blocks, index
 
@@ -67,11 +65,8 @@ def shift_srt(text, offset, start_index):
 def demo_clip(duration):
     """The walkthrough, fitted to the narration that plays over it."""
     clip = VideoFileClip(str(DEMO))
-    factor = clip.duration / duration
-    fitted = clip.with_speed_scaled(factor)
+    fitted = clip.with_speed_scaled(clip.duration / duration)
 
-    # Recorded at 1600x900; centred on the 1920x1080 canvas against the same
-    # background the slides use, so the change of scene is not a jolt.
     scaled = fitted.resized(width=WIDTH)
     if scaled.h > HEIGHT:
         scaled = fitted.resized(height=HEIGHT)
@@ -81,49 +76,73 @@ def demo_clip(duration):
     ).with_duration(duration)
 
 
+def load_timing(silent):
+    """Where the durations come from: the recordings, or the reference pace."""
+    if silent:
+        path = BUILD / "reference.json"
+        if not path.exists():
+            raise SystemExit("No reference.json. Run `python video/reference.py` first.")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return {entry["id"]: (entry["duration"], None) for entry in data["sections"]}
+
+    path = BUILD / "narration.json"
+    if not path.exists():
+        raise SystemExit("No narration.json. Run `python video/voiceover.py` first.")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {entry["id"]: (entry["duration"], entry["path"]) for entry in data["sections"]}
+
+
 def main():
-    manifest = json.loads((BUILD / "narration.json").read_text(encoding="utf-8"))
-    durations = {entry["id"]: entry["duration"] for entry in manifest["sections"]}
+    silent = "--silent" in sys.argv
+    timing = load_timing(silent)
+
+    suffix = "-preview" if silent else ""
+    out = BUILD / f"OriginPass-Entrega-1{suffix}.mp4"
+    srt_out = BUILD / f"OriginPass-Entrega-1{suffix}.srt"
 
     clips, srt_blocks, index, offset = [], [], 1, 0.0
 
     for section in SECTIONS:
-        section_id = section["id"]
-        narration = AudioFileClip(str(AUDIO / f"{section_id}.mp3"))
-        length = durations[section_id] + GAP
+        duration, audio_path = timing[section["id"]]
+        length = duration + GAP
 
         if section["kind"] == "slide":
-            visual = ImageClip(str(SLIDES / f"{section_id}.png")).with_duration(length)
+            visual = ImageClip(str(SLIDES / f"{section['id']}.png")).with_duration(length)
         else:
             visual = demo_clip(length)
 
-        clips.append(visual.with_audio(narration).with_fps(FPS))
+        if audio_path:
+            visual = visual.with_audio(AudioFileClip(audio_path))
 
-        blocks, index = shift_srt(
-            (AUDIO / f"{section_id}.srt").read_text(encoding="utf-8"), offset, index
-        )
+        clips.append(visual.with_fps(FPS))
+
+        blocks, index = cues_for(section["text"], offset, duration, index)
         srt_blocks += blocks
         offset += length
 
-        print(f"  {section_id:22} {length:6.2f} s   ends {offset:7.2f} s")
+        print(f"  {section['id']:22} {length:6.2f} s   ends {offset:7.2f} s")
 
     video = concatenate_videoclips(clips, method="compose")
 
-    print(f"\nwriting {OUT.name} — {video.duration:.1f} s ({video.duration / 60:.2f} min)")
+    print(f"\nwriting {out.name} — {video.duration:.1f} s ({video.duration / 60:.2f} min)")
     video.write_videofile(
-        str(OUT),
+        str(out),
         fps=FPS,
         codec="libx264",
-        audio_codec="aac",
+        audio_codec="aac" if not silent else None,
+        audio=not silent,
         preset="medium",
         threads=4,
+        temp_audiofile=str(BUILD / "temp-audio.m4a"),
         logger=None,
     )
 
-    SRT_OUT.write_text("\n\n".join(srt_blocks) + "\n", encoding="utf-8")
+    srt_out.write_text("\n\n".join(srt_blocks) + "\n", encoding="utf-8")
 
-    print(f"video:     {OUT}  ({OUT.stat().st_size / 1_048_576:.1f} MB)")
-    print(f"subtitles: {SRT_OUT.name}  ({len(srt_blocks)} cues)")
+    print(f"video:     {out}  ({out.stat().st_size / 1_048_576:.1f} MB)")
+    print(f"subtitles: {srt_out.name}  ({len(srt_blocks)} cues)")
+    if silent:
+        print("\nThis is the silent preview. Record the narration, then run the build again.")
 
 
 if __name__ == "__main__":

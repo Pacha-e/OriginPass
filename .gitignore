@@ -39,6 +39,11 @@ course-material/
 video/build/
 *TEMP_MPY_*
 
+# The narration recordings themselves. Audio files do not belong in a code
+# repository; the finished video is published elsewhere.
+video/voice/*
+!video/voice/.gitkeep
+
 # Browser automation session dumps
 .playwright-mcp/
 

@@ -106,6 +106,7 @@ OriginPass/
 ├── audit/            append-only AuditEntry
 ├── templates/        base template, error pages and one folder per app
 ├── static/           the stylesheet and the favicon, written for this project
+├── video/            builds the deliverable presentation video from a script
 ├── .github/workflows/ci.yml
 ├── docker-compose.yml
 └── manage.py
@@ -123,6 +124,24 @@ Sprint 1 delivers accounts, company applications and the administrator's review 
 Product registration, the public verification page, custody transfers and the analytics
 follow in later sprints; their tables already exist.
 
+## Licence
+
+Copyright © 2026 Emmanuel Hernández Melo.
+
+Released under the **GNU Affero General Public License, version 3**. The full text is in
+[LICENSE](LICENSE).
+
+The AGPL was chosen over a permissive licence for a specific reason. OriginPass is meant
+to be run as a service, and under a permissive licence anyone could take this code, run a
+closed competing service on it and give nothing back. Section 13 of the AGPL closes that:
+anyone who runs a modified version and lets other people use it over a network has to
+offer them its source. Reading the code, learning from it, running it and modifying it are
+all allowed; keeping the modifications secret while serving them to the public is not.
+
+As the sole copyright holder I can license the same code differently to anyone who asks,
+so this choice does not close any door.
+
 ## Author
 
 Emmanuel Hernández Melo — ehernandem@eafit.edu.co
+Universidad EAFIT, Medellín, Colombia

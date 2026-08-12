@@ -115,6 +115,26 @@ OriginPass/
 Business rules live in the models, input validation in the forms, orchestration in the
 views and presentation in the templates.
 
+## Integrity
+
+Products, audit entries and custody records are signed with a key derived from
+`SECRET_KEY`, which the database does not hold, and the audit trail and each chain of
+custody are linked so that every record carries the signature of the one before it.
+Rewriting a row invalidates its signature; removing one leaves a gap in the chain.
+
+```bash
+python manage.py verify_integrity
+```
+
+Walks everything and names the first record that does not hold up. Exits non-zero on a
+failure, so it can be run on a schedule.
+
+This makes tampering by anyone holding **only the database** detectable. It does not cover
+whoever runs the server, who holds the key too. Closing that needs the head of the chain
+published somewhere the operator does not control, which is a Sprint 4 option. The
+reasoning, including why the records are not on a blockchain, is on the
+[Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) page.
+
 Documentation is kept in the Wiki rather than in the repository, so that a single copy
 stays authoritative.
 

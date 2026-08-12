@@ -8,15 +8,16 @@ Sprint 1 creates these tables and their invariants. The views that exercise
 them belong to later sprints.
 """
 
-import hashlib
 import secrets
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.crypto import constant_time_compare
 
+from audit.integrity import GENESIS, sign, verify_chain
 from audit.models import Action, AuditEntry
 from companies.models import CompanyStatus, CompanyType
 
@@ -115,22 +116,24 @@ class Product(models.Model):
             )
 
     def compute_integrity_hash(self):
-        """Hash over the identifying fields, so later tampering is detectable."""
-        identity = "|".join(
-            [
-                self.passport_code,
-                str(self.company_id),
-                self.product_type,
-                self.name,
-                self.category,
-                self.origin,
-            ]
+        """Sign the identifying fields, so later tampering is detectable.
+
+        Signed rather than hashed. A plain hash over these columns could be
+        recomputed by anyone able to write to them, which would let an edited
+        row be left looking untouched; the key this uses is not in the database.
+        """
+        return sign(
+            self.passport_code,
+            self.company_id,
+            self.product_type,
+            self.name,
+            self.category,
+            self.origin,
         )
-        return hashlib.sha256(identity.encode("utf-8")).hexdigest()
 
     @property
     def is_intact(self):
-        return self.integrity_hash == self.compute_integrity_hash()
+        return constant_time_compare(self.integrity_hash, self.compute_integrity_hash())
 
     @property
     def current_holder(self):
@@ -176,8 +179,13 @@ class CustodyTransfer(models.Model):
         max_length=16, choices=TransferState.choices, default=TransferState.INITIATED
     )
     note = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    # Set before the row is written rather than by the database, because the
+    # signature covers it and cannot be computed after the fact.
+    created_at = models.DateTimeField(default=timezone.now)
     resolved_at = models.DateTimeField(null=True, blank=True)
+
+    previous_hash = models.CharField(max_length=64, default=GENESIS, editable=False)
+    entry_hash = models.CharField(max_length=64, blank=True, editable=False)
 
     class Meta:
         ordering = ["created_at"]
@@ -192,11 +200,53 @@ class CustodyTransfer(models.Model):
         return f"{self.product.passport_code}: {self.from_holder} -> {self.to_holder}"
 
     def save(self, *args, **kwargs):
-        if self.pk is not None and self.state != TransferState.INITIATED:
+        if self.pk is None:
+            return self._append(*args, **kwargs)
+
+        if self.state != TransferState.INITIATED:
             existing = type(self).objects.get(pk=self.pk)
             if existing.state != TransferState.INITIATED:
                 raise ValueError("A resolved custody transfer cannot be edited.")
         return super().save(*args, **kwargs)
+
+    def _append(self, *args, **kwargs):
+        """Link this handover to the previous one for the same product."""
+        with transaction.atomic():
+            last = (
+                type(self)
+                .objects.select_for_update()
+                .filter(product_id=self.product_id)
+                .order_by("-id")
+                .first()
+            )
+            self.previous_hash = last.entry_hash if last else GENESIS
+            self.entry_hash = sign(self.previous_hash, *self.signed_parts())
+            return super().save(*args, **kwargs)
+
+    def signed_parts(self):
+        """The facts of the handover itself.
+
+        The state and the time it was resolved are deliberately outside the
+        signature, because they change once when the transfer is accepted or
+        declined and that is a legitimate change. Those two are evidenced
+        instead by the entry the resolution appends to the audit trail, which
+        is chained.
+        """
+        return (
+            self.product_id,
+            self.from_holder_id,
+            self.to_holder_id,
+            self.note,
+            self.created_at.isoformat(),
+        )
+
+    @classmethod
+    def verify_chain(cls, product):
+        """Walk one product's chain of custody. Returns (ok, problem)."""
+        return verify_chain(
+            cls.objects.filter(product=product).order_by("id"),
+            lambda transfer: transfer.signed_parts(),
+        )
 
     def clean(self):
         if self.product_id and self.product.status == ProductStatus.REVOKED:
@@ -206,15 +256,18 @@ class CustodyTransfer(models.Model):
         if self.product_id and self.from_holder_id != self.product.current_holder.pk:
             raise ValidationError("Only the current holder can transfer this product.")
 
-    def _resolve(self, state):
+    def _resolve(self, state, action, actor):
         if self.state != TransferState.INITIATED:
             raise ValueError("This transfer has already been resolved.")
         self.state = state
         self.resolved_at = timezone.now()
         self.save(update_fields=["state", "resolved_at"])
+        # The resolution is not covered by this row's own signature, so it is
+        # written into the chained trail instead.
+        AuditEntry.record(actor=actor or self.to_holder, action=action, target=self)
 
-    def accept(self):
-        self._resolve(TransferState.ACCEPTED)
+    def accept(self, actor=None):
+        self._resolve(TransferState.ACCEPTED, Action.CUSTODY_ACCEPTED, actor)
 
-    def decline(self):
-        self._resolve(TransferState.DECLINED)
+    def decline(self, actor=None):
+        self._resolve(TransferState.DECLINED, Action.CUSTODY_DECLINED, actor)

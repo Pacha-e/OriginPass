@@ -23,7 +23,14 @@ def _flag(name, default="False"):
     return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
 
 
+# Also the key every integrity signature is derived from, so rotating it
+# invalidates the signature on every product, audit entry and custody record
+# written before the rotation. Put the old value in SECRET_KEY_FALLBACKS when
+# rotating; see audit/integrity.py.
 SECRET_KEY = _required("SECRET_KEY")
+SECRET_KEY_FALLBACKS = [
+    key.strip() for key in os.getenv("SECRET_KEY_FALLBACKS", "").split(",") if key.strip()
+]
 DEBUG = _flag("DEBUG")
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
 

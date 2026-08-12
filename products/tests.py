@@ -4,11 +4,15 @@ The views that exercise these belong to later sprints; the rules are in place
 from now, which is what DBR12 asks for on the revocation side.
 """
 
+import hashlib
+
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.db import IntegrityError, connection, transaction
+from django.test import TestCase, override_settings
 
 from accounts.models import User
+from audit.integrity import GENESIS
+from audit.models import Action, AuditEntry
 from companies.models import Company, CompanyStatus, CompanyType, VerificationTrack
 
 from .models import CustodyTransfer, Product, ProductStatus, ProductType
@@ -102,12 +106,12 @@ class PassportCodeTests(TestCase):
 
 
 class IntegrityHashTests(TestCase):
-    """The identifying fields are hashed, so later tampering is detectable."""
+    """The identifying fields are signed, so later tampering is detectable."""
 
     def setUp(self):
         self.company = make_approved_company()
 
-    def test_the_hash_is_written_on_registration(self):
+    def test_the_signature_is_written_on_registration(self):
         product = make_product(self.company)
 
         self.assertEqual(len(product.integrity_hash), 64)
@@ -120,6 +124,46 @@ class IntegrityHashTests(TestCase):
         product.refresh_from_db()
 
         self.assertFalse(product.is_intact)
+
+    def test_an_attacker_holding_the_database_cannot_repair_the_signature(self):
+        """The case a plain hash over these columns would not survive.
+
+        Someone able to write to the table knows every input the signature
+        covers, so with an unkeyed hash they could edit the row and recompute a
+        matching value. The key is not in the database, so they cannot.
+        """
+        product = make_product(self.company)
+
+        forged_columns = "|".join(
+            [
+                product.passport_code,
+                str(product.company_id),
+                product.product_type,
+                "Sombrero de imitacion",
+                "Sombreros",
+                "Bogota",
+            ]
+        )
+        recomputed_without_the_key = hashlib.sha256(forged_columns.encode()).hexdigest()
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE products_product "
+                "SET name = %s, origin = %s, integrity_hash = %s WHERE id = %s",
+                ["Sombrero de imitacion", "Bogota", recomputed_without_the_key, product.pk],
+            )
+
+        product.refresh_from_db()
+        self.assertEqual(product.name, "Sombrero de imitacion")
+        self.assertFalse(product.is_intact)
+
+    def test_the_signature_does_not_verify_under_another_key(self):
+        product = make_product(self.company)
+
+        with override_settings(SECRET_KEY="a-different-secret-key-entirely"):
+            self.assertFalse(product.is_intact)
+
+        self.assertTrue(product.is_intact)
 
 
 class ProductTypeMatchesCompanyTests(TestCase):
@@ -210,3 +254,65 @@ class CustodyChainTests(TestCase):
                 from_holder=self.company.owner,
                 to_holder=self.company.owner,
             )
+
+
+class CustodyChainIntegrityTests(TestCase):
+    """One chain per product, and what shows when someone edits it with SQL."""
+
+    def setUp(self):
+        self.company = make_approved_company()
+        self.product = make_product(self.company)
+        self.first = User.objects.create_user("first@example.co", "First-Pass-2026")
+        self.second = User.objects.create_user("second@example.co", "Second-Pass-2026")
+
+        step_one = CustodyTransfer.objects.create(
+            product=self.product, from_holder=self.company.owner, to_holder=self.first
+        )
+        step_one.accept()
+        step_two = CustodyTransfer.objects.create(
+            product=self.product, from_holder=self.first, to_holder=self.second
+        )
+        step_two.accept()
+
+    def test_an_untouched_chain_verifies(self):
+        ok, problem = CustodyTransfer.verify_chain(self.product)
+
+        self.assertTrue(ok, problem)
+
+    def test_each_handover_links_to_the_one_before_it(self):
+        transfers = list(CustodyTransfer.objects.filter(product=self.product).order_by("id"))
+
+        self.assertEqual(transfers[0].previous_hash, GENESIS)
+        self.assertEqual(transfers[1].previous_hash, transfers[0].entry_hash)
+
+    def test_rewriting_a_handover_with_raw_sql_is_detected(self):
+        target = CustodyTransfer.objects.filter(product=self.product).order_by("id").first()
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE products_custodytransfer SET to_holder_id = %s WHERE id = %s",
+                [self.second.pk, target.pk],
+            )
+
+        ok, problem = CustodyTransfer.verify_chain(self.product)
+        self.assertFalse(ok)
+        self.assertIn("altered since it was written", problem)
+
+    def test_removing_a_handover_from_the_middle_is_detected(self):
+        target = CustodyTransfer.objects.filter(product=self.product).order_by("id").first()
+
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM products_custodytransfer WHERE id = %s", [target.pk])
+
+        ok, problem = CustodyTransfer.verify_chain(self.product)
+        self.assertFalse(ok)
+        self.assertIn("removed or reordered", problem)
+
+    def test_resolving_a_transfer_is_written_into_the_audit_trail(self):
+        """The state is outside the row's signature, so it is evidenced there."""
+        actions = set(AuditEntry.objects.values_list("action", flat=True))
+
+        self.assertIn(Action.CUSTODY_ACCEPTED, actions)
+
+        ok, problem = AuditEntry.verify_chain()
+        self.assertTrue(ok, problem)

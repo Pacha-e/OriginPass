@@ -33,6 +33,15 @@ htmlcov/
 # Course material kept locally for reference, not part of the project
 course-material/
 
+# Video production output. The scripts that build it are tracked; the audio,
+# the slides and the rendered file are not, because they are large binaries
+# that can be rebuilt with `python video/build.py`.
+video/build/
+*TEMP_MPY_*
+
+# Browser automation session dumps
+.playwright-mcp/
+
 # Operating system
 .DS_Store
 Thumbs.db

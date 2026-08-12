@@ -1,0 +1,7 @@
+{# One form field with its cause of refusal rendered directly beside it (UR08). #}
+<div class="field-row{% if field.errors %} field-row--invalid{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+</div>

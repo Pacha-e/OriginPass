@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.legal_name }} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>{{ company.legal_name }}</h1>
+  <p><a href="{% url 'companies:review_list' %}">Back to applications</a></p>
+</div>
+
+<div class="stack">
+
+  <div class="card">
+    <dl class="detail-list">
+      <dt>Status</dt>
+      <dd><span class="pill pill--{{ company.status|lower }}">{{ company.get_status_display }}</span></dd>
+
+      <dt>Owner</dt>
+      <dd>{{ company.owner.email }}</dd>
+
+      <dt>Company type</dt>
+      <dd>{{ company.get_company_type_display }}</dd>
+
+      <dt>Verification track</dt>
+      <dd>
+        {{ company.get_verification_track_display }}
+        {% if company.requires_manual_review %}<span class="faint">— needs manual review</span>{% endif %}
+      </dd>
+
+      <dt>Registry code</dt>
+      <dd>
+        {% if company.registry_code %}
+          <span class="mono">{{ company.registry_code }}</span>
+        {% else %}
+          <span class="faint">None — artisan workshop</span>
+        {% endif %}
+      </dd>
+
+      <dt>Location</dt>
+      <dd>{{ company.location }}</dd>
+
+      <dt>Website</dt>
+      <dd>{% if company.website %}<a href="{{ company.website }}">{{ company.website }}</a>{% else %}<span class="faint">Not provided</span>{% endif %}</dd>
+
+      <dt>Description</dt>
+      <dd>{{ company.description|linebreaksbr }}</dd>
+
+      <dt>Submitted</dt>
+      <dd>{{ company.submitted_at|date:"j F Y, H:i" }}</dd>
+
+      {% if company.status_reason %}
+        <dt>Recorded reason</dt>
+        <dd>{{ company.status_reason }}</dd>
+      {% endif %}
+    </dl>
+  </div>
+
+  {% if company.status == "PENDING" %}
+    <div class="card">
+      <div class="card__head">
+        <h2>Decision</h2>
+        <p>An approval takes effect at once. A rejection has to state its reason.</p>
+      </div>
+
+      {# FR13 #}
+      <form method="post" action="{% url 'companies:review_approve' company.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--primary">Approve application</button>
+      </form>
+
+      <hr class="divider">
+
+      {# FR14: the reason is required and is stored with the decision. #}
+      <form method="post" action="{% url 'companies:review_reject' company.pk %}" novalidate>
+        {% csrf_token %}
+        {% include "partials/field.html" with field=rejection_form.reason %}
+        <button type="submit" class="btn btn--danger">Reject application</button>
+      </form>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

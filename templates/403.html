@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Not allowed — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>Not allowed</h1>
+  </div>
+  <div class="notice notice--danger">
+    <p>{% if exception %}{{ exception }}{% else %}You do not have access to this page.{% endif %}</p>
+  </div>
+  <div class="form-actions">
+    <a class="btn" href="{% url 'home' %}">Back to the home page</a>
+  </div>
+</div>
+{% endblock %}

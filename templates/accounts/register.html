@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Create an account — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>Create an account</h1>
+    <p>An account lets you apply as a company and manage your passports.</p>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% for error in form.non_field_errors %}
+      <div class="form-error">{{ error }}</div>
+    {% endfor %}
+
+    {% include "partials/field.html" with field=form.email %}
+    {% include "partials/field.html" with field=form.password1 %}
+    {% include "partials/field.html" with field=form.password2 %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary btn--block">Create account</button>
+    </div>
+  </form>
+
+  <hr class="divider">
+  <p class="faint">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a>.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+# Django templates are not HTML documents: an HTML formatter reads tags such as
+# {% if a == b %} as element attributes and rewrites them into something that no
+# longer parses. Leave them alone.
+templates/
+**/templates/

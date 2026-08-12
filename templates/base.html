@@ -1,0 +1,53 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OriginPass{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/originpass.css' %}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="{% url 'home' %}">
+      <span class="brand__mark">OP</span>
+      OriginPass
+    </a>
+
+    <nav class="nav">
+      {% if user.is_authenticated %}
+        {% if user.is_platform_admin %}
+          <a href="{% url 'companies:review_list' %}">Applications</a>
+        {% else %}
+          <a href="{% url 'companies:application_detail' %}">My application</a>
+        {% endif %}
+        <span class="faint">{{ user.email }}</span>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn--link">Log out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}">Log in</a>
+        <a class="btn btn--primary" href="{% url 'accounts:register' %}">Create account</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+<main class="layout">
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="notice notice--{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}ok{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}">
+          <p>{{ message }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

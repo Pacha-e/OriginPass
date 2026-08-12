@@ -37,35 +37,71 @@ Requirements are tracked as issues in the [Backlog](https://github.com/users/Pac
 ## Technology
 
 - Python 3.12
-- Django 5
-- PostgreSQL
-- HTML, CSS and Django templates following the MVT pattern
+- Django 5.2
+- PostgreSQL 17, run from `docker-compose.yml`
+- HTML, CSS and Django templates following the MVT pattern, with no CSS framework
 
 ## Running the project locally
 
-The Django project is under development. Once the application package is in place, the steps are:
+PostgreSQL is required; the application does not fall back to another engine.
 
 ```bash
+docker compose up -d db          # PostgreSQL 17 on localhost:5432
+
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+source .venv/Scripts/activate    # Linux and macOS: source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env             # then fill in the values
+
+cp .env.example .env             # then fill in SECRET_KEY
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py createsuperuser # this account is the platform administrator
 python manage.py runserver
 ```
 
 The application is then served at http://127.0.0.1:8000/.
 
+Generate a secret key with:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"
+```
+
+## Tests
+
+Every acceptance criterion of the current sprint has a test that asserts it, including
+the response-time bounds the requirements state.
+
+```bash
+python manage.py test
+```
+
 ## Repository layout
 
 ```
 OriginPass/
-├── README.md
-└── .gitignore
+├── config/           project settings, root URLs, landing page
+├── accounts/         User model, registration, login, logout
+├── companies/        Company model, applications and the administrator's review
+├── products/         Product and CustodyTransfer models
+├── verification/     ScanEvent model
+├── audit/            append-only AuditEntry
+├── templates/        base template and one folder per app
+├── static/css/       the stylesheet, written for this project
+├── docker-compose.yml
+└── manage.py
 ```
 
-The Django application is added in Sprint 1. Documentation is kept in the Wiki rather than in the repository, so that a single copy stays authoritative.
+Business rules live in the models, input validation in the forms, orchestration in the
+views and presentation in the templates.
+
+Documentation is kept in the Wiki rather than in the repository, so that a single copy
+stays authoritative.
+
+## Status
+
+Sprint 1 delivers accounts, company applications and the administrator's review of them.
+Product registration, the public verification page, custody transfers and the analytics
+follow in later sprints; their tables already exist.
 
 ## Author
 

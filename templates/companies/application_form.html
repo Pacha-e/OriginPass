@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{% if company %}Edit application{% else %}Apply as a company{% endif %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% if company %}Edit your application{% else %}Apply as a company{% endif %}</h1>
+    <p>
+      {% if company %}
+        Saving your changes puts the application back into the review queue.
+      {% else %}
+        A commercial company is verified through an official registry. An artisan
+        workshop is reviewed by a person, and needs no registry code.
+      {% endif %}
+    </p>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% for error in form.non_field_errors %}
+      <div class="form-error">{{ error }}</div>
+    {% endfor %}
+
+    {% include "partials/field.html" with field=form.legal_name %}
+    {% include "partials/field.html" with field=form.company_type %}
+    {% include "partials/field.html" with field=form.verification_track %}
+    {% include "partials/field.html" with field=form.registry_code %}
+    {% include "partials/field.html" with field=form.description %}
+    {% include "partials/field.html" with field=form.location %}
+    {% include "partials/field.html" with field=form.website %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">
+        {% if company %}Save and resubmit{% else %}Submit application{% endif %}
+      </button>
+      {% if company %}
+        <a class="btn" href="{% url 'companies:application_detail' %}">Cancel</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -177,9 +177,7 @@ class CustodyChainTests(TestCase):
 
     def test_only_the_current_holder_can_transfer(self):
         stranger = User.objects.create_user("stranger@example.co", "Stranger-Pass-2026")
-        transfer = CustodyTransfer(
-            product=self.product, from_holder=stranger, to_holder=self.buyer
-        )
+        transfer = CustodyTransfer(product=self.product, from_holder=stranger, to_holder=self.buyer)
 
         with self.assertRaises(ValidationError):
             transfer.clean()

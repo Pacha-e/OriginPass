@@ -26,11 +26,13 @@ All project documentation lives in the [Wiki](https://github.com/Pacha-e/OriginP
 |---|---|
 | [Project Overview](https://github.com/Pacha-e/OriginPass/wiki/Project-Overview) | What the product is and how it works |
 | [Product Vision Board](https://github.com/Pacha-e/OriginPass/wiki/Product-Vision-Board) | Vision, target group, needs, product, business goals |
+| [Elevator Pitch](https://github.com/Pacha-e/OriginPass/wiki/Elevator-Pitch) | The pitch, in one minute |
 | [Problem Validation](https://github.com/Pacha-e/OriginPass/wiki/Problem-Validation) | Evidence that the problem is real |
 | [Requirements Specification](https://github.com/Pacha-e/OriginPass/wiki/Requirements-Specification) | Functional, usability and database requirements |
 | [Requirements Prioritisation](https://github.com/Pacha-e/OriginPass/wiki/Requirements-Prioritisation) | MoSCoW prioritisation and sprint assignment |
 | [Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) | Entities, relationships and state machines |
 | [Deliverable 1](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-1) | Project definition and software requirements specification |
+| [Sprint 1 Review](https://github.com/Pacha-e/OriginPass/wiki/Sprint-1-Review) | What was committed, delivered and how it was verified |
 
 Requirements are tracked as issues in the [Backlog](https://github.com/users/Pacha-e/projects/1).
 
@@ -66,14 +68,21 @@ Generate a secret key with:
 python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"
 ```
 
-## Tests
+## Tests and code quality
 
 Every acceptance criterion of the current sprint has a test that asserts it, including
 the response-time bounds the requirements state.
 
 ```bash
-python manage.py test
+python manage.py test                              # the suite
+python manage.py makemigrations --check --dry-run  # no model change left unmigrated
+ruff check .                                       # lint
+ruff format --check .                              # formatting
 ```
+
+The same four commands run on every push and pull request through
+[GitHub Actions](.github/workflows/ci.yml), against a real PostgreSQL service rather
+than a substitute engine.
 
 ## Repository layout
 
@@ -85,8 +94,9 @@ OriginPass/
 ├── products/         Product and CustodyTransfer models
 ├── verification/     ScanEvent model
 ├── audit/            append-only AuditEntry
-├── templates/        base template and one folder per app
-├── static/css/       the stylesheet, written for this project
+├── templates/        base template, error pages and one folder per app
+├── static/           the stylesheet and the favicon, written for this project
+├── .github/workflows/ci.yml
 ├── docker-compose.yml
 └── manage.py
 ```

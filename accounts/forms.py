@@ -13,12 +13,8 @@ AUTHENTICATION_ERROR = "The email address or password is incorrect."
 
 
 class RegistrationForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label="Password", widget=forms.PasswordInput, strip=False
-    )
-    password2 = forms.CharField(
-        label="Confirm password", widget=forms.PasswordInput, strip=False
-    )
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput, strip=False)
+    password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput, strip=False)
 
     class Meta:
         model = User

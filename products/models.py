@@ -80,9 +80,7 @@ class Product(models.Model):
         ordering = ["-registered_at"]
         constraints = [
             models.CheckConstraint(
-                condition=(
-                    ~Q(status=ProductStatus.REVOKED) | ~Q(revocation_reason="")
-                ),
+                condition=(~Q(status=ProductStatus.REVOKED) | ~Q(revocation_reason="")),
                 name="revocation_states_a_reason",
             ),
         ]
@@ -90,14 +88,21 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} ({self.passport_code})"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # The hash covers the passport code, which a new row only has after the
+        # first save, so it is written on a second pass.
+        expected = self.compute_integrity_hash()
+        if self.integrity_hash != expected:
+            self.integrity_hash = expected
+            super().save(update_fields=["integrity_hash"])
+
     def clean(self):
         """Only an approved company issues passports, and only of its own kind."""
         if self.company_id is None:
             return
         if self.company.status != CompanyStatus.APPROVED:
-            raise ValidationError(
-                {"company": "Only an approved company can register products."}
-            )
+            raise ValidationError({"company": "Only an approved company can register products."})
         expected = PRODUCT_TYPE_BY_COMPANY_TYPE[self.company.company_type]
         if self.product_type != expected:
             raise ValidationError(
@@ -122,13 +127,6 @@ class Product(models.Model):
             ]
         )
         return hashlib.sha256(identity.encode("utf-8")).hexdigest()
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        expected = self.compute_integrity_hash()
-        if self.integrity_hash != expected:
-            self.integrity_hash = expected
-            super().save(update_fields=["integrity_hash"])
 
     @property
     def is_intact(self):
@@ -167,9 +165,7 @@ class CustodyTransfer(models.Model):
     one: that is the whole value of a custody record.
     """
 
-    product = models.ForeignKey(
-        Product, on_delete=models.PROTECT, related_name="custody_transfers"
-    )
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="custody_transfers")
     from_holder = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="transfers_sent"
     )
@@ -195,6 +191,13 @@ class CustodyTransfer(models.Model):
     def __str__(self):
         return f"{self.product.passport_code}: {self.from_holder} -> {self.to_holder}"
 
+    def save(self, *args, **kwargs):
+        if self.pk is not None and self.state != TransferState.INITIATED:
+            existing = type(self).objects.get(pk=self.pk)
+            if existing.state != TransferState.INITIATED:
+                raise ValueError("A resolved custody transfer cannot be edited.")
+        return super().save(*args, **kwargs)
+
     def clean(self):
         if self.product_id and self.product.status == ProductStatus.REVOKED:
             raise ValidationError("A revoked product accepts no custody transfer.")
@@ -202,13 +205,6 @@ class CustodyTransfer(models.Model):
             raise ValidationError("A product cannot be transferred to its current holder.")
         if self.product_id and self.from_holder_id != self.product.current_holder.pk:
             raise ValidationError("Only the current holder can transfer this product.")
-
-    def save(self, *args, **kwargs):
-        if self.pk is not None and self.state != TransferState.INITIATED:
-            existing = type(self).objects.get(pk=self.pk)
-            if existing.state != TransferState.INITIATED:
-                raise ValueError("A resolved custody transfer cannot be edited.")
-        return super().save(*args, **kwargs)
 
     def _resolve(self, state):
         if self.state != TransferState.INITIATED:

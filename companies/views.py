@@ -16,7 +16,6 @@ from audit.models import Action, AuditEntry
 from .forms import CompanyApplicationForm, RejectionForm
 from .models import Company, CompanyStatus
 
-
 # ---------------------------------------------------------------- owner side
 
 
@@ -46,9 +45,7 @@ def application_create(request):
             request.user.role = Role.COMPANY
             request.user.save(update_fields=["role"])
 
-            AuditEntry.record(
-                actor=request.user, action=Action.COMPANY_SUBMITTED, target=company
-            )
+            AuditEntry.record(actor=request.user, action=Action.COMPANY_SUBMITTED, target=company)
             messages.success(
                 request,
                 "Your application has been submitted and is now pending review.",
@@ -86,9 +83,7 @@ def application_edit(request):
     else:
         form = CompanyApplicationForm(instance=company)
 
-    return render(
-        request, "companies/application_form.html", {"form": form, "company": company}
-    )
+    return render(request, "companies/application_form.html", {"form": form, "company": company})
 
 
 # ---------------------------------------------------------- administrator side

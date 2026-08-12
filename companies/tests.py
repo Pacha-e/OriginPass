@@ -124,9 +124,7 @@ class CommercialRegistryCodeTests(TestCase):
         self.assertContains(response, "field-row--invalid")
 
     def test_a_commercial_application_cannot_use_the_artisan_track(self):
-        payload = COMMERCIAL_APPLICATION | {
-            "verification_track": VerificationTrack.ARTISAN_REVIEW
-        }
+        payload = COMMERCIAL_APPLICATION | {"verification_track": VerificationTrack.ARTISAN_REVIEW}
 
         response = self.client.post(reverse("companies:application_create"), payload)
 
@@ -142,9 +140,7 @@ class ArtisanApplicationTests(TestCase):
         self.client.force_login(self.owner)
 
     def test_the_application_is_accepted_with_no_registry_code(self):
-        response = self.client.post(
-            reverse("companies:application_create"), ARTISAN_APPLICATION
-        )
+        response = self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
 
         company = Company.objects.get(owner=self.owner)
         self.assertRedirects(response, reverse("companies:application_detail"))
@@ -268,9 +264,7 @@ class ReviewListTests(TestCase):
         self.suspended.suspend(actor=self.admin, reason="Counterfeit reports.")
 
     def test_the_administrator_sees_every_application(self):
-        response, seconds = elapsed(
-            lambda: self.client.get(reverse("companies:review_list"))
-        )
+        response, seconds = elapsed(lambda: self.client.get(reverse("companies:review_list")))
 
         self.assertEqual(len(response.context["applications"]), 4)
         self.assertLess(seconds, 3, "Results must be shown within 3 seconds.")
@@ -285,9 +279,7 @@ class ReviewListTests(TestCase):
 
         for status, company in expected.items():
             with self.subTest(status=status):
-                response = self.client.get(
-                    reverse("companies:review_list"), {"status": status}
-                )
+                response = self.client.get(reverse("companies:review_list"), {"status": status})
                 applications = list(response.context["applications"])
 
                 self.assertEqual(applications, [company])
@@ -316,9 +308,7 @@ class ApproveTests(TestCase):
 
     def test_the_status_changes_to_approved(self):
         _, seconds = elapsed(
-            lambda: self.client.post(
-                reverse("companies:review_approve", args=[self.company.pk])
-            )
+            lambda: self.client.post(reverse("companies:review_approve", args=[self.company.pk]))
         )
 
         self.company.refresh_from_db()

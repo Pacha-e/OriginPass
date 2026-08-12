@@ -9,7 +9,7 @@ renders the cause next to that input (UR08).
 
 from django import forms
 
-from .models import Company, CompanyType, TRACKS_BY_TYPE, VerificationTrack
+from .models import TRACKS_BY_TYPE, Company, CompanyType, VerificationTrack
 
 
 class CompanyApplicationForm(forms.ModelForm):
@@ -33,9 +33,14 @@ class CompanyApplicationForm(forms.ModelForm):
             "registry_code": "Official registry code",
         }
         help_texts = {
-            "verification_track": "A commercial company chooses one. An artisan workshop is reviewed by a person.",
+            "verification_track": (
+                "A commercial company chooses one. An artisan workshop is reviewed by a person."
+            ),
             "website": "Optional.",
-            "registry_code": "Required for a commercial company, for example a NIT or a Chamber of Commerce code.",
+            "registry_code": (
+                "Required for a commercial company, for example a NIT "
+                "or a Chamber of Commerce code."
+            ),
         }
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),

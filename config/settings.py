@@ -1,11 +1,11 @@
 """Django settings for the OriginPass project."""
 
+import os
 from pathlib import Path
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,9 +15,7 @@ load_dotenv(BASE_DIR / ".env")
 def _required(name):
     value = os.getenv(name)
     if not value:
-        raise ImproperlyConfigured(
-            f"{name} is not set. Copy .env.example to .env and fill it in."
-        )
+        raise ImproperlyConfigured(f"{name} is not set. Copy .env.example to .env and fill it in.")
     return value
 
 
@@ -75,9 +73,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 # PostgreSQL only. A missing DATABASE_URL is an error rather than a silent
 # fallback to another engine, so development and deployment run on the same one.
-DATABASES = {
-    "default": dj_database_url.parse(_required("DATABASE_URL"), conn_max_age=600)
-}
+DATABASES = {"default": dj_database_url.parse(_required("DATABASE_URL"), conn_max_age=600)}
 # Fail fast when the database is not up, rather than blocking on the connect.
 DATABASES["default"].setdefault("OPTIONS", {})["connect_timeout"] = 5
 
@@ -118,10 +114,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+# Transport hardening is driven by its own variables rather than by DEBUG,
+# because whether the site is served over HTTPS is a property of the
+# deployment, not of whether debugging is on. A deployment behind TLS turns
+# these on in its environment; see .env.example.
+SECURE_SSL_REDIRECT = _flag("SECURE_SSL_REDIRECT")
+SESSION_COOKIE_SECURE = _flag("SESSION_COOKIE_SECURE")
+CSRF_COOKIE_SECURE = _flag("CSRF_COOKIE_SECURE")
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
+SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"

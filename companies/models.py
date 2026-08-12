@@ -105,9 +105,7 @@ class Company(models.Model):
                 name="commercial_company_has_registry_code",
             ),
             models.CheckConstraint(
-                condition=(
-                    ~Q(status__in=STATUSES_REQUIRING_REASON) | ~Q(status_reason="")
-                ),
+                condition=(~Q(status__in=STATUSES_REQUIRING_REASON) | ~Q(status_reason="")),
                 name="negative_decision_states_a_reason",
             ),
         ]

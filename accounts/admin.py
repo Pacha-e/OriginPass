@@ -13,7 +13,18 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = [
         (None, {"fields": ["email", "password"]}),
         ("Role", {"fields": ["role"]}),
-        ("Permissions", {"fields": ["is_active", "is_staff", "is_superuser", "groups", "user_permissions"]}),
+        (
+            "Permissions",
+            {
+                "fields": [
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ]
+            },
+        ),
         ("Dates", {"fields": ["last_login", "date_joined"]}),
     ]
     add_fieldsets = [

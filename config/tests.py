@@ -34,3 +34,11 @@ class HomePageTests(TestCase):
         response = self.client.get(reverse("home"))
 
         self.assertContains(response, reverse("companies:application_detail"))
+
+
+class ErrorPageTests(TestCase):
+    def test_an_unknown_address_renders_the_project_404_page(self):
+        response = self.client.get("/no-such-page/")
+
+        self.assertContains(response, "Page not found", status_code=404)
+        self.assertTemplateUsed(response, "404.html")

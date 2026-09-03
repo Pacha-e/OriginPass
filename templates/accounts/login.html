@@ -12,8 +12,10 @@
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}">
 
-    {# One message covers both an unknown address and a wrong password (FR04), so
-       it is shown for the form rather than against either input. #}
+    {% comment %}
+    One message covers both an unknown address and a wrong password (FR04), so
+    it is shown for the form rather than against either input.
+    {% endcomment %}
     {% for error in form.non_field_errors %}
       <div class="form-error">{{ error }}</div>
     {% endfor %}

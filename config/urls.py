@@ -12,6 +12,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("companies/", include("companies.urls")),
+    path("products/", include("products.urls")),
+    # Kept short on purpose: this path is what the QR code encodes, and a
+    # shorter address is a less dense image to scan.
+    path("v/", include("verification.urls")),
 ]
 
 if settings.DEBUG:

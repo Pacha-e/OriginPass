@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Registration refused — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>This company cannot issue a passport</h1>
+  </div>
+
+  {# FR20: the refusal names its cause rather than hiding the page. #}
+  <div class="notice notice--warning">
+    <p>{{ reason }}</p>
+  </div>
+
+  <dl class="detail-list">
+    <dt>Company</dt><dd>{{ company.legal_name }}</dd>
+    <dt>Status</dt>
+    <dd><span class="pill pill--{{ company.status|lower }}">{{ company.get_status_display }}</span></dd>
+    {% if company.status_reason %}
+      <dt>Reason recorded</dt><dd>{{ company.status_reason }}</dd>
+    {% endif %}
+  </dl>
+
+  <div class="form-actions">
+    <a class="btn" href="{% url 'companies:application_detail' %}">See my application</a>
+    <a class="btn btn--link" href="{% url 'products:product_list' %}">Back to my products</a>
+  </div>
+</div>
+{% endblock %}

@@ -548,6 +548,84 @@ tbody tr:hover {
   justify-content: center;
 }
 
+/* ------------------------------------------------------- product passport */
+
+.pill--active {
+  color: var(--ok);
+  background: var(--ok-wash);
+  border-color: rgba(26, 127, 82, 0.22);
+}
+.pill--revoked {
+  color: var(--danger);
+  background: var(--danger-wash);
+  border-color: rgba(192, 42, 42, 0.22);
+}
+
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+}
+.search label {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+.search input[type="search"] {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.product-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+/* ---------------------------------------------------------------- verdict */
+
+/* The answer a stranger came for, so it is the first and largest thing on the
+   page. The verdict is carried by the word as well as by the colour (UR03):
+   remove the colour and the page still answers the question. */
+
+.verdict {
+  padding: var(--space-5);
+  margin: 0 0 var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  text-align: center;
+}
+.verdict__label {
+  margin: 0 0 var(--space-2);
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.verdict__detail {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.verdict--genuine {
+  color: var(--ok);
+  background: var(--ok-wash);
+  border-color: rgba(26, 127, 82, 0.28);
+}
+.verdict--revoked {
+  color: var(--danger);
+  background: var(--danger-wash);
+  border-color: rgba(192, 42, 42, 0.28);
+}
+.verdict--not_found {
+  color: var(--warning);
+  background: var(--warning-wash);
+  border-color: rgba(168, 99, 11, 0.28);
+}
+
 @media (max-width: 640px) {
   .site-header__inner {
     flex-wrap: wrap;

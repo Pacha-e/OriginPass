@@ -50,3 +50,4 @@ video/voice/*
 # Operating system
 .DS_Store
 Thumbs.db
+docs/diagrams/notas-de-sustentacion.md

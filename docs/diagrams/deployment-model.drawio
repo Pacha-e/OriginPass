@@ -1,0 +1,156 @@
+<mxfile host="app.diagrams.net" agent="OriginPass" version="24.7.17">
+  <diagram name="Deployment model" id="originpass-deployment-model">
+    <mxGraphModel dx="1960" dy="1060" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1960" pageHeight="1060" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="OriginPass — Deployment model" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="100" y="24" width="700" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="The devices the system runs on, the software installed on each one with its version, and the protocol between them" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="100" y="58" width="1000" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ================= client: smartphone ================= -->
+        <mxCell id="phone" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Smartphone / tablet&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Android 14 · iOS 17&lt;/font&gt;" style="swimlane;html=1;startSize=64;align=center;verticalAlign=middle;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="160" width="340" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="phone_browser" value="&lt;i&gt;&amp;laquo;execution environment&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Mobile web browser&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Chrome 128 · Safari 17&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=12;" vertex="1" parent="phone">
+          <mxGeometry x="24" y="76" width="292" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="phone_qr" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Camera / QR reader&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;opens the verification address&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=12;dashed=1;" vertex="1" parent="phone">
+          <mxGeometry x="24" y="164" width="292" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= client: pc ================= -->
+        <mxCell id="pc" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Personal computer&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Windows 11 · macOS 14 · Linux&lt;/font&gt;" style="swimlane;html=1;startSize=64;align=center;verticalAlign=middle;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="470" width="340" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="pc_browser" value="&lt;i&gt;&amp;laquo;execution environment&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Desktop web browser&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Chrome 128 · Firefox 130 · Edge 128&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=12;" vertex="1" parent="pc">
+          <mxGeometry x="24" y="76" width="292" height="76" as="geometry" />
+        </mxCell>
+
+        <mxCell id="client_note" value="A company owner and the administrator work from either device. A buyer verifies from the phone, with no account and nothing to install." style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="100" y="660" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= application server ================= -->
+        <mxCell id="appserver" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Application server&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Linux — Ubuntu 24.04 LTS&lt;/font&gt;" style="swimlane;html=1;startSize=64;align=center;verticalAlign=middle;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="700" y="130" width="520" height="660" as="geometry" />
+        </mxCell>
+
+        <mxCell id="python" value="&lt;i&gt;&amp;laquo;execution environment&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;Python 3.12&lt;/b&gt;" style="swimlane;html=1;startSize=44;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;collapsible=0;" vertex="1" parent="appserver">
+          <mxGeometry x="24" y="76" width="472" height="560" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gunicorn" value="&lt;i&gt;&amp;laquo;execution environment&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;Gunicorn 23.0&lt;/b&gt;&amp;nbsp; (WSGI server)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="python">
+          <mxGeometry x="16" y="54" width="440" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="django" value="&lt;i&gt;&amp;laquo;execution environment&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;Django 5.2&lt;/b&gt;&amp;nbsp; (MVT)" style="swimlane;html=1;startSize=42;align=center;verticalAlign=middle;fillColor=#eaf3fc;strokeColor=#6c8ebf;fontSize=13;collapsible=0;" vertex="1" parent="python">
+          <mxGeometry x="16" y="104" width="440" height="330" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c_accounts" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;accounts" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="django">
+          <mxGeometry x="14" y="52" width="206" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c_companies" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;companies" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="django">
+          <mxGeometry x="228" y="52" width="206" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c_products" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;products" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="django">
+          <mxGeometry x="14" y="100" width="206" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c_verification" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;verification" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="django">
+          <mxGeometry x="228" y="100" width="206" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c_audit" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;audit" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="django">
+          <mxGeometry x="14" y="148" width="206" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c_config" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;config" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="django">
+          <mxGeometry x="228" y="148" width="206" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="libs" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;installed libraries&lt;/b&gt;&lt;br&gt;&lt;br&gt;psycopg 3.2 (binary)&amp;nbsp; ·&amp;nbsp; Pillow 11.0&lt;br&gt;dj-database-url 2.3&amp;nbsp; ·&amp;nbsp; python-dotenv 1.0&lt;br&gt;qrcode 8.0&amp;nbsp; — added in Sprint 2 for FR22" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;dashed=1;align=center;verticalAlign=middle;" vertex="1" parent="django">
+          <mxGeometry x="14" y="200" width="420" height="114" as="geometry" />
+        </mxCell>
+
+        <mxCell id="reqs" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;requirements.txt&lt;/b&gt;&amp;nbsp; — the dependency list installed with pip" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;dashed=1;" vertex="1" parent="python">
+          <mxGeometry x="16" y="446" width="440" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="staticfiles" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;staticfiles/&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;CSS and favicon, collectstatic&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;dashed=1;" vertex="1" parent="python">
+          <mxGeometry x="16" y="500" width="212" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="mediafiles" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;media/&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;company logos, product images&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;dashed=1;" vertex="1" parent="python">
+          <mxGeometry x="244" y="500" width="212" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- ================= database server ================= -->
+        <mxCell id="dbserver" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Database server&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;PostgreSQL 17&lt;/font&gt;" style="swimlane;html=1;startSize=64;align=center;verticalAlign=middle;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="160" width="440" height="430" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;originpass&lt;/b&gt;&amp;nbsp; (database schema)" style="swimlane;html=1;startSize=42;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#d79b00;fontSize=13;collapsible=0;" vertex="1" parent="dbserver">
+          <mxGeometry x="24" y="76" width="392" height="336" as="geometry" />
+        </mxCell>
+        <mxCell id="t1" value="accounts_user" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
+          <mxGeometry x="16" y="52" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t2" value="companies_company" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
+          <mxGeometry x="16" y="84" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t3" value="products_product  —  unique index on passport_code" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="db">
+          <mxGeometry x="16" y="116" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t4" value="products_custodytransfer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
+          <mxGeometry x="16" y="148" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t5" value="verification_scanevent" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
+          <mxGeometry x="16" y="180" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t6" value="audit_auditentry" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
+          <mxGeometry x="16" y="212" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="dbnote" value="Five CHECK constraints hold the business rules in the database as well as in the application, so a rule survives a view that forgets it." style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=11;fontColor=#555555;" vertex="1" parent="db">
+          <mxGeometry x="16" y="252" width="360" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= github ================= -->
+        <mxCell id="github" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;GitHub&lt;/b&gt;&amp;nbsp; &lt;font style=&quot;font-size: 11px;&quot;&gt;(external service)&lt;/font&gt;" style="swimlane;html=1;startSize=52;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="640" width="440" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="gh_repo" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;Pacha-e/OriginPass&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;source code, wiki and backlog&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;dashed=1;" vertex="1" parent="github">
+          <mxGeometry x="24" y="66" width="392" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="gh_ci" value="&lt;i&gt;&amp;laquo;execution environment&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;GitHub Actions runner&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;ruff 0.16 · Django test suite&lt;br&gt;service container postgres:17-alpine&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" vertex="1" parent="github">
+          <mxGeometry x="24" y="124" width="392" height="72" as="geometry" />
+        </mxCell>
+
+        <!-- ================= connections ================= -->
+        <mxCell id="conn1" value="&amp;laquo;HTTPS&amp;raquo;&amp;nbsp; TLS 1.3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="phone" target="appserver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn2" value="&amp;laquo;HTTPS&amp;raquo;&amp;nbsp; TLS 1.3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.72;entryDx=0;entryDy=0;" edge="1" parent="1" source="pc" target="appserver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn3" value="&amp;laquo;TCP/IP&amp;raquo;&amp;nbsp; port 5432, psycopg 3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=0.28;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;verticalAlign=bottom;" edge="1" parent="1" source="appserver" target="dbserver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn4" value="&amp;laquo;HTTPS&amp;raquo;&amp;nbsp; deploy on push to main" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=0;exitY=0.35;exitDx=0;exitDy=0;entryX=1;entryY=0.88;entryDx=0;entryDy=0;verticalAlign=bottom;" edge="1" parent="1" source="github" target="appserver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= notes ================= -->
+        <mxCell id="state_note" value="&lt;b&gt;Where the project stands today&lt;/b&gt;&lt;br&gt;&lt;br&gt;The application runs locally: &lt;i&gt;docker compose up -d db&lt;/i&gt; provides the PostgreSQL 17 node and &lt;i&gt;manage.py runserver&lt;/i&gt; the application server. The two are already separate processes speaking the protocol drawn above, so moving to a hosted server changes the address and not the design.&lt;br&gt;&lt;br&gt;Deployment is the subject of Sprint 4, which is when the course covers it. Every version named here is the version the project installs: they were read from requirements.txt and docker-compose.yml, not chosen as an intention." style="shape=note;whiteSpace=wrap;html=1;size=20;align=left;verticalAlign=top;spacing=14;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="810" width="520" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend" value="&lt;b&gt;Colour of the components&lt;/b&gt;&lt;br&gt;&lt;br&gt;blue&amp;nbsp; —&amp;nbsp; delivered in Sprint 1&lt;br&gt;green&amp;nbsp; —&amp;nbsp; being built in Sprint 2&lt;br&gt;purple&amp;nbsp; —&amp;nbsp; model exists, views in Sprint 4" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=14;fillColor=none;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="890" width="440" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 2, section 1.1" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1020" width="800" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

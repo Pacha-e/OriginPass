@@ -6,11 +6,59 @@ also checked from behind the model with `update()`.
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from django.db.models import ProtectedError
 from django.test import TestCase
 
 from companies.models import CompanyType
 from products.models import Product, ProductStatus, ProductType
 from testing.factories import make_admin, make_approved_company, make_product
+
+
+class ProductRecordTests(TestCase):
+    """DBR02 - Store the product record."""
+
+    #: Every field the Domain Model wiki page lists for Product.
+    DOMAIN_MODEL_FIELDS = {
+        "company",
+        "passport_code",
+        "product_type",
+        "status",
+        "name",
+        "description",
+        "category",
+        "origin",
+        "image",
+        "integrity_hash",
+        "revocation_reason",
+        "registered_at",
+        "updated_at",
+    }
+
+    def test_the_model_holds_every_field_listed_in_the_domain_model(self):
+        declared = {field.name for field in Product._meta.get_fields()}
+
+        self.assertTrue(self.DOMAIN_MODEL_FIELDS.issubset(declared))
+
+    def test_the_registration_timestamp_is_set_on_creation(self):
+        self.assertIsNotNone(make_product().registered_at)
+
+
+class ProductBelongsToACompanyTests(TestCase):
+    """DBR04 - Enforce the product to company reference."""
+
+    def test_every_product_names_the_company_that_issued_it(self):
+        company = make_approved_company()
+
+        self.assertEqual(make_product(company).company, company)
+
+    def test_a_company_with_passports_cannot_be_deleted(self):
+        """The reference is PROTECT: deleting the issuer would orphan its passports."""
+        product = make_product()
+
+        with self.assertRaises(ProtectedError), transaction.atomic():
+            product.company.delete()
+
+        self.assertTrue(Product.objects.filter(pk=product.pk).exists())
 
 
 class RevocationReasonTests(TestCase):

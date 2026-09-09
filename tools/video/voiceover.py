@@ -1,6 +1,6 @@
 """Read Emmanuel's recordings and time the video to them.
 
-Put one file per section in `video/voice/`, named after the section id. Any
+Put one file per section in `tools/video/voice/`, named after the section id. Any
 format ffmpeg reads will do: mp3, m4a, wav, ogg. This measures each one and
 writes the manifest that the assembly stage times everything from, so each
 slide is held for exactly as long as the sentence spoken over it.
@@ -71,7 +71,7 @@ def main():
             hint = hints.get(section_id)
             target = f"about {hint:.0f} s" if hint else "see the recording guide"
             print(f"  {section_id}.mp3    ({target})")
-        print("\nRun `python video/reference.py` for the guide with the text to read.")
+        print("\nRun `python tools/video/reference.py` for the guide with the text to read.")
         return 1
 
     total = sum(entry["duration"] for entry in found)

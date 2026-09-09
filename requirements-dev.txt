@@ -1,0 +1,5 @@
+# Tools used to check the code, not to run it. Pinned so that a lint failure is
+# a change in the code rather than a change in the linter.
+-r requirements.txt
+
+ruff==0.16.2

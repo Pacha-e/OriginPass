@@ -1,10 +1,10 @@
 """Build the deliverable video from end to end.
 
-    python video/build.py             the finished video, narrated by you
-    python video/build.py --preview   a silent preview, to check the visuals
+    python tools/video/build.py             the finished video, narrated by you
+    python tools/video/build.py --preview   a silent preview, to check the visuals
                                       before recording anything
 
-Stages write into `video/build/`, which is not tracked, so the whole video can
+Stages write into `tools/video/build/`, which is not tracked, so the whole video can
 be rebuilt from the scripts alone.
 
 The walkthrough stage drives the real application, so it needs the server up:
@@ -71,7 +71,7 @@ def main():
             return code
 
     name = "OriginPass-Entrega-1-preview.mp4" if preview else "OriginPass-Entrega-1.mp4"
-    print(f"\nDone. video/build/{name}")
+    print(f"\nDone. tools/video/build/{name}")
     return 0
 
 

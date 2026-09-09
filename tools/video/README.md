@@ -19,7 +19,7 @@ the finished video.
 ## Recording the narration
 
 ```bash
-python video/reference.py
+python tools/video/reference.py
 ```
 
 Writes `build/recording-guide.md`: a table of the twelve files to record, what to
@@ -27,14 +27,14 @@ read in each, and roughly how long each should take. It also writes a synthetic
 read of every section into `build/reference/`, which exists so you can hear the
 intended pace. **That audio is never used in the video.**
 
-Record one file per section and save them in `video/voice/`, named after the
+Record one file per section and save them in `tools/video/voice/`, named after the
 section id:
 
 ```
-video/voice/01-title.mp3
-video/voice/02-problem.mp3
+tools/video/voice/01-title.mp3
+tools/video/voice/02-problem.mp3
 ...
-video/voice/11-close.mp3
+tools/video/voice/11-close.mp3
 ```
 
 Any format ffmpeg reads works: mp3, m4a, wav, ogg, flac. Recording one file per
@@ -63,11 +63,11 @@ Then, in another terminal:
 pip install edge-tts playwright moviepy imageio-ffmpeg
 python -m playwright install chromium
 
-python video/build.py --preview   # silent, to check the visuals first
-python video/build.py             # the finished video, with your narration
+python tools/video/build.py --preview   # silent, to check the visuals first
+python tools/video/build.py             # the finished video, with your narration
 ```
 
-Output lands in `video/build/`, which is not tracked.
+Output lands in `tools/video/build/`, which is not tracked.
 
 ## How the timing works
 

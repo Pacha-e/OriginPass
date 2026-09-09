@@ -44,8 +44,8 @@ def write_guide(entries):
     lines = [
         "# Recording guide",
         "",
-        "Read one section per file. Save each as `video/voice/<id>.mp3` using the",
-        "names in the table, then run `python video/build.py`.",
+        "Read one section per file. Save each as `tools/video/voice/<id>.mp3` using the",
+        "names in the table, then run `python tools/video/build.py`.",
         "",
         "The target time is what a synthetic voice took at a natural pace. Treat it as a",
         "guide, not a limit: every slide is held for exactly as long as your own",
@@ -55,9 +55,8 @@ def write_guide(entries):
         "|---|---|---|",
     ]
     for entry in entries:
-        lines.append(
-            f"| `video/voice/{entry['id']}.mp3` | {entry['duration']:.0f} s | {entry['words']} |"
-        )
+        recording = f"`tools/video/voice/{entry['id']}.mp3`"
+        lines.append(f"| {recording} | {entry['duration']:.0f} s | {entry['words']} |")
 
     total = sum(entry["duration"] for entry in entries)
     lines += [

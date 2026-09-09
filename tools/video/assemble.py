@@ -5,8 +5,8 @@ nothing has to be timed by hand. The walkthrough is stretched or compressed to
 the length of the narration that plays over it, which keeps what is being said
 lined up with what is on screen.
 
-    python video/assemble.py            uses the recordings in video/voice/
-    python video/assemble.py --silent   builds a preview with no audio, timed
+    python tools/video/assemble.py            uses the recordings in tools/video/voice/
+    python tools/video/assemble.py --silent   builds a preview with no audio, timed
                                         to the reference pace, for checking the
                                         visuals before recording anything
 """
@@ -81,13 +81,13 @@ def load_timing(silent):
     if silent:
         path = BUILD / "reference.json"
         if not path.exists():
-            raise SystemExit("No reference.json. Run `python video/reference.py` first.")
+            raise SystemExit("No reference.json. Run `python tools/video/reference.py` first.")
         data = json.loads(path.read_text(encoding="utf-8"))
         return {entry["id"]: (entry["duration"], None) for entry in data["sections"]}
 
     path = BUILD / "narration.json"
     if not path.exists():
-        raise SystemExit("No narration.json. Run `python video/voiceover.py` first.")
+        raise SystemExit("No narration.json. Run `python tools/video/voiceover.py` first.")
     data = json.loads(path.read_text(encoding="utf-8"))
     return {entry["id"]: (entry["duration"], entry["path"]) for entry in data["sections"]}
 

@@ -8,6 +8,7 @@ from functools import wraps
 
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext as _
 
 
 def admin_required(view):
@@ -16,7 +17,7 @@ def admin_required(view):
         if not request.user.is_authenticated:
             return redirect_to_login(request.get_full_path())
         if not request.user.is_platform_admin:
-            raise PermissionDenied("This page is reserved for the platform administrator.")
+            raise PermissionDenied(_("This page is reserved for the platform administrator."))
         return view(request, *args, **kwargs)
 
     return wrapper

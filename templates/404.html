@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Page not found — OriginPass{% endblock %}
+{% block title %}{% translate "Page not found" %} — OriginPass{% endblock %}
 
 {% block content %}
 <div class="card card--narrow">
   <div class="card__head">
-    <h1>Page not found</h1>
-    <p>The address you opened does not match anything on this site.</p>
+    <h1>{% translate "Page not found" %}</h1>
+    <p>{% translate "The address you opened does not match anything on this site." %}</p>
   </div>
   <div class="form-actions">
-    <a class="btn btn--primary" href="{% url 'home' %}">Back to the home page</a>
+    <a class="btn btn--primary" href="{% url 'pages:home' %}">{% translate "Back to the home page" %}</a>
   </div>
 </div>
 {% endblock %}

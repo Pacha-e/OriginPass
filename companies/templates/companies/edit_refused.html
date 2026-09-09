@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Edit refused" %} — OriginPass{% endblock %}
+
+{% block content %}
+{# FR11: the refusal says why, instead of hiding the page without explanation. #}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "This application cannot be edited" %}</h1>
+  </div>
+
+  <div class="notice notice--danger">
+    <p>{{ reason }}</p>
+  </div>
+
+  <p class="faint">
+    {% translate "Current status:" %}
+    <span class="pill pill--{{ company.status|lower }}">{{ company.get_status_display }}</span>
+  </p>
+
+  <div class="form-actions">
+    <a class="btn" href="{% url 'companies:application_detail' %}">{% translate "Back to my application" %}</a>
+  </div>
+</div>
+{% endblock %}

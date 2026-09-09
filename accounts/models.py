@@ -6,12 +6,13 @@ A buyer verifying a product is not a User: verification is anonymous by design.
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class Role(models.TextChoices):
-    ADMIN = "ADMIN", "Administrator"
-    COMPANY = "COMPANY", "Company"
-    HOLDER = "HOLDER", "Holder"
+    ADMIN = "ADMIN", _("Administrator")
+    COMPANY = "COMPANY", _("Company")
+    HOLDER = "HOLDER", _("Holder")
 
 
 class UserManager(BaseUserManager):

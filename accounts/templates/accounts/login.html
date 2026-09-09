@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Log in" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Log in" %}</h1>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    {% comment %}
+    One message covers both an unknown address and a wrong password (FR04), so
+    it is shown for the form rather than against either input.
+    {% endcomment %}
+    {% for error in form.non_field_errors %}
+      <div class="form-error">{{ error }}</div>
+    {% endfor %}
+
+    {% include "partials/field.html" with field=form.email %}
+    {% include "partials/field.html" with field=form.password %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary btn--block">{% translate "Log in" %}</button>
+    </div>
+  </form>
+
+  <hr class="divider">
+  <p class="faint">
+    {% url 'accounts:register' as register_url %}
+    {% blocktranslate trimmed %}
+      No account yet? <a href="{{ register_url }}">Create one</a>.
+    {% endblocktranslate %}
+  </p>
+</div>
+{% endblock %}

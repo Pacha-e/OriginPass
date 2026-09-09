@@ -10,6 +10,7 @@ registration inside the five that UR10 allows.
 """
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .models import Product
 
@@ -19,16 +20,16 @@ class ProductForm(forms.ModelForm):
         model = Product
         fields = ["name", "description", "category", "origin", "image"]
         labels = {
-            "name": "Product name",
-            "description": "Description",
-            "category": "Category",
-            "origin": "Place of manufacture",
-            "image": "Photograph",
+            "name": _("Product name"),
+            "description": _("Description"),
+            "category": _("Category"),
+            "origin": _("Place of manufacture"),
+            "image": _("Photograph"),
         }
         help_texts = {
-            "category": "For example Headwear, Basketry, Coffee.",
-            "origin": "The town or region where this unit was made.",
-            "image": "Optional. Shown on the public verification page.",
+            "category": _("For example Headwear, Basketry, Coffee."),
+            "origin": _("The town or region where this unit was made."),
+            "image": _("Optional. Shown on the public verification page."),
         }
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
@@ -37,11 +38,11 @@ class ProductForm(forms.ModelForm):
     def clean_name(self):
         name = self.cleaned_data["name"].strip()
         if not name:
-            raise forms.ValidationError("A product needs a name.")
+            raise forms.ValidationError(_("A product needs a name."))
         return name
 
     def clean_origin(self):
         origin = self.cleaned_data["origin"].strip()
         if not origin:
-            raise forms.ValidationError("A passport states where the product was made.")
+            raise forms.ValidationError(_("A passport states where the product was made."))
         return origin

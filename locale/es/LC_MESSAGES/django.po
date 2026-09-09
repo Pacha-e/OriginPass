@@ -1,0 +1,648 @@
+# Spanish translation of the OriginPass interface (UR04).
+#
+# The source strings are English because the course requires every artefact to
+# be written in English. What a visitor reads is this file, which is why the
+# default language of the project is Spanish.
+#
+# Copyright (C) 2026 Emmanuel Hernandez Melo
+# This file is distributed under the same licence as the OriginPass package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OriginPass\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-09 07:00-0500\n"
+"PO-Revision-Date: 2026-09-09 07:00-0500\n"
+"Last-Translator: Emmanuel Hernandez Melo <ehernandem@eafit.edu.co>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# ---------------------------------------------------------------- accounts
+
+msgid "Administrator"
+msgstr "Administrador"
+
+msgid "Company"
+msgstr "Empresa"
+
+msgid "Holder"
+msgstr "Tenedor"
+
+msgid "The email address or password is incorrect."
+msgstr "El correo o la contraseña no son correctos."
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Confirm password"
+msgstr "Confirma la contraseña"
+
+msgid "Email address"
+msgstr "Correo electrónico"
+
+msgid "This email address is already in use."
+msgstr "Este correo ya está en uso."
+
+msgid "The two passwords do not match."
+msgstr "Las dos contraseñas no coinciden."
+
+msgid "This page is reserved for the platform administrator."
+msgstr "Esta página es solo para el administrador de la plataforma."
+
+msgid "Your account has been created. You can now log in."
+msgstr "Tu cuenta fue creada. Ya puedes iniciar sesión."
+
+msgid "You have been logged out."
+msgstr "Cerraste sesión."
+
+msgid "Create an account"
+msgstr "Crear una cuenta"
+
+msgid "Create account"
+msgstr "Crear cuenta"
+
+msgid "An account lets you apply as a company and manage your passports."
+msgstr "Con una cuenta puedes postular tu empresa y administrar tus pasaportes."
+
+msgid "Log in"
+msgstr "Iniciar sesión"
+
+msgid "Log out"
+msgstr "Cerrar sesión"
+
+msgid "No account yet? <a href=\"%(register_url)s\">Create one</a>."
+msgstr "¿Aún no tienes cuenta? <a href=\"%(register_url)s\">Crea una</a>."
+
+msgid "Already have an account? <a href=\"%(login_url)s\">Log in</a>."
+msgstr "¿Ya tienes cuenta? <a href=\"%(login_url)s\">Inicia sesión</a>."
+
+# --------------------------------------------------------------- companies
+
+msgid "Commercial company"
+msgstr "Empresa comercial"
+
+msgid "Artisan workshop"
+msgstr "Taller artesanal"
+
+msgid "Chamber of Commerce"
+msgstr "Cámara de Comercio"
+
+msgid "Official registry"
+msgstr "Registro oficial"
+
+msgid "Manual artisan review"
+msgstr "Revisión artesanal manual"
+
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Approved"
+msgstr "Aprobada"
+
+msgid "Rejected"
+msgstr "Rechazada"
+
+msgid "Suspended"
+msgstr "Suspendida"
+
+msgid "Official registry code. Required for a commercial company (FR08)."
+msgstr "Código de registro oficial. Obligatorio para una empresa comercial (FR08)."
+
+msgid "Why the application was rejected or the company suspended (DBR12)."
+msgstr "Por qué se rechazó la solicitud o se suspendió la empresa (DBR12)."
+
+msgid ""
+"This application cannot be edited because it is %(status)s. Contact the "
+"administrator if the details need to change."
+msgstr ""
+"Esta solicitud no se puede editar porque está %(status)s. Escríbele al "
+"administrador si hay que cambiar algún dato."
+
+msgid "%(company)s is %(current)s, so it cannot become %(wanted)s."
+msgstr "%(company)s está %(current)s, así que no puede quedar %(wanted)s."
+
+msgid "Legal name"
+msgstr "Razón social"
+
+msgid "Company type"
+msgstr "Tipo de empresa"
+
+msgid "Verification track"
+msgstr "Vía de verificación"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Location"
+msgstr "Ubicación"
+
+msgid "Contact website"
+msgstr "Sitio web de contacto"
+
+msgid "Official registry code"
+msgstr "Código de registro oficial"
+
+msgid ""
+"A commercial company chooses one. An artisan workshop is reviewed by a person."
+msgstr ""
+"Una empresa comercial elige una. Un taller artesanal lo revisa una persona."
+
+msgid "Optional."
+msgstr "Opcional."
+
+msgid ""
+"Required for a commercial company, for example a NIT or a Chamber of "
+"Commerce code."
+msgstr ""
+"Obligatorio para una empresa comercial, por ejemplo un NIT o un código de "
+"Cámara de Comercio."
+
+msgid "A commercial company must provide an official registry code."
+msgstr "Una empresa comercial debe dar un código de registro oficial."
+
+msgid ""
+"A commercial company is verified through the Chamber of Commerce or an "
+"official registry."
+msgstr ""
+"Una empresa comercial se verifica por Cámara de Comercio o por un registro "
+"oficial."
+
+msgid ""
+"An artisan workshop is verified by manual review and does not use a registry "
+"code."
+msgstr ""
+"Un taller artesanal se verifica con revisión manual y no usa código de "
+"registro."
+
+msgid "A reason is required to reject an application."
+msgstr "Hay que dar un motivo para rechazar una solicitud."
+
+msgid "Reason for the rejection"
+msgstr "Motivo del rechazo"
+
+msgid "Your application has been submitted and is now pending review."
+msgstr "Enviamos tu solicitud y ya está pendiente de revisión."
+
+msgid "Your application has been updated and is pending review again."
+msgstr "Actualizamos tu solicitud y volvió a quedar pendiente de revisión."
+
+msgid "%(company)s has been approved."
+msgstr "%(company)s quedó aprobada."
+
+msgid "%(company)s has been rejected."
+msgstr "%(company)s quedó rechazada."
+
+msgid "My application"
+msgstr "Mi solicitud"
+
+msgid "Submitted on %(submitted)s."
+msgstr "Enviada el %(submitted)s."
+
+msgid "Your application is pending review"
+msgstr "Tu solicitud está pendiente de revisión"
+
+msgid ""
+"An artisan application is reviewed by a person. You will see the outcome here."
+msgstr ""
+"Una solicitud artesanal la revisa una persona. Verás el resultado aquí."
+
+msgid ""
+"The administrator is checking your registry code. You will see the outcome "
+"here."
+msgstr ""
+"El administrador está verificando tu código de registro. Verás el resultado "
+"aquí."
+
+msgid "Your company is approved"
+msgstr "Tu empresa está aprobada"
+
+msgid "You can now register products and issue their passports."
+msgstr "Ya puedes registrar productos y emitir sus pasaportes."
+
+msgid "Your application was rejected"
+msgstr "Tu solicitud fue rechazada"
+
+msgid "You can correct the details and submit the application again."
+msgstr "Puedes corregir los datos y volver a enviar la solicitud."
+
+msgid "Your company is suspended"
+msgstr "Tu empresa está suspendida"
+
+msgid "Contact the administrator to have the company reactivated."
+msgstr "Escríbele al administrador para reactivar la empresa."
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Registry code"
+msgstr "Código de registro"
+
+msgid "Website"
+msgstr "Sitio web"
+
+msgid "Not provided"
+msgstr "No indicado"
+
+msgid "Last status change"
+msgstr "Último cambio de estado"
+
+msgid "Edit application"
+msgstr "Editar solicitud"
+
+msgid "Apply as a company"
+msgstr "Postular una empresa"
+
+msgid "Edit your application"
+msgstr "Edita tu solicitud"
+
+msgid "Saving your changes puts the application back into the review queue."
+msgstr "Al guardar los cambios, la solicitud vuelve a la fila de revisión."
+
+msgid ""
+"A commercial company is verified through an official registry. An artisan "
+"workshop is reviewed by a person, and needs no registry code."
+msgstr ""
+"Una empresa comercial se verifica con un registro oficial. Un taller "
+"artesanal lo revisa una persona y no necesita código de registro."
+
+msgid "Save and resubmit"
+msgstr "Guardar y reenviar"
+
+msgid "Submit application"
+msgstr "Enviar solicitud"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Edit refused"
+msgstr "Edición rechazada"
+
+msgid "This application cannot be edited"
+msgstr "Esta solicitud no se puede editar"
+
+msgid "Current status:"
+msgstr "Estado actual:"
+
+msgid "Back to my application"
+msgstr "Volver a mi solicitud"
+
+msgid "Company applications"
+msgstr "Solicitudes de empresas"
+
+msgid "Every application, whatever its outcome."
+msgstr "Todas las solicitudes, sea cual sea su resultado."
+
+msgid "All"
+msgstr "Todas"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Owner"
+msgstr "Titular"
+
+msgid "Submitted"
+msgstr "Enviada"
+
+msgid "No applications match this filter."
+msgstr "Ninguna solicitud coincide con este filtro."
+
+msgid "Back to applications"
+msgstr "Volver a las solicitudes"
+
+msgid "needs manual review"
+msgstr "necesita revisión manual"
+
+msgid "None — artisan workshop"
+msgstr "Ninguno — taller artesanal"
+
+msgid "Recorded reason"
+msgstr "Motivo registrado"
+
+msgid "Decision"
+msgstr "Decisión"
+
+msgid "An approval takes effect at once. A rejection has to state its reason."
+msgstr "La aprobación aplica de inmediato. El rechazo tiene que decir su motivo."
+
+msgid "Approve application"
+msgstr "Aprobar solicitud"
+
+msgid "Reject application"
+msgstr "Rechazar solicitud"
+
+msgid "Applications"
+msgstr "Solicitudes"
+
+msgid "Review applications"
+msgstr "Revisar solicitudes"
+
+# ---------------------------------------------------------------- products
+
+msgid "Commercial original"
+msgstr "Original comercial"
+
+msgid "Artisan"
+msgstr "Artesanal"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Revoked"
+msgstr "Revocado"
+
+msgid "Initiated"
+msgstr "Iniciada"
+
+msgid "Accepted"
+msgstr "Aceptada"
+
+msgid "Declined"
+msgstr "Rechazada"
+
+msgid "Place of manufacture."
+msgstr "Lugar de fabricación."
+
+msgid "Only an approved company can register products."
+msgstr "Solo una empresa aprobada puede registrar productos."
+
+msgid "A %(company_type)s registers products of type %(product_type)s."
+msgstr "Una %(company_type)s registra productos de tipo %(product_type)s."
+
+msgid "Product name"
+msgstr "Nombre del producto"
+
+msgid "Category"
+msgstr "Categoría"
+
+msgid "Place of manufacture"
+msgstr "Lugar de fabricación"
+
+msgid "Photograph"
+msgstr "Fotografía"
+
+msgid "For example Headwear, Basketry, Coffee."
+msgstr "Por ejemplo Sombreros, Cestería, Café."
+
+msgid "The town or region where this unit was made."
+msgstr "El municipio o la región donde se hizo esta unidad."
+
+msgid "Optional. Shown on the public verification page."
+msgstr "Opcional. Se muestra en la página pública de verificación."
+
+msgid "A product needs a name."
+msgstr "Un producto necesita un nombre."
+
+msgid "A passport states where the product was made."
+msgstr "Un pasaporte dice dónde se hizo el producto."
+
+msgid ""
+"Your application is still being reviewed. Passports can be issued once it has "
+"been approved."
+msgstr ""
+"Tu solicitud todavía está en revisión. Podrás emitir pasaportes cuando quede "
+"aprobada."
+
+msgid ""
+"Your application was rejected, so it cannot issue passports. Edit and "
+"resubmit it to be reviewed again."
+msgstr ""
+"Tu solicitud fue rechazada, así que no puede emitir pasaportes. Edítala y "
+"reenvíala para que la revisen otra vez."
+
+msgid ""
+"Your company is suspended and cannot issue new passports. Passports already "
+"issued keep working."
+msgstr ""
+"Tu empresa está suspendida y no puede emitir pasaportes nuevos. Los "
+"pasaportes ya emitidos siguen funcionando."
+
+msgid ""
+"This passport has been revoked. A revoked passport is a record of what was "
+"issued and is not edited."
+msgstr ""
+"Este pasaporte fue revocado. Un pasaporte revocado es el registro de lo que "
+"se emitió y no se edita."
+
+msgid "This company cannot issue a passport"
+msgstr "Esta empresa no puede emitir un pasaporte"
+
+msgid "This passport cannot be edited"
+msgstr "Este pasaporte no se puede editar"
+
+msgid "%(product)s now has a passport. Its code is %(code)s."
+msgstr "%(product)s ya tiene pasaporte. Su código es %(code)s."
+
+msgid "%(product)s has been updated."
+msgstr "Actualizamos %(product)s."
+
+msgid "My products"
+msgstr "Mis productos"
+
+msgid "Products of %(name)s"
+msgstr "Productos de %(name)s"
+
+msgid "Every passport this company has issued."
+msgstr "Todos los pasaportes que ha emitido esta empresa."
+
+msgid "Register a product"
+msgstr "Registrar un producto"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Name, category or passport code"
+msgstr "Nombre, categoría o código de pasaporte"
+
+msgid "Clear"
+msgstr "Limpiar"
+
+msgid "Product"
+msgstr "Producto"
+
+msgid "Passport code"
+msgstr "Código de pasaporte"
+
+msgid "Registered"
+msgstr "Registrado"
+
+msgid "No products match this search."
+msgstr "Ningún producto coincide con esta búsqueda."
+
+msgid "No passports have been issued yet."
+msgstr "Todavía no se ha emitido ningún pasaporte."
+
+msgid "Passport"
+msgstr "Pasaporte"
+
+msgid ""
+"This code identifies one physical unit. It was generated from a "
+"cryptographically secure source, so it cannot be worked out from another code."
+msgstr ""
+"Este código identifica una sola unidad física. Se generó desde una fuente "
+"criptográficamente segura, así que no se puede deducir a partir de otro "
+"código."
+
+msgid "Verification address"
+msgstr "Dirección de verificación"
+
+msgid "Download the QR code"
+msgstr "Descargar el código QR"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Back to my products"
+msgstr "Volver a mis productos"
+
+msgid "This passport was revoked."
+msgstr "Este pasaporte fue revocado."
+
+msgid "Edit passport"
+msgstr "Editar pasaporte"
+
+msgid "Edit this passport"
+msgstr "Edita este pasaporte"
+
+msgid ""
+"The descriptive fields change. The passport code stays as it was issued, "
+"because it is already printed on something."
+msgstr ""
+"Los campos descriptivos cambian. El código de pasaporte queda como se emitió, "
+"porque ya está impreso en algún lado."
+
+msgid ""
+"One passport covers one physical unit, not a product line. The passport code "
+"is generated for you and cannot be chosen."
+msgstr ""
+"Un pasaporte cubre una unidad física, no una línea de productos. El código de "
+"pasaporte se genera solo y no se puede elegir."
+
+msgid "Save changes"
+msgstr "Guardar cambios"
+
+msgid "Issue the passport"
+msgstr "Emitir el pasaporte"
+
+msgid "Reason recorded"
+msgstr "Motivo registrado"
+
+msgid "See my application"
+msgstr "Ver mi solicitud"
+
+# ------------------------------------------------------------ verification
+
+msgid "Mobile"
+msgstr "Móvil"
+
+msgid "Tablet"
+msgstr "Tableta"
+
+msgid "Desktop"
+msgstr "Escritorio"
+
+msgid "Unknown"
+msgstr "Desconocido"
+
+msgid "Genuine"
+msgstr "Auténtico"
+
+msgid "Not found"
+msgstr "No encontrado"
+
+msgid "Null when the scanned code matched no product."
+msgstr "Vacío cuando el código escaneado no coincidió con ningún producto."
+
+msgid "Verify a product"
+msgstr "Verificar un producto"
+
+msgid ""
+"Scanning the QR code on the product opens this check directly. Type the "
+"passport code here if the code will not scan."
+msgstr ""
+"Escanear el código QR del producto abre esta verificación directamente. "
+"Escribe aquí el código de pasaporte si el QR no escanea."
+
+msgid "Check this code"
+msgstr "Verificar este código"
+
+msgid "Verification"
+msgstr "Verificación"
+
+msgid "This passport matches an active product registered by a verified company."
+msgstr ""
+"Este pasaporte corresponde a un producto activo registrado por una empresa "
+"verificada."
+
+msgid "This passport was withdrawn on %(withdrawn)s and is no longer valid."
+msgstr "Este pasaporte se retiró el %(withdrawn)s y ya no es válido."
+
+msgid "This code does not match any passport issued by OriginPass."
+msgstr "Este código no corresponde a ningún pasaporte emitido por OriginPass."
+
+msgid "Made in"
+msgstr "Hecho en"
+
+msgid "Registered by"
+msgstr "Registrado por"
+
+msgid "Verified through"
+msgstr "Verificado por"
+
+msgid "Located in"
+msgstr "Ubicada en"
+
+msgid "Passport issued"
+msgstr "Pasaporte emitido"
+
+msgid ""
+"The code you scanned was <span class=\"mono\">%(code)s</span>. Check that it "
+"was read correctly, and be careful if the seller cannot explain where the "
+"product came from."
+msgstr ""
+"El código que escaneaste fue <span class=\"mono\">%(code)s</span>. Revisa que "
+"se haya leído bien, y desconfía si el vendedor no sabe explicar de dónde "
+"viene el producto."
+
+msgid "Try another code"
+msgstr "Probar otro código"
+
+msgid ""
+"OriginPass shows what the registering company declared and who verified that "
+"company. No account is needed to check a product."
+msgstr ""
+"OriginPass muestra lo que declaró la empresa que registró el producto y quién "
+"verificó a esa empresa. No hace falta cuenta para verificar un producto."
+
+# --------------------------------------------------------- pages and errors
+
+msgid "A verifiable passport for every product"
+msgstr "Un pasaporte verificable para cada producto"
+
+msgid ""
+"OriginPass issues one digital passport per physical unit and records each "
+"change of custody along its journey, so a buyer can confirm a product is "
+"genuine without having to trust the seller."
+msgstr ""
+"OriginPass emite un pasaporte digital por unidad física y registra cada "
+"cambio de custodia en su recorrido, para que un comprador confirme que un "
+"producto es auténtico sin tener que confiar en el vendedor."
+
+msgid "Not allowed"
+msgstr "Sin permiso"
+
+msgid "You do not have access to this page."
+msgstr "No tienes acceso a esta página."
+
+msgid "Back to the home page"
+msgstr "Volver al inicio"
+
+msgid "Page not found"
+msgstr "Página no encontrada"
+
+msgid "The address you opened does not match anything on this site."
+msgstr "La dirección que abriste no corresponde a nada de este sitio."

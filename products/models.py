@@ -16,6 +16,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare
+from django.utils.translation import gettext_lazy as _
 
 from audit.integrity import GENESIS, sign, verify_chain
 from audit.models import Action, AuditEntry
@@ -23,19 +24,19 @@ from companies.models import CompanyStatus, CompanyType
 
 
 class ProductType(models.TextChoices):
-    COMMERCIAL_ORIGINAL = "COMMERCIAL_ORIGINAL", "Commercial original"
-    ARTISAN = "ARTISAN", "Artisan"
+    COMMERCIAL_ORIGINAL = "COMMERCIAL_ORIGINAL", _("Commercial original")
+    ARTISAN = "ARTISAN", _("Artisan")
 
 
 class ProductStatus(models.TextChoices):
-    ACTIVE = "ACTIVE", "Active"
-    REVOKED = "REVOKED", "Revoked"
+    ACTIVE = "ACTIVE", _("Active")
+    REVOKED = "REVOKED", _("Revoked")
 
 
 class TransferState(models.TextChoices):
-    INITIATED = "INITIATED", "Initiated"
-    ACCEPTED = "ACCEPTED", "Accepted"
-    DECLINED = "DECLINED", "Declined"
+    INITIATED = "INITIATED", _("Initiated")
+    ACCEPTED = "ACCEPTED", _("Accepted")
+    DECLINED = "DECLINED", _("Declined")
 
 
 #: A commercial company issues commercial originals, an artisan workshop issues
@@ -70,7 +71,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     category = models.CharField(max_length=100)
-    origin = models.CharField(max_length=200, help_text="Place of manufacture.")
+    origin = models.CharField(max_length=200, help_text=_("Place of manufacture."))
     image = models.ImageField(upload_to="product-images/", blank=True)
     integrity_hash = models.CharField(max_length=64, blank=True)
     revocation_reason = models.TextField(blank=True)
@@ -103,15 +104,18 @@ class Product(models.Model):
         if self.company_id is None:
             return
         if self.company.status != CompanyStatus.APPROVED:
-            raise ValidationError({"company": "Only an approved company can register products."})
+            raise ValidationError({"company": _("Only an approved company can register products.")})
         expected = PRODUCT_TYPE_BY_COMPANY_TYPE[self.company.company_type]
         if self.product_type != expected:
             raise ValidationError(
                 {
-                    "product_type": (
-                        f"A {self.company.get_company_type_display().lower()} registers "
-                        f"products of type {expected.label.lower()}."
+                    "product_type": _(
+                        "A %(company_type)s registers products of type %(product_type)s."
                     )
+                    % {
+                        "company_type": self.company.get_company_type_display().lower(),
+                        "product_type": expected.label.lower(),
+                    }
                 }
             )
 

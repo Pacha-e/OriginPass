@@ -7,6 +7,7 @@ when it is allowed, is decided by the model.
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import admin_required
@@ -14,7 +15,7 @@ from accounts.models import Role
 from audit.models import Action, AuditEntry
 
 from .forms import CompanyApplicationForm, RejectionForm
-from .models import Company, CompanyStatus
+from .models import Company, CompanyStatus, TransitionNotAllowed
 
 # ---------------------------------------------------------------- owner side
 
@@ -22,7 +23,7 @@ from .models import Company, CompanyStatus
 @login_required
 def application_detail(request):
     """FR17: the owner sees the status and, for a negative decision, the reason."""
-    company = Company.objects.filter(owner=request.user).first()
+    company = Company.objects.owned_by(request.user)
     if company is None:
         return redirect("companies:application_create")
     return render(request, "companies/application_detail.html", {"company": company})
@@ -31,7 +32,7 @@ def application_detail(request):
 @login_required
 def application_create(request):
     """FR07: an authenticated user submits an application, stored as Pending."""
-    if Company.objects.filter(owner=request.user).exists():
+    if Company.objects.owned_by(request.user) is not None:
         return redirect("companies:application_detail")
 
     if request.method == "POST":
@@ -48,7 +49,7 @@ def application_create(request):
             AuditEntry.record(actor=request.user, action=Action.COMPANY_SUBMITTED, target=company)
             messages.success(
                 request,
-                "Your application has been submitted and is now pending review.",
+                _("Your application has been submitted and is now pending review."),
             )
             return redirect("companies:application_detail")
     else:
@@ -77,7 +78,7 @@ def application_edit(request):
             company = form.save()
             company.resubmit(actor=request.user)
             messages.success(
-                request, "Your application has been updated and is pending review again."
+                request, _("Your application has been updated and is pending review again.")
             )
             return redirect("companies:application_detail")
     else:
@@ -95,7 +96,7 @@ def review_list(request):
     selected = request.GET.get("status", "")
     applications = Company.objects.select_related("owner")
 
-    valid_statuses = {value for value, _ in CompanyStatus.choices}
+    valid_statuses = {value for value, label in CompanyStatus.choices}
     if selected not in valid_statuses:
         selected = ""
     else:
@@ -125,10 +126,20 @@ def review_detail(request, pk):
 @admin_required
 @require_POST
 def review_approve(request, pk):
-    """FR13: a pending application becomes Approved."""
+    """FR13: a pending application becomes Approved.
+
+    Which statuses an approval may be made from is the model's rule, so the view
+    asks and reports the answer rather than deciding it.
+    """
     company = get_object_or_404(Company, pk=pk)
-    company.approve(actor=request.user)
-    messages.success(request, f"{company.legal_name} has been approved.")
+
+    try:
+        company.approve(actor=request.user)
+    except TransitionNotAllowed as refusal:
+        messages.error(request, str(refusal))
+    else:
+        messages.success(request, _("%(company)s has been approved.") % {"company": company})
+
     return redirect("companies:review_detail", pk=company.pk)
 
 
@@ -147,6 +158,11 @@ def review_reject(request, pk):
             status=400,
         )
 
-    company.reject(actor=request.user, reason=form.cleaned_data["reason"])
-    messages.success(request, f"{company.legal_name} has been rejected.")
+    try:
+        company.reject(actor=request.user, reason=form.cleaned_data["reason"])
+    except TransitionNotAllowed as refusal:
+        messages.error(request, str(refusal))
+    else:
+        messages.success(request, _("%(company)s has been rejected.") % {"company": company})
+
     return redirect("companies:review_detail", pk=company.pk)

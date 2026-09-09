@@ -8,19 +8,20 @@ Sprint 1 creates this table. The public verification page belongs to Sprint 2.
 """
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class DeviceCategory(models.TextChoices):
-    MOBILE = "MOBILE", "Mobile"
-    TABLET = "TABLET", "Tablet"
-    DESKTOP = "DESKTOP", "Desktop"
-    UNKNOWN = "UNKNOWN", "Unknown"
+    MOBILE = "MOBILE", _("Mobile")
+    TABLET = "TABLET", _("Tablet")
+    DESKTOP = "DESKTOP", _("Desktop")
+    UNKNOWN = "UNKNOWN", _("Unknown")
 
 
 class Verdict(models.TextChoices):
-    GENUINE = "GENUINE", "Genuine"
-    REVOKED = "REVOKED", "Revoked"
-    NOT_FOUND = "NOT_FOUND", "Not found"
+    GENUINE = "GENUINE", _("Genuine")
+    REVOKED = "REVOKED", _("Revoked")
+    NOT_FOUND = "NOT_FOUND", _("Not found")
 
 
 class ScanEvent(models.Model):
@@ -30,7 +31,7 @@ class ScanEvent(models.Model):
         related_name="scan_events",
         null=True,
         blank=True,
-        help_text="Null when the scanned code matched no product.",
+        help_text=_("Null when the scanned code matched no product."),
     )
     scanned_at = models.DateTimeField(auto_now_add=True)
     region = models.CharField(max_length=100, blank=True)

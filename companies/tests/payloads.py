@@ -1,6 +1,6 @@
 """What a person types into the application form, as the form receives it.
 
-Separate from `testing.factories`, which builds stored records: these are the raw
+Separate from `test_support.factories`, which builds stored records: these are the raw
 POST bodies, so a test can start from a valid one and change the single field it
 is about with `COMMERCIAL_APPLICATION | {"registry_code": ""}`.
 """

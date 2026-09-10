@@ -16,5 +16,47 @@ services:
       timeout: 5s
       retries: 10
 
+  # A window onto the database, for showing the schema and the rows during a
+  # review rather than describing them. It reads the same database the
+  # application uses, so what it shows is what the application sees, and it is
+  # the only way to see the constraints: the administration site of Django
+  # shows models, and a constraint is not a model field.
+  #
+  # pgAdmin rather than something smaller, because in a review the tool should
+  # not need explaining. This is the client PostgreSQL ships and the one the
+  # course teaches, so it is recognised on sight and the data model stays the
+  # subject.
+  #
+  # It arrives ready: SERVER_MODE off skips its own login, and servers.json
+  # registers the connection at first start, so it opens on the table tree
+  # instead of an empty screen asking for a host. Only the database password is
+  # typed, once.
+  #
+  # Development only. Bound to the loopback address rather than merely to a
+  # port, because a container published on every interface is reachable from
+  # the room.
+  pgadmin:
+    image: dpage/pgadmin4:9.17
+    container_name: originpass-pgadmin
+    ports:
+      - "127.0.0.1:8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@originpass.co
+      PGADMIN_DEFAULT_PASSWORD: originpass
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      # Otherwise the first thing on screen is a banner announcing that a newer
+      # pgAdmin exists, which in a review reads as something being wrong.
+      PGADMIN_CONFIG_UPGRADE_CHECK_ENABLED: "False"
+    volumes:
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - pgadmindata:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
+  # Keeps the connection pgAdmin registered at first start, so it is registered
+  # once rather than on every restart.
+  pgadmindata:

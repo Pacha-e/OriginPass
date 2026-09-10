@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "OriginPass",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "originpass",
+      "Username": "originpass",
+      "SSLMode": "prefer",
+      "Comment": "The database the application reads and writes. Loaded at first start from docker/pgadmin/servers.json so the connection never has to be registered by hand."
+    }
+  }
+}

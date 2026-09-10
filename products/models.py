@@ -237,10 +237,23 @@ class CustodyTransfer(models.Model):
         # holds, never by what this instance holds. An instance read before the
         # transfer was resolved still carries Initiated, and asking it would let
         # that stale copy write itself over the resolution.
-        stored_state = type(self).objects.filter(pk=self.pk).values_list("state", flat=True).first()
-        if stored_state != TransferState.INITIATED:
-            raise ValueError("A resolved custody transfer cannot be edited.")
-        return super().save(*args, **kwargs)
+        #
+        # Locked and read inside a transaction, because reading it plainly only
+        # answers for a copy that was already stale. A resolution committing
+        # between the read and the write would still be overwritten: the write
+        # waits for the lock it does not hold, then lands on top of what it
+        # waited for. The lock makes the answer hold until this row is written.
+        with transaction.atomic():
+            stored_state = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("state", flat=True)
+                .first()
+            )
+            if stored_state != TransferState.INITIATED:
+                raise ValueError("A resolved custody transfer cannot be edited.")
+            return super().save(*args, **kwargs)
 
     def _append(self, *args, **kwargs):
         """Link this handover to the previous one for the same product."""

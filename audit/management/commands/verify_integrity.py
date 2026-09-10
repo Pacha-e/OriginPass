@@ -6,6 +6,7 @@ Exits non-zero when something fails, so it can be run on a schedule and have
 the failure noticed rather than logged into a file nobody reads.
 """
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from audit.models import AuditEntry
@@ -61,8 +62,15 @@ class Command(BaseCommand):
             raise SystemExit(1)
 
         self.stdout.write("")
+        keys = 1 + len(settings.SECRET_KEY_FALLBACKS)
+        against = "the current signing key" if keys == 1 else f"one of {keys} signing keys"
         self.stdout.write(
-            "Everything verifies against the current signing key. This proves no record was "
-            "changed by anyone holding only the database. It does not cover whoever holds the "
-            "key as well, which is what publishing the chain head externally would close."
+            f"Everything verifies against {against}. This proves no record was changed by "
+            "anyone holding only the database. It does not cover whoever holds a key as well, "
+            "which is what publishing the chain head externally would close."
         )
+        if keys > 1:
+            self.stdout.write(
+                "Retired keys are still accepted, so a record signed under one of them counts "
+                "as verified. Drop them from SECRET_KEY_FALLBACKS once nothing needs them."
+            )

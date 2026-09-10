@@ -11,6 +11,8 @@ from django.db import transaction
 
 from accounts.models import Role, User
 from companies.models import Company, CompanyStatus, CompanyType, VerificationTrack
+from products.models import PRODUCT_TYPE_BY_COMPANY_TYPE, Product
+from verification.models import DeviceCategory, ScanEvent, Verdict
 
 PASSWORD = "OriginPass-2026"
 
@@ -89,8 +91,58 @@ APPLICATIONS = [
 ]
 
 
+#: Passports for the two approved companies. Sprint 2 is about products, so a
+#: demo dataset without them shows none of what the sprint built.
+#:
+#: `owner_email` names the company that issues each one. The product type is not
+#: written here: it follows from the company type (FR23), and stating it a
+#: second time would be a chance for the two to disagree.
+PASSPORTS = [
+    {
+        "owner_email": "taller@tuchin.co",
+        "name": "Sombrero vueltiao 21 vueltas",
+        "description": (
+            "Woven from cana flecha over three weeks. Twenty-one pairs of fibre "
+            "in the weave, which is the count that marks the fine grade."
+        ),
+        "category": "Sombreros",
+        "origin": "Tuchin, Cordoba",
+        "scans": 7,
+    },
+    {
+        "owner_email": "taller@tuchin.co",
+        "name": "Sombrero vueltiao 15 vueltas",
+        "description": "Everyday grade, woven in the same workshop.",
+        "category": "Sombreros",
+        "origin": "Tuchin, Cordoba",
+        "scans": 2,
+    },
+    {
+        "owner_email": "contacto@labonga.co",
+        "name": "Canasto de iraca",
+        "description": "Palm basket woven in Usiacuri and distributed from Monteria.",
+        "category": "Cesteria",
+        "origin": "Usiacuri, Atlantico",
+        "scans": 4,
+    },
+    {
+        "owner_email": "contacto@labonga.co",
+        "name": "Hamaca de San Jacinto",
+        "description": "Cotton hammock woven on a vertical loom.",
+        "category": "Textiles",
+        "origin": "San Jacinto, Bolivar",
+        "scans": 1,
+        "revoked": "Reported by three buyers as a machine-made copy sold under this name.",
+    },
+]
+
+#: Enough of a spread that the verification page has something to show and the
+#: Sprint 3 analytics have something to read.
+SCAN_DEVICES = [DeviceCategory.MOBILE, DeviceCategory.MOBILE, DeviceCategory.DESKTOP]
+
+
 class Command(BaseCommand):
-    help = "Create a small set of demo accounts and company applications."
+    help = "Create a small set of demo accounts, company applications and passports."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -141,6 +193,10 @@ class Command(BaseCommand):
             self.stdout.write(f"  {company.legal_name} — {company.get_status_display()}")
 
         self.stdout.write(self.style.SUCCESS(f"\n{created} companies created."))
+
+        issued = self._issue_passports(admin)
+
+        self.stdout.write(self.style.SUCCESS(f"\n{issued} passports issued."))
         self.stdout.write(f"Administrator: {ADMIN_EMAIL}")
         self.stdout.write(f"Password for every demo account: {PASSWORD}")
 
@@ -150,3 +206,54 @@ class Command(BaseCommand):
             admin = User.objects.create_superuser(ADMIN_EMAIL, PASSWORD)
             self.stdout.write(f"  administrator {ADMIN_EMAIL} created")
         return admin
+
+    def _issue_passports(self, admin):
+        """One passport per entry, for the companies that are approved."""
+        issued = 0
+
+        for entry in PASSPORTS:
+            company = Company.objects.filter(owner__email=entry["owner_email"]).first()
+            if company is None or not company.can_register_products:
+                continue
+            if Product.objects.filter(company=company, name=entry["name"]).exists():
+                self.stdout.write(f"  skipped {entry['name']}, already present")
+                continue
+
+            product = Product.objects.create(
+                company=company,
+                # FR23: the type follows from the company rather than being chosen.
+                product_type=PRODUCT_TYPE_BY_COMPANY_TYPE[company.company_type],
+                name=entry["name"],
+                description=entry["description"],
+                category=entry["category"],
+                origin=entry["origin"],
+            )
+
+            if entry.get("revoked"):
+                product.revoke(actor=admin, reason=entry["revoked"])
+
+            self._record_scans(product, entry.get("scans", 0))
+
+            issued += 1
+            self.stdout.write(
+                f"  {product.name} — {product.get_status_display()} — /v/{product.passport_code}"
+            )
+
+        return issued
+
+    def _record_scans(self, product, how_many):
+        """A history of verifications, so the page and the analytics have data.
+
+        Written straight to the table rather than through the view: this is a
+        record of visits that already happened, not a visit being made now.
+        """
+        verdict = Verdict.REVOKED if product.revocation_reason else Verdict.GENUINE
+
+        ScanEvent.objects.bulk_create(
+            ScanEvent(
+                product=product,
+                verdict=verdict,
+                device_category=SCAN_DEVICES[number % len(SCAN_DEVICES)],
+            )
+            for number in range(how_many)
+        )

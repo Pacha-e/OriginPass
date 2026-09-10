@@ -11,6 +11,7 @@ The source strings stay English; `locale/es` is what turns them.
 from django.template.defaultfilters import date as render_date
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from testing.factories import make_admin, make_product
 from testing.timing import measure
@@ -20,11 +21,18 @@ from verification.models import Verdict
 def as_the_page_writes_it(moment):
     """The date exactly as the page renders it.
 
-    Runs the same filter the template runs rather than reimplementing it with
-    strftime, whose month names come from the process locale and would say
-    "September" where the page says "septiembre".
+    Two steps, and leaving out either one produces a test that fails at some
+    hours of the day and not others:
+
+    - Localtime, because the template engine converts an aware datetime to the
+      project's time zone before any filter sees it. Formatting the UTC value
+      instead is off by a day for the five hours either side of midnight
+      in Bogota.
+    - The template's own filter rather than strftime, whose month names come
+      from the process locale and say "September" where the page says
+      "septiembre".
     """
-    return render_date(moment, "j F Y")
+    return render_date(timezone.localtime(moment), "j F Y")
 
 
 def verdict_url(product):

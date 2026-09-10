@@ -12,10 +12,15 @@ from pathlib import Path
 from django.conf import settings
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
+from django.utils import translation
 
 from test_support.factories import make_product
 
 CATALOGUE = Path(settings.BASE_DIR) / "locale" / "es" / "LC_MESSAGES" / "django.po"
+
+#: What Django actually reads. Built from the catalogue above and committed
+#: beside it, so that a clone serves Spanish without GNU gettext installed.
+COMPILED = CATALOGUE.with_suffix(".mo")
 
 #: One quoted chunk of a .po field, where a quote inside the text is escaped.
 #: Matching with a plain `[^"]*` would stop at the first `\"` and silently read
@@ -92,3 +97,35 @@ class TranslationCatalogueTests(SimpleTestCase):
         untranslated = [msgid for msgid, msgstr in catalogue_entries() if not msgstr]
 
         self.assertEqual(untranslated, [])
+
+
+class CompiledCatalogueTests(SimpleTestCase):
+    """The compiled catalogue is the one Django reads, and it is committed.
+
+    Django translates from the compiled `.mo`, never from the `.po` beside it,
+    so a catalogue edited and not recompiled changes nothing while looking as
+    though it changed everything. The binary is committed for that reason: a
+    clone with no `.mo` serves every page in English, which is what UR04
+    forbids, and building one needs GNU gettext installed.
+
+    Committing a build artefact earns exactly one obligation, which is this
+    class: prove the artefact still matches the source it was built from.
+    """
+
+    def test_the_compiled_catalogue_is_present(self):
+        self.assertTrue(COMPILED.exists(), f"no compiled catalogue at {COMPILED}")
+
+    def test_every_translation_in_the_source_is_the_one_being_served(self):
+        with translation.override("es"):
+            stale = [
+                msgid
+                for msgid, msgstr in catalogue_entries()
+                if translation.gettext(msgid) != msgstr
+            ]
+
+        self.assertEqual(
+            stale,
+            [],
+            "the catalogue was edited without being recompiled: run "
+            "`python manage.py compilemessages`",
+        )

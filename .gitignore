@@ -26,9 +26,24 @@ env/
 .coverage
 htmlcov/
 
-# Compiled translations. Built from the tracked .po files with
-# `python manage.py compilemessages`, so the binary is not committed.
+# Compiled translations are committed, against the usual advice.
+#
+# UR04 asks for the interface in Spanish, and Django reads it from the compiled
+# .mo, not from the .po beside it. Leaving the .mo out means a fresh clone
+# serves English until somebody installs GNU gettext and runs compilemessages,
+# and this project has no deployment pipeline to do that on its behalf. It was
+# measured: on a clone with no .mo, twenty-one tests fail and every page comes
+# out in English.
+#
+# The usual objection is that a build artefact drifts from its source without
+# anybody noticing. `pages/tests/test_language.py` closes that: it reads every
+# entry from the .po and asserts the running catalogue answers with it, so a
+# .po edited without recompiling fails the suite rather than shipping quietly.
+#
+# gettext is therefore needed to *change* a translation, not to *run* the
+# project.
 *.mo
+!locale/**/*.mo
 
 # Editors
 .vscode/

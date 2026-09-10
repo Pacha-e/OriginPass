@@ -6,7 +6,7 @@ it, and the ones the database can express are also written as constraints.
 """
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -189,48 +189,90 @@ class Company(models.Model):
     def can_be_reactivated(self):
         return self.status in self.REACTIVATE_FROM
 
-    def _set_status(self, status, *, allowed_from, reason=""):
-        if self.status not in allowed_from:
-            raise TransitionNotAllowed(
-                _("%(company)s is %(current)s, so it cannot become %(wanted)s.")
-                % {
-                    "company": self.legal_name,
-                    "current": self.get_status_display().lower(),
-                    "wanted": CompanyStatus(status).label.lower(),
-                }
-            )
+    def _set_status(self, status, *, allowed_from, actor, action, reason=""):
+        """Take the decision and record it, as one act or not at all.
+
+        Two administrators can hold the same application open, and each request
+        works from its own copy of the row. The copy the second one holds still
+        says pending after the first has decided, so the question of whether the
+        decision may be taken is put to the database, on a locked row, rather
+        than to the copy in hand. Recording it is inside the same transaction:
+        a decision that was refused leaves nothing behind, and one that was
+        taken is never left without its entry in the trail.
+        """
         if status in STATUSES_REQUIRING_REASON and not reason.strip():
             raise ValueError(f"A reason is required to set the status to {status}.")
-        self.status = status
-        self.status_reason = reason.strip()
-        self.status_changed_at = timezone.now()
-        self.save(update_fields=["status", "status_reason", "status_changed_at"])
+
+        with transaction.atomic():
+            stored_status = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("status", flat=True)
+                .first()
+            )
+            if stored_status is not None:
+                self.status = stored_status
+
+            if self.status not in allowed_from:
+                raise TransitionNotAllowed(
+                    _("%(company)s is %(current)s, so it cannot become %(wanted)s.")
+                    % {
+                        "company": self.legal_name,
+                        "current": self.get_status_display().lower(),
+                        "wanted": CompanyStatus(status).label.lower(),
+                    }
+                )
+
+            self.status = status
+            self.status_reason = reason.strip()
+            self.status_changed_at = timezone.now()
+            self.save(update_fields=["status", "status_reason", "status_changed_at"])
+            AuditEntry.record(actor=actor, action=action, target=self, reason=self.status_reason)
 
     def approve(self, actor):
         """FR13: a pending application becomes approved."""
-        self._set_status(CompanyStatus.APPROVED, allowed_from=self.APPROVE_FROM)
-        AuditEntry.record(actor=actor, action=Action.COMPANY_APPROVED, target=self)
+        self._set_status(
+            CompanyStatus.APPROVED,
+            allowed_from=self.APPROVE_FROM,
+            actor=actor,
+            action=Action.COMPANY_APPROVED,
+        )
 
     def reject(self, actor, reason):
         """FR14: a pending application is refused, with the reason recorded."""
-        self._set_status(CompanyStatus.REJECTED, allowed_from=self.REJECT_FROM, reason=reason)
-        AuditEntry.record(
-            actor=actor, action=Action.COMPANY_REJECTED, target=self, reason=self.status_reason
+        self._set_status(
+            CompanyStatus.REJECTED,
+            allowed_from=self.REJECT_FROM,
+            actor=actor,
+            action=Action.COMPANY_REJECTED,
+            reason=reason,
         )
 
     def suspend(self, actor, reason):
         """An approved company stops issuing passports; the ones it issued keep working."""
-        self._set_status(CompanyStatus.SUSPENDED, allowed_from=self.SUSPEND_FROM, reason=reason)
-        AuditEntry.record(
-            actor=actor, action=Action.COMPANY_SUSPENDED, target=self, reason=self.status_reason
+        self._set_status(
+            CompanyStatus.SUSPENDED,
+            allowed_from=self.SUSPEND_FROM,
+            actor=actor,
+            action=Action.COMPANY_SUSPENDED,
+            reason=reason,
         )
 
     def reactivate(self, actor):
         """A suspension is lifted and the company is approved again."""
-        self._set_status(CompanyStatus.APPROVED, allowed_from=self.REACTIVATE_FROM)
-        AuditEntry.record(actor=actor, action=Action.COMPANY_REACTIVATED, target=self)
+        self._set_status(
+            CompanyStatus.APPROVED,
+            allowed_from=self.REACTIVATE_FROM,
+            actor=actor,
+            action=Action.COMPANY_REACTIVATED,
+        )
 
     def resubmit(self, actor):
         """An edited application goes back into the queue (FR10)."""
-        self._set_status(CompanyStatus.PENDING, allowed_from=EDITABLE_STATUSES)
-        AuditEntry.record(actor=actor, action=Action.COMPANY_RESUBMITTED, target=self)
+        self._set_status(
+            CompanyStatus.PENDING,
+            allowed_from=EDITABLE_STATUSES,
+            actor=actor,
+            action=Action.COMPANY_RESUBMITTED,
+        )

@@ -9,6 +9,7 @@ its only caller: the demo command and the tests change status too.
 from django.test import TestCase
 from django.urls import reverse
 
+from audit.models import Action, AuditEntry
 from companies.models import Company, CompanyStatus, TransitionNotAllowed
 from test_support.factories import make_admin, make_company, make_user
 
@@ -54,6 +55,65 @@ class ApprovalTransitionTests(TestCase):
 
         with self.assertRaises(TransitionNotAllowed):
             self.company.reject(actor=self.admin, reason="Changed my mind.")
+
+
+class TwoAdministratorsDecidingAtOnceTests(TestCase):
+    """The refusal has to read the stored status, not the one in hand.
+
+    Two administrators can hold the same application open. Each request loads
+    its own copy, and the copy the second one holds still says pending after
+    the first has decided. If the guard trusts that copy, both decisions go
+    through: the trail records two contradictory decisions on one application
+    and the status is whichever write landed last.
+    """
+
+    def setUp(self):
+        self.admin = make_admin()
+        self.company = make_company()
+
+    def _two_copies(self):
+        return (
+            Company.objects.get(pk=self.company.pk),
+            Company.objects.get(pk=self.company.pk),
+        )
+
+    def test_a_rejection_is_refused_once_the_other_copy_has_approved(self):
+        approving, rejecting = self._two_copies()
+
+        approving.approve(actor=self.admin)
+
+        with self.assertRaises(TransitionNotAllowed):
+            rejecting.reject(actor=self.admin, reason="Registry code not found.")
+
+        self.company.refresh_from_db()
+        self.assertEqual(self.company.status, CompanyStatus.APPROVED)
+
+    def test_the_refused_decision_leaves_nothing_in_the_trail(self):
+        approving, rejecting = self._two_copies()
+
+        approving.approve(actor=self.admin)
+        with self.assertRaises(TransitionNotAllowed):
+            rejecting.reject(actor=self.admin, reason="Registry code not found.")
+
+        self.assertEqual(
+            AuditEntry.objects.filter(action=Action.COMPANY_REJECTED).count(),
+            0,
+            "A decision that was refused must not be recorded as taken.",
+        )
+
+    def test_a_second_approval_is_refused_as_well(self):
+        first, second = self._two_copies()
+
+        first.approve(actor=self.admin)
+
+        with self.assertRaises(TransitionNotAllowed):
+            second.approve(actor=self.admin)
+
+        self.assertEqual(
+            AuditEntry.objects.filter(action=Action.COMPANY_APPROVED).count(),
+            1,
+            "One application approved once leaves one entry in the trail.",
+        )
 
 
 class ReviewViewRefusesTheTransitionTests(TestCase):

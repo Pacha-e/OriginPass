@@ -11,7 +11,11 @@ class ProductAdmin(admin.ModelAdmin):
     passport code is: this site edits fields directly, so a revocation made
     here would carry no check that a reason was given and leave nothing in the
     audit trail, and the reason for a revocation already made could be
-    rewritten afterwards. `Product.revoke` is the way in.
+    rewritten afterwards.
+
+    `Product.revoke` is the way in, and until Sprint 4 it is the only one:
+    FR41 and FR42 are what give revocation a page, for the company and for the
+    administrator. Revoking is therefore something only code does today.
     """
 
     list_display = ["name", "passport_code", "company", "product_type", "status"]

@@ -105,7 +105,24 @@ class AuditEntry(models.Model):
 
     @classmethod
     def record(cls, *, actor, action, target, reason=""):
-        """Append one entry, linked to the one before it."""
+        """Append one entry, linked to the one before it.
+
+        Where the call belongs, so that adding an action does not start with
+        working it out again:
+
+        - **A status change records itself, inside the model method that makes
+          it**, within the same transaction. `Company._set_status` and
+          `Product.revoke` do this. A decision and its record are one act: a
+          refused transition must leave nothing behind, and one that went
+          through must never be left without its entry.
+        - **A creation records in the view**, after the object is saved. There
+          is no model method to put it in — a form built the object — and there
+          is nothing to be inconsistent with, because a row that does not exist
+          yet has no state for the trail to disagree with.
+
+        Both are used here on purpose. If an action ever has both a model
+        method and a view, it goes in the model method.
+        """
         with transaction.atomic():
             # Locks the current last entry so two writers cannot both link to
             # it. An empty table has no row to lock, which is why the linearity

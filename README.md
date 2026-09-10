@@ -81,11 +81,20 @@ python manage.py runserver
 The application is then served at http://127.0.0.1:8000/.
 
 To look at the interface with something in it, or to record the deliverable
-walkthrough, populate a demo dataset of five companies, one in each status:
+walkthrough, populate a demo dataset:
 
 ```bash
 python manage.py seed_demo
 ```
+
+Five company applications, one in each status, and four passports issued by the two
+approved ones, with one revoked so that verdict can be shown and a history of scans
+behind them. It prints each passport's verification path, so the walkthrough does not
+need the codes to be looked up first.
+
+The data goes through the same model rules the application does, so it cannot create a
+row the application would refuse: the product type is derived from the company rather
+than written down, exactly as the registration view derives it.
 
 Every account it creates shares one known password, which it prints, so it refuses
 to run unless `DEBUG` is on.

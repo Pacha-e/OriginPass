@@ -107,6 +107,27 @@ class ProductEditTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_a_suspended_company_is_refused_rather_than_crashed_into(self):
+        """Suspension is the one way a passport outlives its company's approval.
+
+        A company is only approved when it registers a passport, and the only
+        transition out of approved is suspension, so this is the single state
+        in which an owner can open the edit page for a passport its company may
+        no longer act on. The refusal has to be stated, because the alternative
+        is the model's own rule reaching a form that has no field to attach it
+        to.
+        """
+        self.company.suspend(actor=make_admin(), reason="Under investigation.")
+
+        response = self.client.post(
+            reverse("products:product_edit", args=[self.product.pk]),
+            {**VALID_PRODUCT, "description": "Rewritten while suspended."},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.description, VALID_PRODUCT["description"])
+
     def test_a_company_cannot_edit_the_product_of_another(self):
         make_approved_company(email="otro@barranquilla.co")
         self.client.login(email="otro@barranquilla.co", password=OWNER_PASSWORD)

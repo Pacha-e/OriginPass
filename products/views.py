@@ -175,6 +175,20 @@ def product_edit(request, pk):
             reason=REVOKED_PASSPORT_REFUSAL,
         )
 
+    # Asked before the form is built, because the model's rule is that a
+    # passport belongs to an approved company, and it states that against the
+    # company field, which this form does not have. Left to reach the form, it
+    # arrives as an error with nowhere to go and the page fails outright.
+    # Suspension is the only way to get here: a company is approved when it
+    # registers a passport, and suspension is the only way out of approved.
+    if not company.can_register_products:
+        return _refuse(
+            request,
+            company,
+            heading=_("This passport cannot be edited"),
+            reason=REFUSAL_BY_STATUS[company.status],
+        )
+
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():

@@ -78,3 +78,8 @@ Thumbs.db
 # Graphify build output. The report and the graph are written to an archive
 # outside this repository, but the extractor leaves a cache behind here.
 graphify-out/
+
+# Local notes for running a review, which say so on their first line. Kept on
+# disk, out of the repository: they are one person's cheat sheet, not a project
+# artefact, and were committed once by mistake.
+docs/sprint-2-demo-runbook.md

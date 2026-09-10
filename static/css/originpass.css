@@ -152,10 +152,16 @@ a:hover {
   gap: var(--space-4);
   font-size: 0.9rem;
 }
-.nav a {
+/* Scoped away from buttons on purpose. `.nav a` outweighs `.btn--primary`, so
+   without the exclusion a button placed in the navigation lost its own colour
+   and rendered dark grey on the accent blue: a contrast ratio of 1.07 against
+   the 4.5 UR09 asks for, which is a control nobody can read. It was the Create
+   account button, in the header of every page including the public
+   verification page. */
+.nav a:not(.btn) {
   color: var(--ink-soft);
 }
-.nav a:hover {
+.nav a:not(.btn):hover {
   color: var(--ink);
   text-decoration: none;
 }

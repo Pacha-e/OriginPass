@@ -3,6 +3,7 @@
 from django.test import TestCase
 
 from audit.models import Action, AuditEntry
+from companies.models import Company
 from test_support.factories import make_admin, make_company
 
 
@@ -14,9 +15,21 @@ class AuditTrailTests(TestCase):
     def test_an_approval_is_recorded(self):
         self.company.approve(actor=self.admin)
 
-        entry = AuditEntry.objects.get(target_type="Company", target_id=self.company.pk)
+        entry = AuditEntry.objects.get(target_type=Company._meta.label, target_id=self.company.pk)
         self.assertEqual(entry.action, Action.COMPANY_APPROVED)
         self.assertEqual(entry.actor, self.admin)
+
+    def test_the_target_names_its_app_as_well_as_its_model(self):
+        """A bare class name would let two apps' same-named models share a row.
+
+        The trail is the one place an ambiguity about what a record refers to
+        must not exist, so the label carries the app.
+        """
+        self.company.approve(actor=self.admin)
+
+        entry = AuditEntry.objects.get(target_id=self.company.pk)
+
+        self.assertEqual(entry.target_type, "companies.Company")
 
     def test_a_rejection_records_its_reason(self):
         self.company.reject(actor=self.admin, reason="Registry code not found.")

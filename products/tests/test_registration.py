@@ -62,7 +62,7 @@ class ProductRegistrationTests(TestCase):
         self.client.post(reverse("products:product_create"), VALID_PRODUCT)
         product = Product.objects.get(name=VALID_PRODUCT["name"])
 
-        entry = AuditEntry.objects.get(target_type="Product", target_id=product.pk)
+        entry = AuditEntry.objects.get(target_type=Product._meta.label, target_id=product.pk)
         self.assertEqual(entry.action, Action.PRODUCT_REGISTERED)
         self.assertEqual(entry.actor, self.company.owner)
 

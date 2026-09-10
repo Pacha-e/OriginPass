@@ -40,6 +40,16 @@ class AuditEntry(models.Model):
         blank=True,
     )
     action = models.CharField(max_length=32, choices=Action.choices)
+    #: What the entry is about, as `app_label.ModelName`, and its primary key.
+    #:
+    #: Deliberately a string rather than a GenericForeignKey. Two of that
+    #: field's properties are wrong for a trail whose whole job is to outlive
+    #: what it describes: it cascades, so deleting the target would delete the
+    #: evidence of what happened to it, and it identifies the model by a
+    #: ContentType row whose id the database assigns. This entry's signature
+    #: covers `target_type`, so an id that differs between two databases would
+    #: make the same event sign differently in each, and a restore would
+    #: invalidate every signature. A label is stable everywhere.
     target_type = models.CharField(max_length=32)
     target_id = models.PositiveIntegerField()
     reason = models.TextField(blank=True)
@@ -94,7 +104,10 @@ class AuditEntry(models.Model):
             entry = cls(
                 actor=actor,
                 action=action,
-                target_type=target.__class__.__name__,
+                # The app label is part of it: a bare class name would let two
+                # models of the same name in different apps share a row in the
+                # trail, which is the one place an ambiguity must not exist.
+                target_type=target._meta.label,
                 target_id=target.pk,
                 reason=reason,
                 created_at=timezone.now(),

@@ -64,6 +64,18 @@ class AuditEntry(models.Model):
         ordering = ["-created_at"]
         verbose_name_plural = "audit entries"
         indexes = [models.Index(fields=["target_type", "target_id"])]
+        constraints = [
+            # The chain is linear, so no entry is the predecessor of two
+            # others. Saying that to the database closes the one gap the lock
+            # in `record` cannot: an empty table has no row to lock, so two
+            # writers racing to append the first entry would both read GENESIS
+            # and both link to it. They still race; now the loser is rejected
+            # instead of forking the chain in silence.
+            models.UniqueConstraint(
+                fields=["previous_hash"],
+                name="audit_entry_links_to_one_predecessor",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.action} on {self.target_type}#{self.target_id}"
@@ -95,9 +107,9 @@ class AuditEntry(models.Model):
     def record(cls, *, actor, action, target, reason=""):
         """Append one entry, linked to the one before it."""
         with transaction.atomic():
-            # Locks the current last entry so two writers cannot both link to it.
-            # An empty table has no row to lock; the first two entries of a brand
-            # new database are the one case this does not cover.
+            # Locks the current last entry so two writers cannot both link to
+            # it. An empty table has no row to lock, which is why the linearity
+            # of the chain is also a database constraint: see Meta.
             last = cls.objects.select_for_update().order_by("-id").first()
             previous = last.entry_hash if last else GENESIS
 

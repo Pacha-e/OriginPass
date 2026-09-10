@@ -3,10 +3,11 @@
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, transaction
 from django.test import TestCase
+from django.utils import timezone
 
 from audit.integrity import GENESIS
 from audit.models import Action, AuditEntry
-from products.models import CustodyTransfer
+from products.models import CustodyTransfer, TransferState
 from test_support.factories import make_admin, make_approved_company, make_product, make_user
 
 
@@ -117,6 +118,45 @@ class CustodyChainIntegrityTests(TestCase):
         ok, problem = CustodyTransfer.verify_chain(self.product)
         self.assertFalse(ok)
         self.assertIn("removed or reordered", problem)
+
+    def test_the_database_refuses_a_fork_in_one_product_s_chain(self):
+        """Two handovers claiming the same predecessor would split the chain in two.
+
+        Written with SQL because `_append` recomputes `previous_hash` from the
+        last row, so the model cannot produce this state. That is the point:
+        the lock in `_append` has nothing to hold on a product's first
+        transfer, so the shape of the chain is stated to the database as well.
+        """
+        existing = self._transfers().first()
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO products_custodytransfer "
+                    "(product_id, from_holder_id, to_holder_id, state, note,"
+                    " created_at, previous_hash, entry_hash) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    [
+                        self.product.pk,
+                        self.second.pk,
+                        self.first.pk,
+                        TransferState.INITIATED,
+                        "A second handover claiming the same predecessor",
+                        timezone.now(),
+                        existing.previous_hash,
+                        "forged",
+                    ],
+                )
+
+    def test_a_second_product_starts_its_own_chain(self):
+        """The chain is per product, so every product has its own first handover."""
+        other = make_product(self.company, name="Canasto de iraca")
+
+        first_of_other = CustodyTransfer.objects.create(
+            product=other, from_holder=self.company.owner, to_holder=self.first
+        )
+
+        self.assertEqual(first_of_other.previous_hash, GENESIS)
 
     def test_resolving_a_transfer_is_written_into_the_audit_trail(self):
         """The state is outside the row's signature, so it is evidenced there."""

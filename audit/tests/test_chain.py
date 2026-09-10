@@ -6,7 +6,7 @@ that matter: the chain is what makes them visible.
 
 from datetime import timedelta
 
-from django.db import connection
+from django.db import IntegrityError, connection, transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -114,6 +114,34 @@ class ChainTests(TestCase):
         ok, problem = AuditEntry.verify_chain()
         self.assertFalse(ok)
         self.assertIn("altered since it was written", problem)
+
+    def test_the_database_refuses_a_second_entry_linked_to_the_same_predecessor(self):
+        """The fork the lock in `record` cannot prevent on an empty table.
+
+        Two writers racing to append the first entry of a new database both
+        read GENESIS and both link to it, because there is no row to lock. The
+        chain is linear, so the database rejects the second one.
+        """
+        existing = self._oldest()
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO audit_auditentry "
+                    "(actor_id, action, target_type, target_id, reason, created_at,"
+                    " previous_hash, entry_hash) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    [
+                        self.admin.pk,
+                        Action.COMPANY_APPROVED,
+                        "companies.Company",
+                        self.company.pk,
+                        "A second entry claiming the same predecessor",
+                        timezone.now(),
+                        existing.previous_hash,
+                        sign("a", "forged", "entry"),
+                    ],
+                )
 
     def test_a_signature_made_with_another_key_does_not_pass(self):
         entry = self._oldest()

@@ -210,6 +210,14 @@ class CustodyTransfer(models.Model):
                 condition=~Q(from_holder=models.F("to_holder")),
                 name="custody_transfer_changes_holder",
             ),
+            # One chain per product, and a chain is linear: within a product no
+            # handover is the predecessor of two others. The lock in `_append`
+            # has nothing to hold on a product's first transfer, so the shape of
+            # the chain is stated to the database as well.
+            models.UniqueConstraint(
+                fields=["product", "previous_hash"],
+                name="custody_transfer_links_to_one_predecessor",
+            ),
         ]
 
     def __str__(self):

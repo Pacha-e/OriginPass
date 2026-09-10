@@ -3,6 +3,7 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
@@ -45,6 +46,51 @@ class LoginTests(TestCase):
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)
         self.assertTrue(second.wsgi_request.user.is_authenticated)
+
+
+class LoginDestinationTests(TestCase):
+    """Where a login lands, when the link that led to it named a destination.
+
+    The address is supplied by whoever wrote the link, so it is treated as
+    input rather than as instruction: this page hands a freshly authenticated
+    user straight to it, and a page on another site is exactly what a login
+    form pretending to be this one would ask for.
+    """
+
+    def setUp(self):
+        make_user(EMAIL)
+
+    def _log_in_asking_for(self, destination):
+        return self.client.post(
+            reverse("accounts:login"),
+            {"email": EMAIL, "password": PASSWORD, "next": destination},
+        )
+
+    def test_a_path_on_this_site_is_honoured(self):
+        wanted = reverse("products:product_list")
+
+        response = self._log_in_asking_for(wanted)
+
+        self.assertEqual(response.url, wanted)
+
+    def test_an_address_on_another_site_is_discarded(self):
+        response = self._log_in_asking_for("https://originpass.example.net/steal")
+
+        self.assertEqual(response.url, reverse(settings.LOGIN_REDIRECT_URL))
+
+    def test_a_scheme_relative_address_is_discarded(self):
+        # Reads as a path and is not one: the browser keeps the current scheme
+        # and replaces the host.
+        response = self._log_in_asking_for("//originpass.example.net/steal")
+
+        self.assertEqual(response.url, reverse(settings.LOGIN_REDIRECT_URL))
+
+    def test_no_destination_lands_on_the_account_page(self):
+        response = self.client.post(
+            reverse("accounts:login"), {"email": EMAIL, "password": PASSWORD}
+        )
+
+        self.assertEqual(response.url, reverse(settings.LOGIN_REDIRECT_URL))
 
 
 class UniformAuthenticationErrorTests(TestCase):

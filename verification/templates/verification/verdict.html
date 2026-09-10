@@ -12,11 +12,16 @@ UR03: the verdict is a word, not only a colour. Someone who does not
 distinguish these colours reads the same answer as everyone else.
 {% endcomment %}
 <div class="verdict verdict--{{ verdict|lower }}">
-  <p class="verdict__label">
+  {% comment %}
+  The heading of the page, because it is the answer to the question the page was
+  opened to ask. An unmatched code has no product to name, so making the product
+  the heading left that page with no heading at all.
+  {% endcomment %}
+  <h1 class="verdict__label">
     {% if verdict == "GENUINE" %}{% translate "Genuine" %}
     {% elif verdict == "REVOKED" %}{% translate "Revoked" %}
     {% else %}{% translate "Not found" %}{% endif %}
-  </p>
+  </h1>
   <p class="verdict__detail">
     {% if verdict == "GENUINE" %}
       {% translate "This passport matches an active product registered by a verified company." %}
@@ -33,7 +38,7 @@ distinguish these colours reads the same answer as everyone else.
 {% if product %}
   <div class="card">
     <div class="card__head">
-      <h1>{{ product.name }}</h1>
+      <h2>{{ product.name }}</h2>
       <p class="muted">{{ product.category }}</p>
     </div>
 

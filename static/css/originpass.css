@@ -5,7 +5,13 @@
 :root {
   --ink: #16181d;
   --ink-soft: #5b6270;
-  --ink-faint: #8b91a0;
+  /* Each of these three was moved to the darkest value that clears the 4.5 to 1
+     UR09 asks for, against the palest background it is ever drawn on, and no
+     further. The old values measured 2.94, 4.45 and 4.29 on the public
+     verification page, which is the one page read by people who cannot ask for
+     help. The faint ink is checked against all six surfaces it is drawn on, not
+     only white: its worst case is 4.52, on the danger wash. */
+  --ink-faint: #676d7c;
   --surface: #ffffff;
   --surface-sunken: #f6f7f9;
   --border: #e3e6ec;
@@ -15,9 +21,9 @@
   --accent-dark: #2f39b3;
   --accent-wash: #eef0fd;
 
-  --ok: #1a7f52;
+  --ok: #197e51;
   --ok-wash: #e7f5ee;
-  --warning: #a8630b;
+  --warning: #a45f07;
   --warning-wash: #fdf3e3;
   --danger: #c02a2a;
   --danger-wash: #fceceb;
@@ -94,7 +100,12 @@ a:hover {
   color: var(--ink-faint);
   font-size: 0.85rem;
 }
+/* A passport code is forty-three characters with no spaces in it. Left to sit on
+   one line it set a floor under the width of its row, its card and the whole
+   page: on a 360 pixel screen the passport detail came out 109 pixels too wide
+   and had to be scrolled sideways. It breaks mid-code instead. */
 .mono {
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
@@ -149,7 +160,13 @@ a:hover {
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  /* Wraps rather than running off the side. A signed-in visitor is offered more
+     links than a stranger, and on a 360 pixel screen they did not fit: the row
+     pushed the page up to 144 pixels wider than the screen, so every page had to
+     be scrolled sideways to be read. Wrapping costs nothing at any width where
+     the row already fits. */
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
   font-size: 0.9rem;
 }
 /* Scoped away from buttons on purpose. `.nav a` outweighs `.btn--primary`, so
@@ -520,6 +537,18 @@ tbody tr:hover {
   gap: var(--space-3) var(--space-4);
   font-size: 0.93rem;
 }
+/* A grid item will not shrink below its own minimum width unless told to, and
+   the minimum width of a forty-three character passport code is the whole code.
+   Without this the track, the card and the page all stretched to fit it, and
+   `overflow-wrap` on the code alone could not undo that. */
+.detail-list dt,
+.detail-list dd,
+.detail-list dd a {
+  min-width: 0;
+  /* The public verification address is printed in full here, and a URL has no
+     spaces to break at either. */
+  overflow-wrap: anywhere;
+}
 .detail-list dt {
   color: var(--ink-soft);
 }
@@ -630,6 +659,13 @@ tbody tr:hover {
   color: var(--warning);
   background: var(--warning-wash);
   border-color: rgba(168, 99, 11, 0.28);
+}
+
+/* A file input carries its own intrinsic width, wider than the column it sits
+   in on a narrow screen, and pushed the registration form three pixels past the
+   edge. */
+input[type="file"] {
+  max-width: 100%;
 }
 
 @media (max-width: 640px) {

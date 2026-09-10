@@ -234,8 +234,21 @@ unapplied migrations. If that warning appears, step 5 did not finish.
 `originpass`. Tick *Save password*. The tables are then under
 **Databases → originpass → Schemas → public → Tables**.
 
-> The step up to the password prompt was verified; the path below it was not walked on this
-> machine. Walk it once yourself while rehearsing, and correct this file if it differs.
+Rehearse it once, in this order, and every click you meet live is one you have already made:
+
+1. Open `http://127.0.0.1:8080/` — it should land on the object tree with no login of its own
+2. Double-click **Servers**, then **OriginPass**
+3. Type `originpass` at the password prompt and tick *Save password*
+4. Double-click **Databases → originpass → Schemas → public → Tables**
+5. Double-click **products_custodytransfer**, then **Constraints**
+
+Step 5 is the one worth showing. It reads **Constraints (6)** and lists
+`custody_transfer_links_to_one_predecessor`, which is what stops a chain of custody from
+forking, and `custody_transfer_changes_holder`, which stops a product being handed to
+whoever already holds it. Neither is a model field, which is why the administration site
+of Django cannot show them and this can.
+
+Leave the tree expanded at that point before anyone is watching.
 
 To show a rule the database holds rather than the application:
 **products_custodytransfer → Constraints**. There is

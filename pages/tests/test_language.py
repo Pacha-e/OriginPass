@@ -13,7 +13,7 @@ from django.conf import settings
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
-from testing.factories import make_product
+from test_support.factories import make_product
 
 CATALOGUE = Path(settings.BASE_DIR) / "locale" / "es" / "LC_MESSAGES" / "django.po"
 

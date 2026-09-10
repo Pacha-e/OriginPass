@@ -3,7 +3,7 @@
 from django.test import TestCase
 
 from audit.models import Action, AuditEntry
-from testing.factories import make_admin, make_company
+from test_support.factories import make_admin, make_company
 
 
 class AuditTrailTests(TestCase):

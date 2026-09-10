@@ -11,7 +11,7 @@ from audit.models import Action, AuditEntry
 from companies.models import CompanyStatus, CompanyType
 from products.forms import ProductForm
 from products.models import Product, ProductStatus, ProductType
-from testing.factories import OWNER_PASSWORD, make_approved_company, make_company
+from test_support.factories import OWNER_PASSWORD, make_approved_company, make_company
 
 VALID_PRODUCT = {
     "name": "Sombrero vueltiao 21 vueltas",

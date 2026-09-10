@@ -8,8 +8,8 @@ from django.urls import reverse
 
 from accounts.models import Role
 from companies.models import Company, CompanyStatus, VerificationTrack
-from testing.factories import make_user
-from testing.timing import measure
+from test_support.factories import make_user
+from test_support.timing import measure
 
 from .payloads import ARTISAN_APPLICATION, COMMERCIAL_APPLICATION
 

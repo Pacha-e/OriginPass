@@ -9,8 +9,8 @@ from django.urls import reverse
 
 from companies.models import CompanyStatus
 from products.models import Product, ProductType
-from testing.factories import make_admin, make_company, make_user
-from testing.timing import measure
+from test_support.factories import make_admin, make_company, make_user
+from test_support.timing import measure
 
 
 def unsaved_product_for(company):

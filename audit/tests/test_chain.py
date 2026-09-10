@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from audit.integrity import sign
 from audit.models import Action, AuditEntry
-from testing.factories import make_admin, make_company, make_user
+from test_support.factories import make_admin, make_company, make_user
 
 
 class ChainTests(TestCase):

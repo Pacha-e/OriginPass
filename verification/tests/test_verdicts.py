@@ -13,8 +13,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from testing.factories import make_admin, make_product
-from testing.timing import measure
+from test_support.factories import make_admin, make_product
+from test_support.timing import measure
 from verification.models import Verdict
 
 

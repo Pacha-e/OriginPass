@@ -6,7 +6,7 @@ import qrcode
 from django.test import TestCase
 from django.urls import reverse
 
-from testing.factories import OWNER_PASSWORD, make_approved_company, make_product
+from test_support.factories import OWNER_PASSWORD, make_approved_company, make_product
 
 
 class QrCodeTests(TestCase):

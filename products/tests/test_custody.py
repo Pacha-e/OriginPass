@@ -7,7 +7,7 @@ from django.test import TestCase
 from audit.integrity import GENESIS
 from audit.models import Action, AuditEntry
 from products.models import CustodyTransfer
-from testing.factories import make_admin, make_approved_company, make_product, make_user
+from test_support.factories import make_admin, make_approved_company, make_product, make_user
 
 
 class CustodyChainTests(TestCase):

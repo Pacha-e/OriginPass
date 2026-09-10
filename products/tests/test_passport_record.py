@@ -11,7 +11,7 @@ from django.test import TestCase
 
 from companies.models import CompanyType
 from products.models import Product, ProductStatus, ProductType
-from testing.factories import make_admin, make_approved_company, make_product
+from test_support.factories import make_admin, make_approved_company, make_product
 
 
 class ProductRecordTests(TestCase):

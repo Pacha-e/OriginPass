@@ -6,7 +6,7 @@ from django.db import connection
 from django.test import TestCase, override_settings
 
 from products.models import Product
-from testing.factories import make_approved_company, make_product
+from test_support.factories import make_approved_company, make_product
 
 
 class IntegrityHashTests(TestCase):

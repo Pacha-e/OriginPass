@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from companies.models import CompanyStatus
-from testing.factories import make_admin, make_company, make_user
+from test_support.factories import make_admin, make_company, make_user
 
 from .payloads import COMMERCIAL_APPLICATION
 

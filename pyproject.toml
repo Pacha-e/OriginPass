@@ -28,6 +28,6 @@ known-first-party = [
     "config",
     "pages",
     "products",
-    "testing",
+    "test_support",
     "verification",
 ]

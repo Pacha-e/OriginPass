@@ -8,7 +8,7 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 
 from companies.models import Company, CompanyStatus, CompanyType, VerificationTrack
-from testing.factories import make_admin, make_company, make_user
+from test_support.factories import make_admin, make_company, make_user
 
 
 class CompanyRecordTests(TestCase):

@@ -133,7 +133,7 @@ OriginPass/
 ├── pages/            the landing page
 ├── config/           settings, root URLs, WSGI and ASGI entry points
 ├── templates/        base template, shared partials and the error pages
-├── testing/          factories and helpers shared by the apps' test suites
+├── test_support/     factories and helpers shared by the apps' test suites
 ├── locale/es/        the Spanish the interface is served in
 ├── static/           the stylesheet and the favicon, written for this project
 ├── docs/diagrams/    deployment, component and data models

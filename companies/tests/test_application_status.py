@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from testing.factories import make_admin, make_company, make_user
+from test_support.factories import make_admin, make_company, make_user
 
 
 class ApplicationStatusVisibleToOwnerTests(TestCase):

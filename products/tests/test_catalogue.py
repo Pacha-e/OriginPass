@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from products.models import ProductStatus
-from testing.factories import OWNER_PASSWORD, make_admin, make_approved_company, make_product
-from testing.timing import measure
+from test_support.factories import OWNER_PASSWORD, make_admin, make_approved_company, make_product
+from test_support.timing import measure
 
 VALID_PRODUCT = {
     "name": "Sombrero vueltiao 21 vueltas",

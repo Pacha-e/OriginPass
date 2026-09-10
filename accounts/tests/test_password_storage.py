@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import User
-from testing.factories import make_user
+from test_support.factories import make_user
 
 PASSWORD = "Vueltiao-2026"
 

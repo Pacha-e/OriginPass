@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts import forms
-from testing.factories import make_user
-from testing.timing import measure
+from test_support.factories import make_user
+from test_support.timing import measure
 
 #: Resolved once, here, because the form holds it as a lazy translation and the
 #: assertions below compare it against text that has already been rendered.

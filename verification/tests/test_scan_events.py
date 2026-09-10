@@ -7,7 +7,7 @@ signal that would be lost by recording only the successes.
 from django.test import TestCase
 from django.urls import reverse
 
-from testing.factories import make_product
+from test_support.factories import make_product
 from verification.models import ScanEvent, Verdict
 
 ANDROID = "Mozilla/5.0 (Linux; Android 14) Mobile Safari/537.36"

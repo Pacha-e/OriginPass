@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import Role, User
-from testing.factories import make_user
-from testing.timing import measure
+from test_support.factories import make_user
+from test_support.timing import measure
 
 EMAIL = "weaver@tuchin.co"
 PASSWORD = "Vueltiao-2026"

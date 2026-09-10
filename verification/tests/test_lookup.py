@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from products.models import Product
-from testing.factories import make_product
-from testing.timing import measure
+from test_support.factories import make_product
+from test_support.timing import measure
 
 #: Enough rows that a sequential scan would show against an index lookup.
 FILLER_ROWS = 200

@@ -91,13 +91,25 @@ class Product(models.Model):
         return f"{self.name} ({self.passport_code})"
 
     def save(self, *args, **kwargs):
+        """Sign the row, then write it once.
+
+        Every field the signature covers is known before the row reaches the
+        database: `passport_code` has a Python-side default, which Django
+        applies when the instance is built rather than when it is saved. This
+        used to write each row twice, on the stated grounds that the code only
+        existed after the first save. That was not true, and it cost every
+        registration an extra UPDATE.
+        """
+        self.integrity_hash = self.compute_integrity_hash()
+
+        # A caller changing one column still needs the signature to follow it,
+        # or an edit through `update_fields` would leave the row looking
+        # tampered with.
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = {*update_fields, "integrity_hash"}
+
         super().save(*args, **kwargs)
-        # The hash covers the passport code, which a new row only has after the
-        # first save, so it is written on a second pass.
-        expected = self.compute_integrity_hash()
-        if self.integrity_hash != expected:
-            self.integrity_hash = expected
-            super().save(update_fields=["integrity_hash"])
 
     def clean(self):
         """Only an approved company issues passports, and only of its own kind."""

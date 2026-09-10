@@ -59,3 +59,7 @@ docs/diagrams/cheat-sheet.md
 # Operating system
 .DS_Store
 Thumbs.db
+
+# Graphify build output. The report and the graph are written to an archive
+# outside this repository, but the extractor leaves a cache behind here.
+graphify-out/

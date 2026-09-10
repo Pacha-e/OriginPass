@@ -19,6 +19,26 @@ class IntegrityHashTests(TestCase):
         self.assertEqual(len(product.integrity_hash), 64)
         self.assertTrue(product.is_intact)
 
+    def test_registering_a_passport_writes_the_row_once(self):
+        """The signature is computed before the write, not patched in afterwards.
+
+        Every field it covers is known before the row reaches the database, so
+        a second UPDATE per registration buys nothing.
+        """
+        with self.assertNumQueries(1):
+            make_product(self.company)
+
+    def test_changing_one_column_carries_the_signature_with_it(self):
+        """An edit through `update_fields` must not leave the row looking tampered with."""
+        product = make_product(self.company)
+
+        product.name = "Sombrero vueltiao 27 vueltas"
+        product.save(update_fields=["name"])
+
+        product.refresh_from_db()
+        self.assertEqual(product.name, "Sombrero vueltiao 27 vueltas")
+        self.assertTrue(product.is_intact)
+
     def test_a_change_written_behind_the_model_is_detectable(self):
         product = make_product(self.company)
 

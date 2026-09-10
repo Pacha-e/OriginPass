@@ -64,8 +64,13 @@ committed; the `.po` is.
 
 PostgreSQL is required; the application does not fall back to another engine.
 
+To bring the project up on a machine that has never run it, and have it ready to
+demonstrate, follow [docs/ready-to-present.md](docs/ready-to-present.md) instead of this
+section. It covers the same ground step by step, states what each command should print,
+and says what to do when one of them does not.
+
 ```bash
-docker compose up -d db          # PostgreSQL 17 on localhost:5432
+docker compose up -d             # PostgreSQL 17 on localhost:5432, pgAdmin on 127.0.0.1:8080
 
 python -m venv .venv
 source .venv/Scripts/activate    # Linux and macOS: source .venv/bin/activate

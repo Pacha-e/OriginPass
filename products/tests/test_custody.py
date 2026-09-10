@@ -59,6 +59,39 @@ class CustodyChainTests(TestCase):
         with self.assertRaises(ValueError):
             transfer.save()
 
+    def test_a_copy_read_before_the_transfer_was_accepted_cannot_write_over_it(self):
+        """The refusal reads the stored row, not the instance asking to be saved.
+
+        Two people can hold the same transfer open at once. One accepts it; the
+        other still holds a copy that says Initiated. Believing that copy would
+        put the row back to Initiated and leave the audit trail saying it was
+        accepted.
+        """
+        transfer = self._hand_to(self.buyer)
+        stale = CustodyTransfer.objects.get(pk=transfer.pk)
+        transfer.accept()
+
+        stale.note = "Written from a copy read before the acceptance"
+        with self.assertRaises(ValueError):
+            stale.save()
+
+        self.assertEqual(CustodyTransfer.objects.get(pk=transfer.pk).state, TransferState.ACCEPTED)
+
+    def test_a_copy_read_before_the_transfer_was_accepted_cannot_resolve_it_again(self):
+        transfer = self._hand_to(self.buyer)
+        stale = CustodyTransfer.objects.get(pk=transfer.pk)
+        transfer.accept()
+
+        with self.assertRaises(ValueError):
+            stale.decline()
+
+        self.assertEqual(CustodyTransfer.objects.get(pk=transfer.pk).state, TransferState.ACCEPTED)
+        self.assertEqual(
+            AuditEntry.objects.filter(action=Action.CUSTODY_DECLINED).count(),
+            0,
+            "A refused resolution must leave nothing behind in the trail.",
+        )
+
     def test_the_database_refuses_a_transfer_that_changes_nothing(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
             self._hand_to(self.company.owner)

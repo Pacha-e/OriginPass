@@ -227,10 +227,13 @@ class CustodyTransfer(models.Model):
         if self.pk is None:
             return self._append(*args, **kwargs)
 
-        if self.state != TransferState.INITIATED:
-            existing = type(self).objects.get(pk=self.pk)
-            if existing.state != TransferState.INITIATED:
-                raise ValueError("A resolved custody transfer cannot be edited.")
+        # Whether this row may still be written is decided by what the database
+        # holds, never by what this instance holds. An instance read before the
+        # transfer was resolved still carries Initiated, and asking it would let
+        # that stale copy write itself over the resolution.
+        stored_state = type(self).objects.filter(pk=self.pk).values_list("state", flat=True).first()
+        if stored_state != TransferState.INITIATED:
+            raise ValueError("A resolved custody transfer cannot be edited.")
         return super().save(*args, **kwargs)
 
     def _append(self, *args, **kwargs):
@@ -281,14 +284,26 @@ class CustodyTransfer(models.Model):
             raise ValidationError("Only the current holder can transfer this product.")
 
     def _resolve(self, state, action, actor):
-        if self.state != TransferState.INITIATED:
-            raise ValueError("This transfer has already been resolved.")
-        self.state = state
-        self.resolved_at = timezone.now()
-        self.save(update_fields=["state", "resolved_at"])
-        # The resolution is not covered by this row's own signature, so it is
-        # written into the chained trail instead.
-        AuditEntry.record(actor=actor or self.to_holder, action=action, target=self)
+        with transaction.atomic():
+            # Locked and re-read before the question is asked, so that two
+            # resolutions of the same transfer cannot both find it open and
+            # both append a resolution to the trail.
+            stored_state = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("state", flat=True)
+                .first()
+            )
+            if stored_state != TransferState.INITIATED:
+                raise ValueError("This transfer has already been resolved.")
+
+            self.state = state
+            self.resolved_at = timezone.now()
+            self.save(update_fields=["state", "resolved_at"])
+            # The resolution is not covered by this row's own signature, so it
+            # is written into the chained trail instead.
+            AuditEntry.record(actor=actor or self.to_holder, action=action, target=self)
 
     def accept(self, actor=None):
         self._resolve(TransferState.ACCEPTED, Action.CUSTODY_ACCEPTED, actor)

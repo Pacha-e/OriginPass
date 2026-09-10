@@ -6,13 +6,20 @@ that matter: the chain is what makes them visible.
 
 from datetime import timedelta
 
+from django.conf import settings
 from django.db import IntegrityError, connection, transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from audit.integrity import sign
 from audit.models import Action, AuditEntry
-from test_support.factories import make_admin, make_company, make_user
+from test_support.factories import (
+    make_admin,
+    make_approved_company,
+    make_company,
+    make_product,
+    make_user,
+)
 
 
 class ChainTests(TestCase):
@@ -150,3 +157,74 @@ class ChainTests(TestCase):
             self.assertFalse(entry.is_intact)
 
         self.assertTrue(entry.is_intact)
+
+
+class KeyRotationTests(TestCase):
+    """Rotating the signing key must not make every existing record look forged.
+
+    The two cases have to stay apart. A record signed with a key that is being
+    retired is a record this system wrote and still stands behind; a record
+    signed with a key it never used is a forgery. Collapsing them would drown a
+    real alteration in a report that flags everything.
+    """
+
+    def setUp(self):
+        self.admin = make_admin()
+        self.owner = make_user()
+        self.company = make_company(self.owner)
+        self.company.approve(actor=self.admin)
+        self.product = make_product(make_approved_company(email="otro@monteria.co"))
+
+    def test_an_entry_signed_with_a_retired_key_still_verifies(self):
+        entry = AuditEntry.objects.order_by("id").first()
+
+        with override_settings(
+            SECRET_KEY="the-key-rotated-in",
+            SECRET_KEY_FALLBACKS=[settings.SECRET_KEY],
+        ):
+            self.assertTrue(entry.is_intact)
+
+    def test_the_whole_trail_still_verifies_after_a_rotation(self):
+        with override_settings(
+            SECRET_KEY="the-key-rotated-in",
+            SECRET_KEY_FALLBACKS=[settings.SECRET_KEY],
+        ):
+            ok, problem = AuditEntry.verify_chain()
+
+        self.assertTrue(ok, problem)
+
+    def test_a_product_signed_with_a_retired_key_still_verifies(self):
+        with override_settings(
+            SECRET_KEY="the-key-rotated-in",
+            SECRET_KEY_FALLBACKS=[settings.SECRET_KEY],
+        ):
+            self.product.refresh_from_db()
+            self.assertTrue(self.product.is_intact)
+
+    def test_a_key_that_was_never_ours_is_still_refused(self):
+        entry = AuditEntry.objects.order_by("id").first()
+
+        with override_settings(
+            SECRET_KEY="the-key-rotated-in",
+            SECRET_KEY_FALLBACKS=["a-key-this-system-never-used"],
+        ):
+            self.assertFalse(entry.is_intact)
+
+    def test_a_record_altered_under_the_retired_key_is_still_caught(self):
+        """The fallback accepts an old signature, not an old row that changed."""
+        entry = AuditEntry.objects.order_by("id").first()
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE audit_auditentry SET reason = %s WHERE id = %s",
+                ["Rewritten during the rotation window", entry.pk],
+            )
+
+        with override_settings(
+            SECRET_KEY="the-key-rotated-in",
+            SECRET_KEY_FALLBACKS=[settings.SECRET_KEY],
+        ):
+            ok, problem = AuditEntry.verify_chain()
+
+        self.assertFalse(ok)
+        self.assertIn("altered since it was written", problem)

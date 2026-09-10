@@ -15,10 +15,9 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.crypto import constant_time_compare
 from django.utils.translation import gettext_lazy as _
 
-from audit.integrity import GENESIS, sign, verify_chain
+from audit.integrity import GENESIS, matches, sign, verify_chain
 from audit.models import Action, AuditEntry
 from companies.models import CompanyStatus, CompanyType
 
@@ -131,14 +130,9 @@ class Product(models.Model):
                 }
             )
 
-    def compute_integrity_hash(self):
-        """Sign the identifying fields, so later tampering is detectable.
-
-        Signed rather than hashed. A plain hash over these columns could be
-        recomputed by anyone able to write to them, which would let an edited
-        row be left looking untouched; the key this uses is not in the database.
-        """
-        return sign(
+    def signed_parts(self):
+        """The identifying fields the signature covers."""
+        return (
             self.passport_code,
             self.company_id,
             self.product_type,
@@ -147,9 +141,21 @@ class Product(models.Model):
             self.origin,
         )
 
+    def compute_integrity_hash(self):
+        """Sign the identifying fields, so later tampering is detectable.
+
+        Signed rather than hashed. A plain hash over these columns could be
+        recomputed by anyone able to write to them, which would let an edited
+        row be left looking untouched; the key this uses is not in the database.
+        """
+        return sign(*self.signed_parts())
+
     @property
     def is_intact(self):
-        return constant_time_compare(self.integrity_hash, self.compute_integrity_hash())
+        # Asked through `matches` rather than compared against a fresh
+        # signature, so that a row written before a key rotation is still
+        # recognised as ours instead of being reported as altered.
+        return matches(self.integrity_hash, *self.signed_parts())
 
     @property
     def current_holder(self):

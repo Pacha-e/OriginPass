@@ -6,6 +6,7 @@ when it is allowed, is decided by the model.
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
@@ -41,7 +42,17 @@ def application_create(request):
             company = form.save(commit=False)
             company.owner = request.user
             company.status = CompanyStatus.PENDING
-            company.save()
+            try:
+                # In its own block, so that the refused write is the only thing
+                # rolled back and the request can go on to answer.
+                with transaction.atomic():
+                    company.save()
+            except IntegrityError:
+                # A double-clicked submit button sends the form twice, and the
+                # check above ran before either write landed. The database says
+                # what that check meant to say, one company per account, so the
+                # answer is the one already written for it a few lines up.
+                return redirect("companies:application_detail")
 
             request.user.role = Role.COMPANY
             request.user.save(update_fields=["role"])

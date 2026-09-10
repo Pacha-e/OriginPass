@@ -3,12 +3,14 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import Role
 from companies.models import Company, CompanyStatus, VerificationTrack
-from test_support.factories import make_user
+from test_support.factories import make_company, make_user
 from test_support.timing import measure
 
 from .payloads import ARTISAN_APPLICATION, COMMERCIAL_APPLICATION
@@ -45,6 +47,25 @@ class SubmitApplicationTests(TestCase):
 
         self.owner.refresh_from_db()
         self.assertEqual(self.owner.role, Role.COMPANY)
+
+    def test_a_second_submission_that_races_the_first_lands_on_the_application(self):
+        """A double-clicked submit button sends the form twice.
+
+        The page that decides whether this account has already applied reads
+        the answer before either write has landed, so both requests get past it
+        and the second one meets the database rule that an account owns one
+        company. That is the same answer the page already knows how to give, so
+        it gives it rather than failing.
+        """
+        make_company(self.owner)
+
+        with patch.object(Company.objects, "owned_by", return_value=None):
+            response = self.client.post(
+                reverse("companies:application_create"), COMMERCIAL_APPLICATION
+            )
+
+        self.assertRedirects(response, reverse("companies:application_detail"))
+        self.assertEqual(Company.objects.filter(owner=self.owner).count(), 1)
 
 
 class CommercialRegistryCodeTests(TestCase):

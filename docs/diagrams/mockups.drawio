@@ -8,7 +8,7 @@
         <mxCell id="title" value="OriginPass — Sprint 2 mockups" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="100" y="24" width="700" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="The five views the Sprint 2 requirements are reflected in. Each frame names its requirements, its content groups and the one interaction it offers." style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="subtitle" value="The five views the Sprint 2 requirements are reflected in, drawn in six frames: the last is the public verdict again at the 360 pixel width UR01 names, which a desktop frame cannot show. Each frame names its requirements, its content groups and the one interaction it offers." style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="100" y="58" width="1200" height="22" as="geometry" />
         </mxCell>
         <mxCell id="legend" value="Green marks what Sprint 2 delivered, matching the other three diagrams. Grey is chrome shared with Sprint 1." style="text;html=1;fontSize=12;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">

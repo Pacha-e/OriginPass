@@ -143,7 +143,7 @@
 
         <!-- ================= notes ================= -->
         <mxCell id="state_note" value="&lt;b&gt;Where the project stands today&lt;/b&gt;&lt;br&gt;&lt;br&gt;The application runs locally: &lt;i&gt;docker compose up -d&lt;/i&gt; provides the PostgreSQL 17 node, and &lt;i&gt;manage.py runserver&lt;/i&gt; the application server. The two are already separate processes speaking the protocol drawn above, so moving to a hosted server changes the address and not the design. Compose also starts a pgAdmin container for looking at the database; it is a tool for reading the system, not a part of it, so it is not drawn as a node.&lt;br&gt;&lt;br&gt;Deployment is the subject of Sprint 4, which is when the course covers it, and a WSGI server arrives with it.&lt;br&gt;&lt;br&gt;Every version named here is the version installed, read from &lt;i&gt;pip list&lt;/i&gt; and from the image tags in docker-compose.yml. It is deliberately not read from requirements.txt, which states the lowest version accepted rather than the one in use." style="shape=note;whiteSpace=wrap;html=1;size=20;align=left;verticalAlign=top;spacing=14;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="700" y="810" width="520" height="200" as="geometry" />
+          <mxGeometry x="700" y="880" width="520" height="210" as="geometry" />
         </mxCell>
 
         <mxCell id="legend" value="&lt;b&gt;Colour of the components&lt;/b&gt;&lt;br&gt;&lt;br&gt;blue&amp;nbsp; —&amp;nbsp; delivered in Sprint 1&lt;br&gt;green&amp;nbsp; —&amp;nbsp; being built in Sprint 2&lt;br&gt;purple&amp;nbsp; —&amp;nbsp; model exists, views in Sprint 4" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=14;fillColor=none;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
@@ -151,7 +151,7 @@
         </mxCell>
 
         <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 2, section 1.1" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
-          <mxGeometry x="100" y="1020" width="800" height="20" as="geometry" />
+          <mxGeometry x="100" y="1120" width="800" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

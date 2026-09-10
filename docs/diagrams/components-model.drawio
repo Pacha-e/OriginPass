@@ -79,7 +79,7 @@
 
         <!-- ================= products ================= -->
         <mxCell id="products" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;products&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="680" y="140" width="400" height="192" as="geometry" />
+          <mxGeometry x="680" y="170" width="400" height="192" as="geometry" />
         </mxCell>
         <mxCell id="pr_create" value="product_create  —  FR19, FR20, FR21, FR23, UR10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
           <mxGeometry y="52" width="400" height="28" as="geometry" />
@@ -134,7 +134,7 @@
         </mxCell>
 
         <mxCell id="i_passport" value="PassportLookup" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=3;verticalLabelPosition=middle;verticalAlign=middle;align=left;labelPosition=right;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="869" y="340" width="22" height="22" as="geometry" />
+          <mxGeometry x="869" y="382" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_passport_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#82b366;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="products" target="i_passport">
           <mxGeometry relative="1" as="geometry" />

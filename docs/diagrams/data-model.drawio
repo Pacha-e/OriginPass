@@ -8,8 +8,8 @@
         <mxCell id="title" value="OriginPass — Relational data model" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="80" y="24" width="700" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="PostgreSQL 17 · six tables · read from the running database with manage.py describe_schema, not from models.py" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="80" y="58" width="440" height="22" as="geometry" />
+        <mxCell id="subtitle" value="PostgreSQL 17 · six tables · read from the running database, not from models.py" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="80" y="58" width="560" height="22" as="geometry" />
         </mxCell>
 
         <!-- ================= accounts_user ================= -->
@@ -234,7 +234,7 @@
           <mxGeometry x="0.7" relative="1" as="geometry"><mxPoint y="-12" as="offset" /></mxGeometry>
         </mxCell>
         <mxCell id="r1c" value="owns · ON DELETE CASCADE" style="edgeLabel;html=1;resizable=0;fontSize=11;fontColor=#555555;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="r1">
-          <mxGeometry relative="1" as="geometry"><mxPoint y="14" as="offset" /></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><mxPoint y="-13" as="offset" /></mxGeometry>
         </mxCell>
 
         <!-- 2. company 1 — * product -->
@@ -248,7 +248,7 @@
           <mxGeometry x="0.75" relative="1" as="geometry"><mxPoint y="-12" as="offset" /></mxGeometry>
         </mxCell>
         <mxCell id="r2c" value="registers · ON DELETE PROTECT" style="edgeLabel;html=1;resizable=0;fontSize=11;fontColor=#555555;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="r2">
-          <mxGeometry relative="1" as="geometry"><mxPoint y="14" as="offset" /></mxGeometry>
+          <mxGeometry relative="1" as="geometry"><mxPoint y="-13" as="offset" /></mxGeometry>
         </mxCell>
 
         <!-- 3. product 1 — * scanevent -->
@@ -342,11 +342,11 @@
         </mxCell>
 
         <mxCell id="constraints" value="&lt;b&gt;Rules the database holds itself — a rule here survives a view that forgets it&lt;br&gt;&lt;br&gt;&lt;b&gt;Check constraints&lt;/b&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;company_track_matches_type&lt;/b&gt;&amp;nbsp; a commercial company uses CHAMBER_OF_COMMERCE or OFFICIAL_REGISTRY; an artisan company uses ARTISAN_REVIEW&lt;br&gt;&lt;br&gt;&lt;b&gt;commercial_company_has_registry_code&lt;/b&gt;&amp;nbsp; registry_code is filled for COMMERCIAL and empty for ARTISAN&amp;nbsp; (FR08, FR09)&lt;br&gt;&lt;br&gt;&lt;b&gt;negative_decision_states_a_reason&lt;/b&gt;&amp;nbsp; status_reason is filled when status is REJECTED or SUSPENDED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;revocation_states_a_reason&lt;/b&gt;&amp;nbsp; revocation_reason is filled when status is REVOKED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_changes_holder&lt;/b&gt;&amp;nbsp; from_holder_id is not to_holder_id&lt;br&gt;&lt;br&gt;&lt;b&gt;Unique constraints&lt;/b&gt; &amp;#8212; each chain of signed records stays linear&lt;br&gt;&lt;br&gt;&lt;b&gt;audit_entry_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; no audit entry is the predecessor of two others&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; within one product, no handover is the predecessor of two others" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="740" y="890" width="640" height="220" as="geometry" />
+          <mxGeometry x="740" y="890" width="640" height="350" as="geometry" />
         </mxCell>
 
         <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 2, section 1.3" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
-          <mxGeometry x="80" y="1130" width="800" height="20" as="geometry" />
+          <mxGeometry x="80" y="1270" width="800" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

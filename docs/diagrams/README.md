@@ -11,11 +11,26 @@ with no export step needed to read it.
 | `data-model.drawio` | 1.3 | The six tables, their columns and types, the foreign keys with their cardinality, and the check constraints |
 | `mockups.drawio` | 2 | The five views the Sprint 2 requirements are reflected in, each answering what the content groups are, where the information sits, and how the interface is used |
 
-Every version and every column name in these diagrams was read from the code rather
-than from the plan: `requirements.txt` and `docker-compose.yml` for the deployment
-model, `views.py` and `urls.py` for the component model, `models.py` for the data
+`export/` holds a PNG of each diagram at twice its natural size, rebuilt with
+
+```bash
+docker run --rm -v "$PWD/docs/diagrams:/data" rlespinasse/drawio-export -f png --scale 2
+```
+
+The wiki does not use them: it links the `.drawio` sources, so that what a reader opens is
+the file this repository versions rather than a picture of it that can fall behind. They
+exist for slides and for anywhere a link will not do.
+
+Every version and every column name in these diagrams was read from what is installed
+and running rather than from the plan: `pip list` and the image tags in
+`docker-compose.yml` for the deployment model, `views.py` and `urls.py` for the
+component model, the running database through `manage.py describe_schema` for the data
 model, and the templates themselves for the mockups. When the code changes, these
 change with it.
+
+Deliberately not `requirements.txt`: it states the lowest version the project accepts,
+not the one in use, and reading it as though it were the second is how this file once
+named four versions the project does not install.
 
 The mockups are wireframes rather than a copy of the rendered pages, which is what
 the deliverable asks for: they show the structure and the interaction, not the

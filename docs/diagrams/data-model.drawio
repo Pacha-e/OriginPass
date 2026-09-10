@@ -8,7 +8,7 @@
         <mxCell id="title" value="OriginPass — Relational data model" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="80" y="24" width="700" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="PostgreSQL 17 · six tables · read from models.py" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="subtitle" value="PostgreSQL 17 · six tables · read from the running database with manage.py describe_schema, not from models.py" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="80" y="58" width="440" height="22" as="geometry" />
         </mxCell>
 
@@ -332,7 +332,7 @@
         <mxCell id="lg3" value="Table exists, filled from Sprint 3 on" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="1450" y="240" width="260" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="lg4" value="Every table was created by the Sprint 1 migrations, so later sprints add views rather than schema changes.&lt;br&gt;&lt;br&gt;PK primary key · FK foreign key&lt;br&gt;1 exactly one · 0..1 at most one · * many" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=11;fontColor=#555555;" vertex="1" parent="1">
+        <mxCell id="lg4" value="Sprint 1 created every table. Sprint 2 added no table, but did add the signature and link columns to the two chained tables and the constraints that keep those chains linear.&lt;br&gt;&lt;br&gt;PK primary key · FK foreign key&lt;br&gt;1 exactly one · 0..1 at most one · * many" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=11;fontColor=#555555;" vertex="1" parent="1">
           <mxGeometry x="1450" y="286" width="260" height="110" as="geometry" />
         </mxCell>
 
@@ -341,7 +341,7 @@
           <mxGeometry x="80" y="890" width="620" height="220" as="geometry" />
         </mxCell>
 
-        <mxCell id="constraints" value="&lt;b&gt;Check constraints — the rules hold in the database, not only in the application&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;company_track_matches_type&lt;/b&gt;&amp;nbsp; a commercial company uses CHAMBER_OF_COMMERCE or OFFICIAL_REGISTRY; an artisan company uses ARTISAN_REVIEW&lt;br&gt;&lt;br&gt;&lt;b&gt;commercial_company_has_registry_code&lt;/b&gt;&amp;nbsp; registry_code is filled for COMMERCIAL and empty for ARTISAN&amp;nbsp; (FR08, FR09)&lt;br&gt;&lt;br&gt;&lt;b&gt;negative_decision_states_a_reason&lt;/b&gt;&amp;nbsp; status_reason is filled when status is REJECTED or SUSPENDED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;revocation_states_a_reason&lt;/b&gt;&amp;nbsp; revocation_reason is filled when status is REVOKED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_changes_holder&lt;/b&gt;&amp;nbsp; from_holder_id is not to_holder_id" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="constraints" value="&lt;b&gt;Rules the database holds itself — a rule here survives a view that forgets it&lt;br&gt;&lt;br&gt;&lt;b&gt;Check constraints&lt;/b&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;company_track_matches_type&lt;/b&gt;&amp;nbsp; a commercial company uses CHAMBER_OF_COMMERCE or OFFICIAL_REGISTRY; an artisan company uses ARTISAN_REVIEW&lt;br&gt;&lt;br&gt;&lt;b&gt;commercial_company_has_registry_code&lt;/b&gt;&amp;nbsp; registry_code is filled for COMMERCIAL and empty for ARTISAN&amp;nbsp; (FR08, FR09)&lt;br&gt;&lt;br&gt;&lt;b&gt;negative_decision_states_a_reason&lt;/b&gt;&amp;nbsp; status_reason is filled when status is REJECTED or SUSPENDED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;revocation_states_a_reason&lt;/b&gt;&amp;nbsp; revocation_reason is filled when status is REVOKED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_changes_holder&lt;/b&gt;&amp;nbsp; from_holder_id is not to_holder_id&lt;br&gt;&lt;br&gt;&lt;b&gt;Unique constraints&lt;/b&gt; &amp;#8212; each chain of signed records stays linear&lt;br&gt;&lt;br&gt;&lt;b&gt;audit_entry_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; no audit entry is the predecessor of two others&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; within one product, no handover is the predecessor of two others" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="740" y="890" width="640" height="220" as="geometry" />
         </mxCell>
 

@@ -8,8 +8,13 @@ renders the cause next to that input (UR08).
 """
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
-from .models import TRACKS_BY_TYPE, Company, CompanyType, VerificationTrack
+from .models import COMMERCIAL_TRACKS, Company, CompanyType, VerificationTrack
+
+#: Stated once because the form raises it twice: as the required-field message
+#: and again when the submitted reason turns out to be only whitespace.
+REJECTION_REASON_REQUIRED = _("A reason is required to reject an application.")
 
 
 class CompanyApplicationForm(forms.ModelForm):
@@ -25,19 +30,20 @@ class CompanyApplicationForm(forms.ModelForm):
             "registry_code",
         ]
         labels = {
-            "legal_name": "Legal name",
-            "company_type": "Company type",
-            "verification_track": "Verification track",
-            "location": "Location",
-            "website": "Contact website",
-            "registry_code": "Official registry code",
+            "legal_name": _("Legal name"),
+            "company_type": _("Company type"),
+            "verification_track": _("Verification track"),
+            "description": _("Description"),
+            "location": _("Location"),
+            "website": _("Contact website"),
+            "registry_code": _("Official registry code"),
         }
         help_texts = {
-            "verification_track": (
+            "verification_track": _(
                 "A commercial company chooses one. An artisan workshop is reviewed by a person."
             ),
-            "website": "Optional.",
-            "registry_code": (
+            "website": _("Optional."),
+            "registry_code": _(
                 "Required for a commercial company, for example a NIT "
                 "or a Chamber of Commerce code."
             ),
@@ -64,13 +70,15 @@ class CompanyApplicationForm(forms.ModelForm):
             if not registry_code:
                 self.add_error(
                     "registry_code",
-                    "A commercial company must provide an official registry code.",
+                    _("A commercial company must provide an official registry code."),
                 )
-            if track not in TRACKS_BY_TYPE[CompanyType.COMMERCIAL]:
+            if track not in COMMERCIAL_TRACKS:
                 self.add_error(
                     "verification_track",
-                    "A commercial company is verified through the Chamber of Commerce "
-                    "or an official registry.",
+                    _(
+                        "A commercial company is verified through the Chamber of Commerce "
+                        "or an official registry."
+                    ),
                 )
 
         elif company_type == CompanyType.ARTISAN:
@@ -79,8 +87,10 @@ class CompanyApplicationForm(forms.ModelForm):
             if registry_code:
                 self.add_error(
                     "registry_code",
-                    "An artisan workshop is verified by manual review and does not "
-                    "use a registry code.",
+                    _(
+                        "An artisan workshop is verified by manual review and does not "
+                        "use a registry code."
+                    ),
                 )
             else:
                 cleaned["registry_code"] = ""
@@ -92,13 +102,13 @@ class RejectionForm(forms.Form):
     """A rejection carries a written reason, or it is not a rejection (FR14, DBR12)."""
 
     reason = forms.CharField(
-        label="Reason for the rejection",
+        label=_("Reason for the rejection"),
         widget=forms.Textarea(attrs={"rows": 3}),
-        error_messages={"required": "A reason is required to reject an application."},
+        error_messages={"required": REJECTION_REASON_REQUIRED},
     )
 
     def clean_reason(self):
         reason = self.cleaned_data["reason"].strip()
         if not reason:
-            raise forms.ValidationError("A reason is required to reject an application.")
+            raise forms.ValidationError(REJECTION_REASON_REQUIRED)
         return reason

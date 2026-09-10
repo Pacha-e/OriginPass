@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<section class="hero">
+  <h1>{% translate "A verifiable passport for every product" %}</h1>
+  <p>
+    {% blocktranslate trimmed %}
+      OriginPass issues one digital passport per physical unit and records each change of
+      custody along its journey, so a buyer can confirm a product is genuine without having
+      to trust the seller.
+    {% endblocktranslate %}
+  </p>
+  {% if not user.is_authenticated %}
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="{% url 'accounts:register' %}">{% translate "Create an account" %}</a>
+      <a class="btn" href="{% url 'accounts:login' %}">{% translate "Log in" %}</a>
+    </div>
+  {% elif not user.is_platform_admin %}
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="{% url 'companies:application_detail' %}">{% translate "My application" %}</a>
+    </div>
+  {% else %}
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="{% url 'companies:review_list' %}">{% translate "Review applications" %}</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

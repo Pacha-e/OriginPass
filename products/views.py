@@ -16,6 +16,8 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 
 from audit.models import Action, AuditEntry
 from companies.models import Company, CompanyStatus
@@ -25,32 +27,35 @@ from .models import PRODUCT_TYPE_BY_COMPANY_TYPE, Product, ProductStatus
 
 #: Why a company in each non-approving status cannot issue a passport. Kept
 #: here rather than in the template so that the view can also refuse a POST.
+#: Lazily translated because this is built at import time, before a request has
+#: said which language to answer in.
 REFUSAL_BY_STATUS = {
-    CompanyStatus.PENDING: (
+    CompanyStatus.PENDING: gettext_lazy(
         "Your application is still being reviewed. Passports can be issued once it "
         "has been approved."
     ),
-    CompanyStatus.REJECTED: (
+    CompanyStatus.REJECTED: gettext_lazy(
         "Your application was rejected, so it cannot issue passports. Edit and "
         "resubmit it to be reviewed again."
     ),
-    CompanyStatus.SUSPENDED: (
+    CompanyStatus.SUSPENDED: gettext_lazy(
         "Your company is suspended and cannot issue new passports. Passports "
         "already issued keep working."
     ),
 }
 
+REVOKED_PASSPORT_REFUSAL = gettext_lazy(
+    "This passport has been revoked. A revoked passport is a record of what was "
+    "issued and is not edited."
+)
 
-def _company_of(request):
-    return Company.objects.filter(owner=request.user).first()
 
-
-def _refuse(request, company):
-    """FR20: the refusal states its cause instead of hiding the page."""
+def _refuse(request, company, heading, reason):
+    """FR20: a refusal states its cause instead of hiding the page."""
     return render(
         request,
-        "products/registration_refused.html",
-        {"company": company, "reason": REFUSAL_BY_STATUS[company.status]},
+        "products/refusal.html",
+        {"company": company, "heading": heading, "reason": reason},
         status=403,
     )
 
@@ -58,14 +63,14 @@ def _refuse(request, company):
 @login_required
 def product_list(request):
     """FR24 filtered by status, FR25 searched by name, category or passport code."""
-    company = _company_of(request)
+    company = Company.objects.owned_by(request.user)
     if company is None:
         return redirect("companies:application_create")
 
     products = Product.objects.filter(company=company)
 
     selected = request.GET.get("status", "")
-    if selected in {value for value, _ in ProductStatus.choices}:
+    if selected in {value for value, label in ProductStatus.choices}:
         products = products.filter(status=selected)
     else:
         selected = ""
@@ -95,11 +100,16 @@ def product_list(request):
 @login_required
 def product_create(request):
     """FR19 for an approved company, FR20 for any other, FR21 and FR23 on save."""
-    company = _company_of(request)
+    company = Company.objects.owned_by(request.user)
     if company is None:
         return redirect("companies:application_create")
     if not company.can_register_products:
-        return _refuse(request, company)
+        return _refuse(
+            request,
+            company,
+            heading=_("This company cannot issue a passport"),
+            reason=REFUSAL_BY_STATUS[company.status],
+        )
 
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES)
@@ -120,7 +130,8 @@ def product_create(request):
                 )
                 messages.success(
                     request,
-                    f"{product.name} now has a passport. Its code is {product.passport_code}.",
+                    _("%(product)s now has a passport. Its code is %(code)s.")
+                    % {"product": product.name, "code": product.passport_code},
                 )
                 return redirect("products:product_detail", pk=product.pk)
     else:
@@ -136,7 +147,7 @@ def product_create(request):
 @login_required
 def product_detail(request, pk):
     """The passport as its owner sees it: the code, the QR and the public address."""
-    company = _company_of(request)
+    company = Company.objects.owned_by(request.user)
     product = get_object_or_404(Product.objects.select_related("company"), pk=pk, company=company)
     return render(
         request,
@@ -153,28 +164,38 @@ def product_detail(request, pk):
 @login_required
 def product_edit(request, pk):
     """FR26: the descriptive fields change, the passport code does not."""
-    company = _company_of(request)
+    company = Company.objects.owned_by(request.user)
     product = get_object_or_404(Product, pk=pk, company=company)
 
     if product.status == ProductStatus.REVOKED:
-        return render(
+        return _refuse(
             request,
-            "products/registration_refused.html",
-            {
-                "company": company,
-                "reason": (
-                    "This passport has been revoked. A revoked passport is a record of "
-                    "what was issued and is not edited."
-                ),
-            },
-            status=403,
+            company,
+            heading=_("This passport cannot be edited"),
+            reason=REVOKED_PASSPORT_REFUSAL,
+        )
+
+    # Asked before the form is built, because the model's rule is that a
+    # passport belongs to an approved company, and it states that against the
+    # company field, which this form does not have. Left to reach the form, it
+    # arrives as an error with nowhere to go and the page fails outright.
+    # Suspension is the only way to get here: a company is approved when it
+    # registers a passport, and suspension is the only way out of approved.
+    if not company.can_register_products:
+        return _refuse(
+            request,
+            company,
+            heading=_("This passport cannot be edited"),
+            reason=REFUSAL_BY_STATUS[company.status],
         )
 
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
-            messages.success(request, f"{product.name} has been updated.")
+            messages.success(
+                request, _("%(product)s has been updated.") % {"product": product.name}
+            )
             return redirect("products:product_detail", pk=product.pk)
     else:
         form = ProductForm(instance=product)
@@ -189,7 +210,7 @@ def product_edit(request, pk):
 @login_required
 def qr_download(request, pk):
     """FR22: a PNG encoding the public verification address of this passport."""
-    company = _company_of(request)
+    company = Company.objects.owned_by(request.user)
     product = get_object_or_404(Product, pk=pk, company=company)
 
     address = request.build_absolute_uri(

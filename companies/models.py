@@ -6,41 +6,44 @@ it, and the ones the database can express are also written as constraints.
 """
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from audit.models import Action, AuditEntry
 
 
 class CompanyType(models.TextChoices):
-    COMMERCIAL = "COMMERCIAL", "Commercial company"
-    ARTISAN = "ARTISAN", "Artisan workshop"
+    COMMERCIAL = "COMMERCIAL", _("Commercial company")
+    ARTISAN = "ARTISAN", _("Artisan workshop")
 
 
 class VerificationTrack(models.TextChoices):
-    CHAMBER_OF_COMMERCE = "CHAMBER_OF_COMMERCE", "Chamber of Commerce"
-    OFFICIAL_REGISTRY = "OFFICIAL_REGISTRY", "Official registry"
-    ARTISAN_REVIEW = "ARTISAN_REVIEW", "Manual artisan review"
+    CHAMBER_OF_COMMERCE = "CHAMBER_OF_COMMERCE", _("Chamber of Commerce")
+    OFFICIAL_REGISTRY = "OFFICIAL_REGISTRY", _("Official registry")
+    ARTISAN_REVIEW = "ARTISAN_REVIEW", _("Manual artisan review")
 
 
 class CompanyStatus(models.TextChoices):
-    PENDING = "PENDING", "Pending"
-    APPROVED = "APPROVED", "Approved"
-    REJECTED = "REJECTED", "Rejected"
-    SUSPENDED = "SUSPENDED", "Suspended"
+    PENDING = "PENDING", _("Pending")
+    APPROVED = "APPROVED", _("Approved")
+    REJECTED = "REJECTED", _("Rejected")
+    SUSPENDED = "SUSPENDED", _("Suspended")
 
 
 #: A commercial company is verified through a registry; an artisan workshop is
 #: verified by a person. Crossing the two is the ModoVerificacionInvalido error
 #: of the prototype contract.
-TRACKS_BY_TYPE = {
+VERIFICATION_TRACKS_BY_COMPANY_TYPE = {
     CompanyType.COMMERCIAL: [
         VerificationTrack.CHAMBER_OF_COMMERCE,
         VerificationTrack.OFFICIAL_REGISTRY,
     ],
     CompanyType.ARTISAN: [VerificationTrack.ARTISAN_REVIEW],
 }
+
+COMMERCIAL_TRACKS = VERIFICATION_TRACKS_BY_COMPANY_TYPE[CompanyType.COMMERCIAL]
 
 #: The owner may edit only while the outcome is still open (FR10, FR11).
 EDITABLE_STATUSES = (CompanyStatus.PENDING, CompanyStatus.REJECTED)
@@ -50,6 +53,25 @@ EDITABLE_STATUSES = (CompanyStatus.PENDING, CompanyStatus.REJECTED)
 #: processes, which would make the constraint below differ on every
 #: makemigrations run and produce an endless trail of no-op migrations.
 STATUSES_REQUIRING_REASON = (CompanyStatus.REJECTED, CompanyStatus.SUSPENDED)
+
+
+class TransitionNotAllowed(ValueError):
+    """A status change asked for from a status it cannot be made from.
+
+    A ValueError, so that callers written before this existed keep working: the
+    reason-is-missing refusal is a ValueError too, and both mean the same thing
+    to a caller, which is that the change was not made.
+    """
+
+
+class CompanyManager(models.Manager):
+    def owned_by(self, user):
+        """The company this account owns, or None if it has not applied.
+
+        An account owns at most one company, so this answers with the record
+        rather than a queryset. Written once here because three views ask it.
+        """
+        return self.filter(owner=user).first()
 
 
 class Company(models.Model):
@@ -71,14 +93,16 @@ class Company(models.Model):
     registry_code = models.CharField(
         max_length=64,
         blank=True,
-        help_text="Official registry code. Required for a commercial company (FR08).",
+        help_text=_("Official registry code. Required for a commercial company (FR08)."),
     )
     status_reason = models.TextField(
         blank=True,
-        help_text="Why the application was rejected or the company suspended (DBR12).",
+        help_text=_("Why the application was rejected or the company suspended (DBR12)."),
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
     status_changed_at = models.DateTimeField(default=timezone.now)
+
+    objects = CompanyManager()
 
     class Meta:
         ordering = ["-submitted_at"]
@@ -88,7 +112,7 @@ class Company(models.Model):
                 condition=(
                     Q(
                         company_type=CompanyType.COMMERCIAL,
-                        verification_track__in=TRACKS_BY_TYPE[CompanyType.COMMERCIAL],
+                        verification_track__in=COMMERCIAL_TRACKS,
                     )
                     | Q(
                         company_type=CompanyType.ARTISAN,
@@ -133,42 +157,122 @@ class Company(models.Model):
         """Why an edit is being refused, worded for the owner (FR11)."""
         if self.is_editable:
             return None
-        return (
-            f"This application cannot be edited because it is {self.get_status_display().lower()}. "
+        return _(
+            "This application cannot be edited because it is %(status)s. "
             "Contact the administrator if the details need to change."
-        )
+        ) % {"status": self.get_status_display().lower()}
 
     # ---- transitions ----
 
-    def _set_status(self, status, *, reason=""):
+    #: Each transition names the statuses it may be made from, so that a
+    #: decision already taken is not taken a second time and a company is not
+    #: suspended before it has been approved. Checked here rather than in the
+    #: view, because the view is not the only caller.
+    APPROVE_FROM = (CompanyStatus.PENDING,)
+    REJECT_FROM = (CompanyStatus.PENDING,)
+    SUSPEND_FROM = (CompanyStatus.APPROVED,)
+    REACTIVATE_FROM = (CompanyStatus.SUSPENDED,)
+
+    @property
+    def can_be_approved(self):
+        return self.status in self.APPROVE_FROM
+
+    @property
+    def can_be_rejected(self):
+        return self.status in self.REJECT_FROM
+
+    @property
+    def can_be_suspended(self):
+        return self.status in self.SUSPEND_FROM
+
+    @property
+    def can_be_reactivated(self):
+        return self.status in self.REACTIVATE_FROM
+
+    def _set_status(self, status, *, allowed_from, actor, action, reason=""):
+        """Take the decision and record it, as one act or not at all.
+
+        Two administrators can hold the same application open, and each request
+        works from its own copy of the row. The copy the second one holds still
+        says pending after the first has decided, so the question of whether the
+        decision may be taken is put to the database, on a locked row, rather
+        than to the copy in hand. Recording it is inside the same transaction:
+        a decision that was refused leaves nothing behind, and one that was
+        taken is never left without its entry in the trail.
+        """
         if status in STATUSES_REQUIRING_REASON and not reason.strip():
             raise ValueError(f"A reason is required to set the status to {status}.")
-        self.status = status
-        self.status_reason = reason.strip()
-        self.status_changed_at = timezone.now()
-        self.save(update_fields=["status", "status_reason", "status_changed_at"])
+
+        with transaction.atomic():
+            stored_status = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("status", flat=True)
+                .first()
+            )
+            if stored_status is not None:
+                self.status = stored_status
+
+            if self.status not in allowed_from:
+                raise TransitionNotAllowed(
+                    _("%(company)s is %(current)s, so it cannot become %(wanted)s.")
+                    % {
+                        "company": self.legal_name,
+                        "current": self.get_status_display().lower(),
+                        "wanted": CompanyStatus(status).label.lower(),
+                    }
+                )
+
+            self.status = status
+            self.status_reason = reason.strip()
+            self.status_changed_at = timezone.now()
+            self.save(update_fields=["status", "status_reason", "status_changed_at"])
+            AuditEntry.record(actor=actor, action=action, target=self, reason=self.status_reason)
 
     def approve(self, actor):
-        self._set_status(CompanyStatus.APPROVED)
-        AuditEntry.record(actor=actor, action=Action.COMPANY_APPROVED, target=self)
+        """FR13: a pending application becomes approved."""
+        self._set_status(
+            CompanyStatus.APPROVED,
+            allowed_from=self.APPROVE_FROM,
+            actor=actor,
+            action=Action.COMPANY_APPROVED,
+        )
 
     def reject(self, actor, reason):
-        self._set_status(CompanyStatus.REJECTED, reason=reason)
-        AuditEntry.record(
-            actor=actor, action=Action.COMPANY_REJECTED, target=self, reason=self.status_reason
+        """FR14: a pending application is refused, with the reason recorded."""
+        self._set_status(
+            CompanyStatus.REJECTED,
+            allowed_from=self.REJECT_FROM,
+            actor=actor,
+            action=Action.COMPANY_REJECTED,
+            reason=reason,
         )
 
     def suspend(self, actor, reason):
-        self._set_status(CompanyStatus.SUSPENDED, reason=reason)
-        AuditEntry.record(
-            actor=actor, action=Action.COMPANY_SUSPENDED, target=self, reason=self.status_reason
+        """An approved company stops issuing passports; the ones it issued keep working."""
+        self._set_status(
+            CompanyStatus.SUSPENDED,
+            allowed_from=self.SUSPEND_FROM,
+            actor=actor,
+            action=Action.COMPANY_SUSPENDED,
+            reason=reason,
         )
 
     def reactivate(self, actor):
-        self._set_status(CompanyStatus.APPROVED)
-        AuditEntry.record(actor=actor, action=Action.COMPANY_REACTIVATED, target=self)
+        """A suspension is lifted and the company is approved again."""
+        self._set_status(
+            CompanyStatus.APPROVED,
+            allowed_from=self.REACTIVATE_FROM,
+            actor=actor,
+            action=Action.COMPANY_REACTIVATED,
+        )
 
     def resubmit(self, actor):
         """An edited application goes back into the queue (FR10)."""
-        self._set_status(CompanyStatus.PENDING)
-        AuditEntry.record(actor=actor, action=Action.COMPANY_RESUBMITTED, target=self)
+        self._set_status(
+            CompanyStatus.PENDING,
+            allowed_from=EDITABLE_STATUSES,
+            actor=actor,
+            action=Action.COMPANY_RESUBMITTED,
+        )

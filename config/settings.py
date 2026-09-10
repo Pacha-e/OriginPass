@@ -12,26 +12,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
-def _required(name):
+def require_env(name):
     value = os.getenv(name)
     if not value:
         raise ImproperlyConfigured(f"{name} is not set. Copy .env.example to .env and fill it in.")
     return value
 
 
-def _flag(name, default="False"):
+def env_flag(name, default="False"):
     return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
 
 
-# Also the key every integrity signature is derived from, so rotating it
-# invalidates the signature on every product, audit entry and custody record
-# written before the rotation. Put the old value in SECRET_KEY_FALLBACKS when
-# rotating; see audit/integrity.py.
-SECRET_KEY = _required("SECRET_KEY")
+# Also the key every integrity signature is derived from. New signatures are
+# always made with this key; the ones in SECRET_KEY_FALLBACKS are still
+# accepted when an existing record is verified, so a rotation does not report
+# everything written before it as altered. Put the old value there when you
+# rotate, and keep it until nothing signed under it is left. See
+# audit/integrity.py.
+SECRET_KEY = require_env("SECRET_KEY")
 SECRET_KEY_FALLBACKS = [
     key.strip() for key in os.getenv("SECRET_KEY_FALLBACKS", "").split(",") if key.strip()
 ]
-DEBUG = _flag("DEBUG")
+DEBUG = env_flag("DEBUG")
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
 
 INSTALLED_APPS = [
@@ -46,11 +48,15 @@ INSTALLED_APPS = [
     "products",
     "verification",
     "audit",
+    "pages",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # Between the session and the common middleware, which is where it can read
+    # the language from the session and still act before the URL is resolved.
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -80,7 +86,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 # PostgreSQL only. A missing DATABASE_URL is an error rather than a silent
 # fallback to another engine, so development and deployment run on the same one.
-DATABASES = {"default": dj_database_url.parse(_required("DATABASE_URL"), conn_max_age=600)}
+DATABASES = {"default": dj_database_url.parse(require_env("DATABASE_URL"), conn_max_age=600)}
 # Fail fast when the database is not up, rather than blocking on the connect.
 DATABASES["default"].setdefault("OPTIONS", {})["connect_timeout"] = 5
 
@@ -103,9 +109,19 @@ PASSWORD_HASHERS = [
 
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "companies:application_detail"
-LOGOUT_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "pages:home"
 
-LANGUAGE_CODE = "en-us"
+# UR04 asks for the interface in Spanish; the course asks for every artefact in
+# English. Both hold at once: code, comments, commit messages and documentation
+# stay in English, and the interface strings are translated at render time. The
+# source strings are therefore the English ones, and locale/es holds the
+# translation actually served.
+LANGUAGE_CODE = "es-co"
+LANGUAGES = [
+    ("es", "Español"),
+    ("en", "English"),
+]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "America/Bogota"
 USE_I18N = True
 USE_TZ = True
@@ -125,9 +141,9 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 # because whether the site is served over HTTPS is a property of the
 # deployment, not of whether debugging is on. A deployment behind TLS turns
 # these on in its environment; see .env.example.
-SECURE_SSL_REDIRECT = _flag("SECURE_SSL_REDIRECT")
-SESSION_COOKIE_SECURE = _flag("SESSION_COOKIE_SECURE")
-CSRF_COOKIE_SECURE = _flag("CSRF_COOKIE_SECURE")
+SECURE_SSL_REDIRECT = env_flag("SECURE_SSL_REDIRECT")
+SESSION_COOKIE_SECURE = env_flag("SESSION_COOKIE_SECURE")
+CSRF_COOKIE_SECURE = env_flag("CSRF_COOKIE_SECURE")
 SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
 SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0

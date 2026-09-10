@@ -23,6 +23,7 @@ that a rebuilt chain no longer matches what was published. That is the anchoring
 step, and it is not implemented here.
 """
 
+from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
 
 #: Namespaces the derived key. Changing it invalidates every existing signature,
@@ -37,15 +38,37 @@ GENESIS = "0" * 64
 SEPARATOR = "\x1f"
 
 
+def _sign_with(secret, *parts):
+    payload = SEPARATOR.join("" if part is None else str(part) for part in parts)
+    return salted_hmac(KEY_SALT, payload, secret=secret, algorithm="sha256").hexdigest()
+
+
 def sign(*parts):
     """Sign the parts with a key derived from SECRET_KEY, never stored in the database."""
-    payload = SEPARATOR.join("" if part is None else str(part) for part in parts)
-    return salted_hmac(KEY_SALT, payload, algorithm="sha256").hexdigest()
+    return _sign_with(settings.SECRET_KEY, *parts)
 
 
 def matches(signature, *parts):
-    """Whether `signature` is the signature of `parts`, compared in constant time."""
-    return constant_time_compare(signature or "", sign(*parts))
+    """Whether `signature` is one this system produced for `parts`.
+
+    Every key the deployment still stands behind is tried: the current one and
+    the ones named in SECRET_KEY_FALLBACKS, which is how a key is rotated
+    without the records written under the old one being reported as forged. A
+    signature made with a key that was never ours still fails, so a rotation
+    does not weaken what this detects.
+
+    Signing always uses the current key, so any record written or rewritten
+    after the rotation carries the new signature, and the old key can be
+    dropped once nothing is left that needs it.
+    """
+    # Every key is compared before the answer is given, rather than stopping at
+    # the first that matches, so that the time taken says nothing about which
+    # one it was.
+    against_each_key = [
+        constant_time_compare(signature or "", _sign_with(secret, *parts))
+        for secret in (settings.SECRET_KEY, *settings.SECRET_KEY_FALLBACKS)
+    ]
+    return any(against_each_key)
 
 
 def verify_chain(records, parts_of):

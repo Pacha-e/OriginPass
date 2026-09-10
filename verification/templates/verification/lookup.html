@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Verify a product" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Verify a product" %}</h1>
+    <p>
+      {% blocktranslate trimmed %}
+        Scanning the QR code on the product opens this check directly. Type the
+        passport code here if the code will not scan.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  <form method="get" action="{% url 'verification:lookup' %}">
+    <div class="field-row">
+      <label for="code">{% translate "Passport code" %}</label>
+      <input type="text" id="code" name="code" autocomplete="off" required>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">{% translate "Check this code" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

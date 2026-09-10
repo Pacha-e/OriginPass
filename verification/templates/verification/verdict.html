@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Verification" %} — OriginPass{% endblock %}
+
+{% block content %}
+{% comment %}
+The page a stranger reaches from a QR code. No session, no script, one
+stylesheet: the whole page is one request and its budget is UR06.
+
+UR03: the verdict is a word, not only a colour. Someone who does not
+distinguish these colours reads the same answer as everyone else.
+{% endcomment %}
+<div class="verdict verdict--{{ verdict|lower }}">
+  <p class="verdict__label">
+    {% if verdict == "GENUINE" %}{% translate "Genuine" %}
+    {% elif verdict == "REVOKED" %}{% translate "Revoked" %}
+    {% else %}{% translate "Not found" %}{% endif %}
+  </p>
+  <p class="verdict__detail">
+    {% if verdict == "GENUINE" %}
+      {% translate "This passport matches an active product registered by a verified company." %}
+    {% elif verdict == "REVOKED" %}
+      {% blocktranslate trimmed with withdrawn=product.updated_at|date:"j F Y" %}
+        This passport was withdrawn on {{ withdrawn }} and is no longer valid.
+      {% endblocktranslate %}
+    {% else %}
+      {% translate "This code does not match any passport issued by OriginPass." %}
+    {% endif %}
+  </p>
+</div>
+
+{% if product %}
+  <div class="card">
+    <div class="card__head">
+      <h1>{{ product.name }}</h1>
+      <p class="muted">{{ product.category }}</p>
+    </div>
+
+    {% if product.image %}
+      <p><img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}"></p>
+    {% endif %}
+
+    <p>{{ product.description|linebreaksbr }}</p>
+
+    <dl class="detail-list">
+      <dt>{% translate "Made in" %}</dt><dd>{{ product.origin }}</dd>
+      <dt>{% translate "Registered by" %}</dt><dd>{{ product.company.legal_name }}</dd>
+      <dt>{% translate "Company type" %}</dt><dd>{{ product.company.get_company_type_display }}</dd>
+      <dt>{% translate "Verified through" %}</dt><dd>{{ product.company.get_verification_track_display }}</dd>
+      <dt>{% translate "Located in" %}</dt><dd>{{ product.company.location }}</dd>
+      <dt>{% translate "Passport issued" %}</dt><dd>{{ product.registered_at|date:"j F Y" }}</dd>
+      <dt>{% translate "Passport code" %}</dt><dd class="mono">{{ product.passport_code }}</dd>
+    </dl>
+  </div>
+{% else %}
+  <div class="card card--narrow">
+    <p class="muted">
+      {% comment %}
+      FR31: the same message for every unmatched code. Telling one kind of miss
+      from another would leak which codes are live.
+      {% endcomment %}
+      {% blocktranslate trimmed with code=submitted_code %}
+        The code you scanned was <span class="mono">{{ code }}</span>.
+        Check that it was read correctly, and be careful if the seller cannot
+        explain where the product came from.
+      {% endblocktranslate %}
+    </p>
+    <p><a class="btn" href="{% url 'verification:lookup' %}">{% translate "Try another code" %}</a></p>
+  </div>
+{% endif %}
+
+<p class="faint">
+  {% blocktranslate trimmed %}
+    OriginPass shows what the registering company declared and who verified that
+    company. No account is needed to check a product.
+  {% endblocktranslate %}
+</p>
+{% endblock %}

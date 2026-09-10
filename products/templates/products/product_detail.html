@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ product.name }} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>{{ product.name }}</h1>
+  <p><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></p>
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Passport" %}</h2>
+    <p>
+      {% blocktranslate trimmed %}
+        This code identifies one physical unit. It was generated from a
+        cryptographically secure source, so it cannot be worked out from another code.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  <dl class="detail-list">
+    <dt>{% translate "Passport code" %}</dt><dd class="mono">{{ product.passport_code }}</dd>
+    <dt>{% translate "Type" %}</dt><dd>{{ product.get_product_type_display }}</dd>
+    <dt>{% translate "Category" %}</dt><dd>{{ product.category }}</dd>
+    <dt>{% translate "Place of manufacture" %}</dt><dd>{{ product.origin }}</dd>
+    <dt>{% translate "Registered" %}</dt><dd>{{ product.registered_at|date:"j F Y, H:i" }}</dd>
+    <dt>{% translate "Verification address" %}</dt>
+    <dd><a href="{{ verification_url }}">{{ verification_url }}</a></dd>
+  </dl>
+
+  <div class="form-actions">
+    {# FR22: the QR encodes the address above, downloadable as PNG. #}
+    <a class="btn btn--primary" href="{% url 'products:qr_download' product.pk %}">{% translate "Download the QR code" %}</a>
+    {% if product.status == "ACTIVE" %}
+      <a class="btn" href="{% url 'products:product_edit' product.pk %}">{% translate "Edit" %}</a>
+    {% endif %}
+    <a class="btn btn--link" href="{% url 'products:product_list' %}">{% translate "Back to my products" %}</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Description" %}</h2>
+  </div>
+  <p>{{ product.description|linebreaksbr }}</p>
+  {% if product.image %}
+    <p><img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}"></p>
+  {% endif %}
+</div>
+
+{% if product.status == "REVOKED" %}
+  <div class="notice notice--danger">
+    <p><strong>{% translate "This passport was revoked." %}</strong> {{ product.revocation_reason }}</p>
+  </div>
+{% endif %}
+{% endblock %}

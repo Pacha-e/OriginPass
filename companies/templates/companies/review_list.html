@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Company applications" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "Company applications" %}</h1>
+  <p>{% translate "Every application, whatever its outcome." %}</p>
+</div>
+
+{# FR12: filter by each of the four statuses. #}
+<div class="filters">
+  <a href="{% url 'companies:review_list' %}"{% if not selected_status %} aria-current="page"{% endif %}>{% translate "All" %}</a>
+  {% for value, label in statuses %}
+    <a href="{% url 'companies:review_list' %}?status={{ value }}"{% if selected_status == value %} aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{% translate "Company" %}</th>
+        <th>{% translate "Type" %}</th>
+        <th>{% translate "Owner" %}</th>
+        <th>{% translate "Submitted" %}</th>
+        <th>{% translate "Status" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for application in applications %}
+        <tr>
+          <td><a href="{% url 'companies:review_detail' application.pk %}">{{ application.legal_name }}</a></td>
+          <td>{{ application.get_company_type_display }}</td>
+          <td class="muted">{{ application.owner.email }}</td>
+          <td class="muted">{{ application.submitted_at|date:"j M Y" }}</td>
+          <td><span class="pill pill--{{ application.status|lower }}">{{ application.get_status_display }}</span></td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5" class="table-empty">{% translate "No applications match this filter." %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

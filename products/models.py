@@ -15,27 +15,27 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.crypto import constant_time_compare
+from django.utils.translation import gettext_lazy as _
 
-from audit.integrity import GENESIS, sign, verify_chain
+from audit.integrity import GENESIS, matches, sign, verify_chain
 from audit.models import Action, AuditEntry
 from companies.models import CompanyStatus, CompanyType
 
 
 class ProductType(models.TextChoices):
-    COMMERCIAL_ORIGINAL = "COMMERCIAL_ORIGINAL", "Commercial original"
-    ARTISAN = "ARTISAN", "Artisan"
+    COMMERCIAL_ORIGINAL = "COMMERCIAL_ORIGINAL", _("Commercial original")
+    ARTISAN = "ARTISAN", _("Artisan")
 
 
 class ProductStatus(models.TextChoices):
-    ACTIVE = "ACTIVE", "Active"
-    REVOKED = "REVOKED", "Revoked"
+    ACTIVE = "ACTIVE", _("Active")
+    REVOKED = "REVOKED", _("Revoked")
 
 
 class TransferState(models.TextChoices):
-    INITIATED = "INITIATED", "Initiated"
-    ACCEPTED = "ACCEPTED", "Accepted"
-    DECLINED = "DECLINED", "Declined"
+    INITIATED = "INITIATED", _("Initiated")
+    ACCEPTED = "ACCEPTED", _("Accepted")
+    DECLINED = "DECLINED", _("Declined")
 
 
 #: A commercial company issues commercial originals, an artisan workshop issues
@@ -70,7 +70,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     category = models.CharField(max_length=100)
-    origin = models.CharField(max_length=200, help_text="Place of manufacture.")
+    origin = models.CharField(max_length=200, help_text=_("Place of manufacture."))
     image = models.ImageField(upload_to="product-images/", blank=True)
     integrity_hash = models.CharField(max_length=64, blank=True)
     revocation_reason = models.TextField(blank=True)
@@ -90,39 +90,49 @@ class Product(models.Model):
         return f"{self.name} ({self.passport_code})"
 
     def save(self, *args, **kwargs):
+        """Sign the row, then write it once.
+
+        Every field the signature covers is known before the row reaches the
+        database: `passport_code` has a Python-side default, which Django
+        applies when the instance is built rather than when it is saved. This
+        used to write each row twice, on the stated grounds that the code only
+        existed after the first save. That was not true, and it cost every
+        registration an extra UPDATE.
+        """
+        self.integrity_hash = self.compute_integrity_hash()
+
+        # A caller changing one column still needs the signature to follow it,
+        # or an edit through `update_fields` would leave the row looking
+        # tampered with.
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = {*update_fields, "integrity_hash"}
+
         super().save(*args, **kwargs)
-        # The hash covers the passport code, which a new row only has after the
-        # first save, so it is written on a second pass.
-        expected = self.compute_integrity_hash()
-        if self.integrity_hash != expected:
-            self.integrity_hash = expected
-            super().save(update_fields=["integrity_hash"])
 
     def clean(self):
         """Only an approved company issues passports, and only of its own kind."""
         if self.company_id is None:
             return
         if self.company.status != CompanyStatus.APPROVED:
-            raise ValidationError({"company": "Only an approved company can register products."})
+            raise ValidationError({"company": _("Only an approved company can register products.")})
         expected = PRODUCT_TYPE_BY_COMPANY_TYPE[self.company.company_type]
         if self.product_type != expected:
             raise ValidationError(
                 {
-                    "product_type": (
-                        f"A {self.company.get_company_type_display().lower()} registers "
-                        f"products of type {expected.label.lower()}."
+                    "product_type": _(
+                        "A %(company_type)s registers products of type %(product_type)s."
                     )
+                    % {
+                        "company_type": self.company.get_company_type_display().lower(),
+                        "product_type": expected.label.lower(),
+                    }
                 }
             )
 
-    def compute_integrity_hash(self):
-        """Sign the identifying fields, so later tampering is detectable.
-
-        Signed rather than hashed. A plain hash over these columns could be
-        recomputed by anyone able to write to them, which would let an edited
-        row be left looking untouched; the key this uses is not in the database.
-        """
-        return sign(
+    def signed_parts(self):
+        """The identifying fields the signature covers."""
+        return (
             self.passport_code,
             self.company_id,
             self.product_type,
@@ -131,9 +141,21 @@ class Product(models.Model):
             self.origin,
         )
 
+    def compute_integrity_hash(self):
+        """Sign the identifying fields, so later tampering is detectable.
+
+        Signed rather than hashed. A plain hash over these columns could be
+        recomputed by anyone able to write to them, which would let an edited
+        row be left looking untouched; the key this uses is not in the database.
+        """
+        return sign(*self.signed_parts())
+
     @property
     def is_intact(self):
-        return constant_time_compare(self.integrity_hash, self.compute_integrity_hash())
+        # Asked through `matches` rather than compared against a fresh
+        # signature, so that a row written before a key rotation is still
+        # recognised as ours instead of being reported as altered.
+        return matches(self.integrity_hash, *self.signed_parts())
 
     @property
     def current_holder(self):
@@ -194,6 +216,14 @@ class CustodyTransfer(models.Model):
                 condition=~Q(from_holder=models.F("to_holder")),
                 name="custody_transfer_changes_holder",
             ),
+            # One chain per product, and a chain is linear: within a product no
+            # handover is the predecessor of two others. The lock in `_append`
+            # has nothing to hold on a product's first transfer, so the shape of
+            # the chain is stated to the database as well.
+            models.UniqueConstraint(
+                fields=["product", "previous_hash"],
+                name="custody_transfer_links_to_one_predecessor",
+            ),
         ]
 
     def __str__(self):
@@ -203,11 +233,27 @@ class CustodyTransfer(models.Model):
         if self.pk is None:
             return self._append(*args, **kwargs)
 
-        if self.state != TransferState.INITIATED:
-            existing = type(self).objects.get(pk=self.pk)
-            if existing.state != TransferState.INITIATED:
+        # Whether this row may still be written is decided by what the database
+        # holds, never by what this instance holds. An instance read before the
+        # transfer was resolved still carries Initiated, and asking it would let
+        # that stale copy write itself over the resolution.
+        #
+        # Locked and read inside a transaction, because reading it plainly only
+        # answers for a copy that was already stale. A resolution committing
+        # between the read and the write would still be overwritten: the write
+        # waits for the lock it does not hold, then lands on top of what it
+        # waited for. The lock makes the answer hold until this row is written.
+        with transaction.atomic():
+            stored_state = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("state", flat=True)
+                .first()
+            )
+            if stored_state != TransferState.INITIATED:
                 raise ValueError("A resolved custody transfer cannot be edited.")
-        return super().save(*args, **kwargs)
+            return super().save(*args, **kwargs)
 
     def _append(self, *args, **kwargs):
         """Link this handover to the previous one for the same product."""
@@ -257,14 +303,26 @@ class CustodyTransfer(models.Model):
             raise ValidationError("Only the current holder can transfer this product.")
 
     def _resolve(self, state, action, actor):
-        if self.state != TransferState.INITIATED:
-            raise ValueError("This transfer has already been resolved.")
-        self.state = state
-        self.resolved_at = timezone.now()
-        self.save(update_fields=["state", "resolved_at"])
-        # The resolution is not covered by this row's own signature, so it is
-        # written into the chained trail instead.
-        AuditEntry.record(actor=actor or self.to_holder, action=action, target=self)
+        with transaction.atomic():
+            # Locked and re-read before the question is asked, so that two
+            # resolutions of the same transfer cannot both find it open and
+            # both append a resolution to the trail.
+            stored_state = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("state", flat=True)
+                .first()
+            )
+            if stored_state != TransferState.INITIATED:
+                raise ValueError("This transfer has already been resolved.")
+
+            self.state = state
+            self.resolved_at = timezone.now()
+            self.save(update_fields=["state", "resolved_at"])
+            # The resolution is not covered by this row's own signature, so it
+            # is written into the chained trail instead.
+            AuditEntry.record(actor=actor or self.to_holder, action=action, target=self)
 
     def accept(self, actor=None):
         self._resolve(TransferState.ACCEPTED, Action.CUSTODY_ACCEPTED, actor)

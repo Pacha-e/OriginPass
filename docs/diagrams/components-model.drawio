@@ -8,7 +8,7 @@
         <mxCell id="title" value="OriginPass — Component model" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="100" y="24" width="700" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="One component per Django app · every function implements at least one requirement · every function is reachable from the interface" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="subtitle" value="One component per Django app · every requirement of Sprints 1 and 2 is implemented by a function drawn here · the functions with no requirement beside them exist to support the work: a landing page, a seed command, a schema report" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="100" y="58" width="1000" height="22" as="geometry" />
         </mxCell>
 
@@ -28,7 +28,7 @@
 
         <!-- ================= companies ================= -->
         <mxCell id="companies" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;companies&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="100" y="340" width="340" height="248" as="geometry" />
+          <mxGeometry x="100" y="340" width="340" height="276" as="geometry" />
         </mxCell>
         <mxCell id="co_create" value="application_create  —  FR07, FR08, FR09" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="companies">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
@@ -51,10 +51,13 @@
         <mxCell id="co_reject" value="review_reject  —  FR14" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="companies">
           <mxGeometry y="220" width="340" height="28" as="geometry" />
         </mxCell>
+        <mxCell id="co_seed" value="seed_demo  —  the demonstration dataset (command)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="companies">
+          <mxGeometry y="248" width="340" height="28" as="geometry" />
+        </mxCell>
 
         <!-- ================= audit ================= -->
         <mxCell id="audit" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;audit&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="100" y="660" width="340" height="108" as="geometry" />
+          <mxGeometry x="100" y="660" width="340" height="136" as="geometry" />
         </mxCell>
         <mxCell id="au_record" value="record_entry  —  FR43" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="audit">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
@@ -62,18 +65,21 @@
         <mxCell id="au_verify" value="verify_integrity  —  FR45" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="audit">
           <mxGeometry y="80" width="340" height="28" as="geometry" />
         </mxCell>
+        <mxCell id="au_describe" value="describe_schema  —  what the database enforces (command)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="audit">
+          <mxGeometry y="108" width="340" height="28" as="geometry" />
+        </mxCell>
 
         <!-- ================= config ================= -->
-        <mxCell id="config" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;config&lt;/b&gt;  (project root)" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
+        <mxCell id="config" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;pages&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
           <mxGeometry x="100" y="830" width="340" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="cfg_home" value="home  —  public landing page" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="config">
+        <mxCell id="cfg_home" value="home  —  the public landing page, reachable with no account" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="config">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
         </mxCell>
 
         <!-- ================= products ================= -->
         <mxCell id="products" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;products&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="680" y="140" width="400" height="164" as="geometry" />
+          <mxGeometry x="680" y="140" width="400" height="192" as="geometry" />
         </mxCell>
         <mxCell id="pr_create" value="product_create  —  FR19, FR20, FR21, FR23, UR10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
           <mxGeometry y="52" width="400" height="28" as="geometry" />
@@ -84,19 +90,25 @@
         <mxCell id="pr_edit" value="product_edit  —  FR26" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
           <mxGeometry y="108" width="400" height="28" as="geometry" />
         </mxCell>
-        <mxCell id="pr_qr" value="qr_download  —  FR22" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
+        <mxCell id="pr_detail" value="product_detail  —  the passport as its owner sees it" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
           <mxGeometry y="136" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="pr_qr" value="qr_download  —  FR22" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
+          <mxGeometry y="164" width="400" height="28" as="geometry" />
         </mxCell>
 
         <!-- ================= verification ================= -->
         <mxCell id="verification" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;verification&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="680" y="400" width="400" height="108" as="geometry" />
+          <mxGeometry x="680" y="400" width="400" height="136" as="geometry" />
         </mxCell>
         <mxCell id="ve_verify" value="verify  —  FR28, FR29, FR30, FR31" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fontStyle=1;" vertex="1" parent="verification">
           <mxGeometry y="52" width="400" height="28" as="geometry" />
         </mxCell>
-        <mxCell id="ve_scan" value="record_scan  —  FR33   (analytics in Sprint 3)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="verification">
+        <mxCell id="ve_lookup" value="lookup  —  a code typed by hand, for a QR that will not scan" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="verification">
           <mxGeometry y="80" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="ve_scan" value="record_scan  —  FR33   (analytics in Sprint 3)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="verification">
+          <mxGeometry y="108" width="400" height="28" as="geometry" />
         </mxCell>
 
         <!-- ================= provided interfaces ================= -->
@@ -199,7 +211,7 @@
         <mxCell id="a8" value="FR13" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="242" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a9" value="FR14" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="268" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a10" value="DBR01, DBR11, DBR12" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="294" width="270" height="26" as="geometry" /></mxCell>
-        <mxCell id="a11" value="SPRINT 2 — in progress, 22 requirements" style="text;strokeColor=none;fillColor=#d5e8d4;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;fontStyle=1;" vertex="1" parent="mapA"><mxGeometry y="320" width="270" height="26" as="geometry" /></mxCell>
+        <mxCell id="a11" value="SPRINT 2 — delivered, 22 requirements" style="text;strokeColor=none;fillColor=#d5e8d4;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;fontStyle=1;" vertex="1" parent="mapA"><mxGeometry y="320" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a12" value="FR19, FR20, FR21, FR23, UR10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="346" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a13" value="FR24, FR25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="372" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a14" value="FR26" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="398" width="270" height="26" as="geometry" /></mxCell>
@@ -273,7 +285,7 @@
         <mxCell id="lg1" value="Sprint 1 — delivered" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1240" y="820" width="210" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="lg2" value="Sprint 2 — in progress" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="lg2" value="Sprint 2 — delivered" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1465" y="820" width="210" height="32" as="geometry" />
         </mxCell>
         <mxCell id="lg3" value="Later sprints" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">

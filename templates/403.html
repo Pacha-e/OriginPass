@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Not allowed — OriginPass{% endblock %}
+{% block title %}{% translate "Not allowed" %} — OriginPass{% endblock %}
 
 {% block content %}
 <div class="card card--narrow">
   <div class="card__head">
-    <h1>Not allowed</h1>
+    <h1>{% translate "Not allowed" %}</h1>
   </div>
   <div class="notice notice--danger">
-    <p>{% if exception %}{{ exception }}{% else %}You do not have access to this page.{% endif %}</p>
+    <p>{% if exception %}{{ exception }}{% else %}{% translate "You do not have access to this page." %}{% endif %}</p>
   </div>
   <div class="form-actions">
-    <a class="btn" href="{% url 'home' %}">Back to the home page</a>
+    <a class="btn" href="{% url 'pages:home' %}">{% translate "Back to the home page" %}</a>
   </div>
 </div>
 {% endblock %}

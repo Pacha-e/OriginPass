@@ -1,5 +1,5 @@
-{% load static %}<!doctype html>
-<html lang="en">
+{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,30 +11,30 @@
 
 <header class="site-header">
   <div class="site-header__inner">
-    <a class="brand" href="{% url 'home' %}">
+    <a class="brand" href="{% url 'pages:home' %}">
       <span class="brand__mark">OP</span>
       OriginPass
     </a>
 
     <nav class="nav">
       {# Reachable without an account, because that is the point (FR28). #}
-      <a href="{% url 'verification:lookup' %}">Verify a product</a>
+      <a href="{% url 'verification:lookup' %}">{% translate "Verify a product" %}</a>
 
       {% if user.is_authenticated %}
         {% if user.is_platform_admin %}
-          <a href="{% url 'companies:review_list' %}">Applications</a>
+          <a href="{% url 'companies:review_list' %}">{% translate "Applications" %}</a>
         {% else %}
-          <a href="{% url 'companies:application_detail' %}">My application</a>
-          <a href="{% url 'products:product_list' %}">My products</a>
+          <a href="{% url 'companies:application_detail' %}">{% translate "My application" %}</a>
+          <a href="{% url 'products:product_list' %}">{% translate "My products" %}</a>
         {% endif %}
         <span class="faint">{{ user.email }}</span>
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
-          <button type="submit" class="btn btn--link">Log out</button>
+          <button type="submit" class="btn btn--link">{% translate "Log out" %}</button>
         </form>
       {% else %}
-        <a href="{% url 'accounts:login' %}">Log in</a>
-        <a class="btn btn--primary" href="{% url 'accounts:register' %}">Create account</a>
+        <a href="{% url 'accounts:login' %}">{% translate "Log in" %}</a>
+        <a class="btn btn--primary" href="{% url 'accounts:register' %}">{% translate "Create account" %}</a>
       {% endif %}
     </nav>
   </div>

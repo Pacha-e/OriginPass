@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "My application" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>{{ company.legal_name }}</h1>
+  <p>
+    {% blocktranslate trimmed with submitted=company.submitted_at|date:"j F Y" %}
+      Submitted on {{ submitted }}.
+    {% endblocktranslate %}
+  </p>
+</div>
+
+<div class="stack">
+
+  {# FR17: the current status, and the stored reason when the decision was negative. #}
+  {% if company.status == "PENDING" %}
+    <div class="notice notice--warning">
+      <p class="notice__title">{% translate "Your application is pending review" %}</p>
+      <p>
+        {% if company.requires_manual_review %}
+          {% translate "An artisan application is reviewed by a person. You will see the outcome here." %}
+        {% else %}
+          {% translate "The administrator is checking your registry code. You will see the outcome here." %}
+        {% endif %}
+      </p>
+    </div>
+  {% elif company.status == "APPROVED" %}
+    <div class="notice notice--ok">
+      <p class="notice__title">{% translate "Your company is approved" %}</p>
+      <p>{% translate "You can now register products and issue their passports." %}</p>
+    </div>
+  {% elif company.status == "REJECTED" %}
+    <div class="notice notice--danger">
+      <p class="notice__title">{% translate "Your application was rejected" %}</p>
+      <p>{{ company.status_reason }}</p>
+      <p class="faint">{% translate "You can correct the details and submit the application again." %}</p>
+    </div>
+  {% elif company.status == "SUSPENDED" %}
+    <div class="notice notice--danger">
+      <p class="notice__title">{% translate "Your company is suspended" %}</p>
+      <p>{{ company.status_reason }}</p>
+      <p class="faint">{% translate "Contact the administrator to have the company reactivated." %}</p>
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <dl class="detail-list">
+      <dt>{% translate "Status" %}</dt>
+      <dd><span class="pill pill--{{ company.status|lower }}">{{ company.get_status_display }}</span></dd>
+
+      <dt>{% translate "Company type" %}</dt>
+      <dd>{{ company.get_company_type_display }}</dd>
+
+      <dt>{% translate "Verification track" %}</dt>
+      <dd>{{ company.get_verification_track_display }}</dd>
+
+      {% if company.registry_code %}
+        <dt>{% translate "Registry code" %}</dt>
+        <dd class="mono">{{ company.registry_code }}</dd>
+      {% endif %}
+
+      <dt>{% translate "Location" %}</dt>
+      <dd>{{ company.location }}</dd>
+
+      <dt>{% translate "Website" %}</dt>
+      <dd>{% if company.website %}<a href="{{ company.website }}">{{ company.website }}</a>{% else %}<span class="faint">{% translate "Not provided" %}</span>{% endif %}</dd>
+
+      <dt>{% translate "Description" %}</dt>
+      <dd>{{ company.description|linebreaksbr }}</dd>
+
+      <dt>{% translate "Last status change" %}</dt>
+      <dd>{{ company.status_changed_at|date:"j F Y, H:i" }}</dd>
+    </dl>
+
+    <hr class="divider">
+
+    {% if company.is_editable %}
+      <a class="btn btn--primary" href="{% url 'companies:application_edit' %}">{% translate "Edit application" %}</a>
+    {% else %}
+      <p class="faint">{{ company.edit_refusal_reason }}</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

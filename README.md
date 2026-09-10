@@ -43,19 +43,42 @@ Requirements are tracked as issues in the [Backlog](https://github.com/users/Pac
 - PostgreSQL 17, run from `docker-compose.yml`
 - HTML, CSS and Django templates following the MVT pattern, with no CSS framework
 
+## Language
+
+The interface is served in **Spanish**; the code, the comments, the commit messages
+and the documentation are written in **English**. Both hold at once because the
+interface text goes through Django's translation machinery: the source strings are
+English and `locale/es/LC_MESSAGES/django.po` is what a visitor actually reads.
+
+Changing interface text means editing the English source string, then:
+
+```bash
+python manage.py makemessages -l es    # collect the strings into the .po
+python manage.py compilemessages       # build the .mo Django serves
+```
+
+Both need GNU gettext installed. The compiled `.mo` is a build artefact and is not
+committed; the `.po` is.
+
 ## Running the project locally
 
 PostgreSQL is required; the application does not fall back to another engine.
 
+To bring the project up on a machine that has never run it, and have it ready to
+demonstrate, follow [docs/ready-to-present.md](docs/ready-to-present.md) instead of this
+section. It covers the same ground step by step, states what each command should print,
+and says what to do when one of them does not.
+
 ```bash
-docker compose up -d db          # PostgreSQL 17 on localhost:5432
+docker compose up -d             # PostgreSQL 17 on localhost:5432, pgAdmin on 127.0.0.1:8080
 
 python -m venv .venv
 source .venv/Scripts/activate    # Linux and macOS: source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # runtime dependencies plus the linter
 
 cp .env.example .env             # then fill in SECRET_KEY
 python manage.py migrate
+python manage.py compilemessages # build the Spanish the interface is served in
 python manage.py createsuperuser # this account is the platform administrator
 python manage.py runserver
 ```
@@ -63,11 +86,20 @@ python manage.py runserver
 The application is then served at http://127.0.0.1:8000/.
 
 To look at the interface with something in it, or to record the deliverable
-walkthrough, populate a demo dataset of five companies, one in each status:
+walkthrough, populate a demo dataset:
 
 ```bash
 python manage.py seed_demo
 ```
+
+Five company applications, one in each status, and four passports issued by the two
+approved ones, with one revoked so that verdict can be shown and a history of scans
+behind them. It prints each passport's verification path, so the walkthrough does not
+need the codes to be looked up first.
+
+The data goes through the same model rules the application does, so it cannot create a
+row the application would refuse: the product type is derived from the company rather
+than written down, exactly as the registration view derives it.
 
 Every account it creates shares one known password, which it prints, so it refuses
 to run unless `DEBUG` is on.
@@ -98,19 +130,28 @@ than a substitute engine.
 
 ```
 OriginPass/
-├── config/           project settings, root URLs, landing page
 ├── accounts/         User model, registration, login, logout
 ├── companies/        Company model, applications and the administrator's review
-├── products/         Product and CustodyTransfer models
-├── verification/     ScanEvent model
-├── audit/            append-only AuditEntry
-├── templates/        base template, error pages and one folder per app
+├── products/         Product and CustodyTransfer models, passports and QR codes
+├── verification/     the public verification page and its ScanEvent record
+├── audit/            append-only AuditEntry and the integrity checks
+├── pages/            the landing page
+├── config/           settings, root URLs, WSGI and ASGI entry points
+├── templates/        base template, shared partials and the error pages
+├── test_support/     factories and helpers shared by the apps' test suites
+├── locale/es/        the Spanish the interface is served in
 ├── static/           the stylesheet and the favicon, written for this project
-├── video/            builds the deliverable presentation video from a script
+├── docs/diagrams/    deployment, component and data models
+├── tools/video/      builds the deliverable presentation video from a script
 ├── .github/workflows/ci.yml
 ├── docker-compose.yml
 └── manage.py
 ```
+
+Each app owns everything that belongs to it: its models, its views, its templates
+under `<app>/templates/<app>/` and its tests under `<app>/tests/`. `config` holds
+configuration and nothing else, which is why the landing page lives in `pages`
+rather than there.
 
 Business rules live in the models, input validation in the forms, orchestration in the
 views and presentation in the templates.
@@ -140,9 +181,13 @@ stays authoritative.
 
 ## Status
 
-Sprint 1 delivers accounts, company applications and the administrator's review of them.
-Product registration, the public verification page, custody transfers and the analytics
-follow in later sprints; their tables already exist.
+Sprint 1 delivered accounts, company applications and the administrator's review of them.
+
+Sprint 2 delivers what the product exists to do: an approved company registers a product,
+gets a QR code for it, and any buyer scans that code and reads a verdict without an
+account. It also serves the whole interface in Spanish.
+
+Custody transfers and the analytics follow in later sprints; their tables already exist.
 
 ## Licence
 

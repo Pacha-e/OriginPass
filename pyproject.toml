@@ -18,7 +18,16 @@ select = [
 # Holds the narration and the slide copy of the deliverable video. The long
 # lines are Spanish prose, and breaking a sentence to satisfy a column limit
 # makes the text harder to read and to edit than leaving it whole.
-"video/script.py" = ["E501"]
+"tools/video/script.py" = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["accounts", "audit", "companies", "config", "products", "verification"]
+known-first-party = [
+    "accounts",
+    "audit",
+    "companies",
+    "config",
+    "pages",
+    "products",
+    "test_support",
+    "verification",
+]

@@ -40,6 +40,16 @@ class AuditEntry(models.Model):
         blank=True,
     )
     action = models.CharField(max_length=32, choices=Action.choices)
+    #: What the entry is about, as `app_label.ModelName`, and its primary key.
+    #:
+    #: Deliberately a string rather than a GenericForeignKey. Two of that
+    #: field's properties are wrong for a trail whose whole job is to outlive
+    #: what it describes: it cascades, so deleting the target would delete the
+    #: evidence of what happened to it, and it identifies the model by a
+    #: ContentType row whose id the database assigns. This entry's signature
+    #: covers `target_type`, so an id that differs between two databases would
+    #: make the same event sign differently in each, and a restore would
+    #: invalidate every signature. A label is stable everywhere.
     target_type = models.CharField(max_length=32)
     target_id = models.PositiveIntegerField()
     reason = models.TextField(blank=True)
@@ -54,6 +64,18 @@ class AuditEntry(models.Model):
         ordering = ["-created_at"]
         verbose_name_plural = "audit entries"
         indexes = [models.Index(fields=["target_type", "target_id"])]
+        constraints = [
+            # The chain is linear, so no entry is the predecessor of two
+            # others. Saying that to the database closes the one gap the lock
+            # in `record` cannot: an empty table has no row to lock, so two
+            # writers racing to append the first entry would both read GENESIS
+            # and both link to it. They still race; now the loser is rejected
+            # instead of forking the chain in silence.
+            models.UniqueConstraint(
+                fields=["previous_hash"],
+                name="audit_entry_links_to_one_predecessor",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.action} on {self.target_type}#{self.target_id}"
@@ -83,18 +105,38 @@ class AuditEntry(models.Model):
 
     @classmethod
     def record(cls, *, actor, action, target, reason=""):
-        """Append one entry, linked to the one before it."""
+        """Append one entry, linked to the one before it.
+
+        Where the call belongs, so that adding an action does not start with
+        working it out again:
+
+        - **A status change records itself, inside the model method that makes
+          it**, within the same transaction. `Company._set_status` and
+          `Product.revoke` do this. A decision and its record are one act: a
+          refused transition must leave nothing behind, and one that went
+          through must never be left without its entry.
+        - **A creation records in the view**, after the object is saved. There
+          is no model method to put it in — a form built the object — and there
+          is nothing to be inconsistent with, because a row that does not exist
+          yet has no state for the trail to disagree with.
+
+        Both are used here on purpose. If an action ever has both a model
+        method and a view, it goes in the model method.
+        """
         with transaction.atomic():
-            # Locks the current last entry so two writers cannot both link to it.
-            # An empty table has no row to lock; the first two entries of a brand
-            # new database are the one case this does not cover.
+            # Locks the current last entry so two writers cannot both link to
+            # it. An empty table has no row to lock, which is why the linearity
+            # of the chain is also a database constraint: see Meta.
             last = cls.objects.select_for_update().order_by("-id").first()
             previous = last.entry_hash if last else GENESIS
 
             entry = cls(
                 actor=actor,
                 action=action,
-                target_type=target.__class__.__name__,
+                # The app label is part of it: a bare class name would let two
+                # models of the same name in different apps share a row in the
+                # trail, which is the one place an ambiguity must not exist.
+                target_type=target._meta.label,
                 target_id=target.pk,
                 reason=reason,
                 created_at=timezone.now(),

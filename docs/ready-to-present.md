@@ -19,9 +19,9 @@ four on one that has them all.
 | Git | `git --version` | [git-scm.com](https://git-scm.com/downloads) |
 | Python 3.12 | `python --version` | [python.org](https://www.python.org/downloads/) — tick *Add to PATH* |
 | Docker Desktop, running | `docker info` | [docker.com](https://www.docker.com/products/docker-desktop/) — start it and wait for the whale to stop animating |
-| gettext | `msgfmt --version` | Needed only by step 6. See that step. |
+| gettext | `msgfmt --version` | Not needed. Only if you change a translation; see step 6. |
 
-**Expect:** four version numbers and no error. `docker info` prints a long block ending in
+**Expect:** the first three print a version and no error. `docker info` prints a long block ending in
 server details; if it says *cannot connect to the Docker daemon*, Docker Desktop is not
 running yet.
 
@@ -144,20 +144,18 @@ front of the room is the kind of pause that reads as not knowing your own projec
 
 ## 6. The interface in Spanish
 
-```bash
-python manage.py compilemessages
-```
+Nothing to do. The compiled catalogue is committed, so a clone is already in Spanish.
 
-**Expect:** `processing file django.po in locale/es/LC_MESSAGES`.
+Confirm it in step 8: `python manage.py test` includes a check that the catalogue being
+served matches its source, and step 10 shows it on screen.
 
-> **`msgfmt` is not on PATH** — this is the one prerequisite Python does not bring. Without
-> it the interface is served in English, and UR04 asks for Spanish.
+> You need GNU gettext only to **change** a translation, never to run the project. If you
+> edit `locale/es/LC_MESSAGES/django.po`, run `python manage.py compilemessages` and commit
+> the rebuilt `.mo` with it; the suite fails if you forget.
 >
-> On Windows, install [gettext for Windows](https://mlocati.github.io/articles/gettext-iconv-windows.html)
-> and open a new terminal. On macOS, `brew install gettext`. On Debian or Ubuntu,
-> `sudo apt install gettext`.
->
-> Check that it worked: `locale/es/LC_MESSAGES/django.mo` exists.
+> Installing it, for that case only: on Windows,
+> [gettext for Windows](https://mlocati.github.io/articles/gettext-iconv-windows.html).
+> On macOS, `brew install gettext`. On Debian or Ubuntu, `sudo apt install gettext`.
 
 ---
 

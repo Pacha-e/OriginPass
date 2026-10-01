@@ -1,0 +1,6 @@
+{% load i18n %}{% blocktranslate with status=company.status reason=company.status_reason %}Hola {{ company.owner.email }},
+
+Tu solicitud para {{ company.legal_name }} quedó {{ status }}.
+{% if reason %}Motivo registrado: {{ reason }}
+{% endif %}
+Entra a tu aplicación para más detalles: {{ site_url }}{% endblocktranslate %}

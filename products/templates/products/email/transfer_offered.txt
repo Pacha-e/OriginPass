@@ -1,0 +1,5 @@
+{% load i18n %}{% blocktranslate with product=transfer.product.name from_holder=transfer.from_holder.email %}Hola,
+
+{{ from_holder }} está ofreciéndote el producto {{ product }}.
+
+Entra a OriginPass para aceptar o rechazar la transferencia: {{ site_url }}{% endblocktranslate %}

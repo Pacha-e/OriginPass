@@ -150,6 +150,8 @@ def review_approve(request, pk):
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been approved.") % {"company": company})
+        from accounts.emails import notify_company_decision
+        notify_company_decision(company)
 
     return redirect("companies:review_detail", pk=company.pk)
 
@@ -175,5 +177,7 @@ def review_reject(request, pk):
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been rejected.") % {"company": company})
+        from accounts.emails import notify_company_decision
+        notify_company_decision(company)
 
     return redirect("companies:review_detail", pk=company.pk)

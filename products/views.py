@@ -309,6 +309,8 @@ def transfer_respond(request, pk):
         try:
             if action == "accept":
                 transfer.accept(actor=request.user)
+                from accounts.emails import notify_revocation
+                notify_revocation(transfer.product)
                 messages.success(request, _("You are now the holder of %(product)s.") % {"product": transfer.product.name})
             elif action == "decline":
                 transfer.decline(actor=request.user)
@@ -371,6 +373,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 
 from verification.models import ScanEvent, Verdict
+from .models import Alert
 
 
 def _is_admin(user):
@@ -526,6 +529,8 @@ def admin_revoke_product(request, pk):
         try:
             product.revoke(actor=request.user, reason=reason)
             messages.success(request, _("%(product)s has been revoked.") % {"product": product.name})
+            from accounts.emails import notify_revocation
+            notify_revocation(product)
             return redirect("products:product_detail", pk=product.pk)
         except ValueError as exc:
             messages.error(request, str(exc))

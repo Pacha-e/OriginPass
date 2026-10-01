@@ -9,6 +9,7 @@ them belong to later sprints.
 """
 
 import secrets
+import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -197,6 +198,9 @@ class CustodyTransfer(models.Model):
     to_holder = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="transfers_received"
     )
+    # A random code the seller keeps private and hands over in person. The buyer
+    # claims ownership by producing it together with the passport code (FR40).
+    transfer_code = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     state = models.CharField(
         max_length=16, choices=TransferState.choices, default=TransferState.INITIATED
     )

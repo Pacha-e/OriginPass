@@ -226,3 +226,134 @@ def qr_download(request, pk):
         f'attachment; filename="originpass-{product.passport_code}.png"'
     )
     return response
+
+
+# ---- Custody transfers (Sprint 3, FR35-FR40) ----
+
+from .models import TransferState, CustodyTransfer
+
+
+@login_required
+def transfer_initiate(request, pk):
+    """FR35: the current holder offers the product to another account."""
+    company = Company.objects.owned_by(request.user)
+    product = get_object_or_404(Product, pk=pk, company=company)
+
+    if product.status == ProductStatus.REVOKED:
+        return _refuse(
+            request,
+            company,
+            heading=_("This product cannot be transferred"),
+            reason=_("A revoked product accepts no custody transfer (FR39)."),
+        )
+
+    from .forms import TransferInitiateForm
+    if request.method == "POST":
+        form = TransferInitiateForm(request.POST, product=product, holder=request.user)
+        if form.is_valid():
+            transfer = form.save()
+            messages.success(
+                request,
+                _("Transfer offered to %(who)s.") % {"who": transfer.to_holder.email},
+            )
+            return redirect("products:product_detail", pk=product.pk)
+    else:
+        form = TransferInitiateForm(product=product, holder=request.user)
+
+    return render(
+        request,
+        "products/transfer_initiate.html",
+        {"form": form, "product": product, "company": company},
+    )
+
+
+@login_required
+def transfer_list(request):
+    """The incoming transfers waiting for the user's answer."""
+    incoming = (
+        CustodyTransfer.objects.filter(to_holder=request.user, state=TransferState.INITIATED)
+        .select_related("product", "from_holder")
+        .order_by("-created_at")
+    )
+    outgoing = (
+        CustodyTransfer.objects.filter(from_holder=request.user, state=TransferState.INITIATED)
+        .select_related("product", "to_holder")
+        .order_by("-created_at")
+    )
+    return render(
+        request,
+        "products/transfer_list.html",
+        {"incoming": incoming, "outgoing": outgoing},
+    )
+
+
+@login_required
+def transfer_respond(request, pk):
+    """FR36: the receiver accepts or declines; the row is locked behind one transaction."""
+    transfer = get_object_or_404(
+        CustodyTransfer.objects.select_related("product", "to_holder"),
+        pk=pk,
+        to_holder=request.user,
+    )
+
+    if transfer.state != TransferState.INITIATED:
+        return _refuse(
+            request,
+            transfer.product.company,
+            heading=_("This transfer has already been resolved"),
+            reason=_("A custody transfer cannot be answered twice."),
+        )
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        try:
+            if action == "accept":
+                transfer.accept(actor=request.user)
+                messages.success(request, _("You are now the holder of %(product)s.") % {"product": transfer.product.name})
+            elif action == "decline":
+                transfer.decline(actor=request.user)
+                messages.success(request, _("You declined the transfer of %(product)s.") % {"product": transfer.product.name})
+            else:
+                raise ValueError("Unknown action.")
+        except ValueError:
+            return _refuse(
+                request,
+                transfer.product.company,
+                heading=_("This transfer has already been resolved"),
+                reason=_("A custody transfer cannot be answered twice."),
+            )
+        return redirect("products:transfer_list")
+
+    return render(
+        request,
+        "products/transfer_respond.html",
+        {"transfer": transfer},
+    )
+
+
+@login_required
+def transfer_claim(request):
+    """FR40: a buyer claims ownership using the passport code + transfer code.
+
+    The two codes are required together: the passport alone must not transfer
+    ownership (that would be one QR worth of phishing), and the transfer code
+    alone tells us nothing without knowing which product it belongs to.
+    """
+    from .forms import TransferClaimForm
+    if request.method == "POST":
+        form = TransferClaimForm(request.POST)
+        if form.is_valid():
+            transfer = form.cleaned_data["transfer"]
+            # The claim moves the product to the claimant; the original owner
+            # remains the from_holder so the chain stays unbroken.
+            transfer.to_holder = request.user
+            transfer.accept(actor=request.user)
+            messages.success(
+                request,
+                _("You are now the registered holder of %(product)s.") % {"product": transfer.product.name},
+            )
+            return redirect("products:product_detail", pk=transfer.product.pk)
+    else:
+        form = TransferClaimForm()
+
+    return render(request, "products/transfer_claim.html", {"form": form})

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Claim a product you just bought" %} — OriginPass{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "Claim a product you just bought" %}</h1>
+  <p>
+    {% translate "A transfer code is shared with you privately by the seller when you receive the product. It moves the product to your account once." %}
+  </p>
+</div>
+<div class="card card--narrow">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="field-row{% if field.errors %} field-row--invalid{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+        {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+    {% if form.non_field_errors %}
+      <div class="form-error">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">{% translate "Claim ownership" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

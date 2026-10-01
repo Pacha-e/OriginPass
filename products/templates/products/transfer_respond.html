@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Answer the transfer" %} — OriginPass{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "Answer the transfer" %}</h1>
+  <p>
+    {% blocktranslate with code=transfer.product.passport_code %}
+      {{ transfer.product.name }} ({{ code }}) is being offered to you by
+      {{ transfer.from_holder.email }}.
+    {% endblocktranslate %}
+  </p>
+</div>
+<div class="card card--narrow">
+  <form method="post" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="accept">
+    <button type="submit" class="btn btn--primary">{% translate "Accept — become the holder" %}</button>
+  </form>
+  <form method="post" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="decline">
+    <button type="submit" class="btn btn--danger">{% translate "Decline" %}</button>
+  </form>
+  <p class="muted" style="margin-top: var(--space-3);">
+    {% translate "Once answered, a transfer cannot be answered again." %}
+  </p>
+</div>
+{% endblock %}

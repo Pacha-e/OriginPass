@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Custody transfers" %} — OriginPass{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "Custody transfers" %}</h1>
+  <p>{% translate "Transfers you are offering, and the ones waiting for your answer." %}</p>
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Waiting for your answer" %}</h2>
+  </div>
+  {% if incoming %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate "Product" %}</th>
+            <th>{% translate "From" %}</th>
+            <th>{% translate "Offered" %}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in incoming %}
+            <tr>
+              <td>{{ transfer.product.name }}</td>
+              <td>{{ transfer.from_holder.email }}</td>
+              <td class="muted">{{ transfer.created_at|date:"j M Y, H:i" }}</td>
+              <td>
+                <a class="btn btn--primary" href="{% url 'products:transfer_respond' transfer.pk %}">
+                  {% translate "Answer" %}
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">{% translate "Nothing is waiting for you." %}</p>
+  {% endif %}
+</div>
+
+<div class="card" style="margin-top: var(--space-5);">
+  <div class="card__head">
+    <h2>{% translate "You are offering" %}</h2>
+  </div>
+  {% if outgoing %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate "Product" %}</th>
+            <th>{% translate "To" %}</th>
+            <th>{% translate "Offered" %}</th>
+            <th>{% translate "State" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in outgoing %}
+            <tr>
+              <td><a href="{% url 'products:product_detail' transfer.product.pk %}">{{ transfer.product.name }}</a></td>
+              <td>{{ transfer.to_holder.email }}</td>
+              <td class="muted">{{ transfer.created_at|date:"j M Y, H:i" }}</td>
+              <td><span class="pill pill--{{ transfer.state|lower }}">{{ transfer.get_state_display }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">{% translate "You have offered no transfers yet." %}</p>
+  {% endif %}
+</div>
+{% endblock %}

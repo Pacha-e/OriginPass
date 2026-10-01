@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Verification analytics" %} — OriginPass{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{% blocktranslate with name=company.legal_name %}Verification analytics of {{ name }}{% endblocktranslate %}</h1>
+  <p>{% translate "Who has been scanning this company's passports." %}</p>
+</div>
+
+<div class="filters">
+  {% for value, label in window_choices %}
+    <a href="{% url 'products:analytics' %}?days={{ value }}"{% if days == value %} aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+  <a class="btn" href="{% url 'products:analytics_csv' %}?days={{ days }}">{% translate "Export as CSV" %}</a>
+</div>
+
+{% if alerts %}
+<div class="notice notice--warning">
+  <p class="notice__title">{% translate "Duplicate-scan alerts" %}</p>
+  {% for product in alerts %}
+    <p>
+      <a href="{% url 'products:product_detail' product.pk %}">{{ product.name }}</a>
+      <span class="muted">{% blocktranslate with when=product.alerts.first.created_at|date:"j M Y, H:i" %}was scanned in more than one region around {{ when }}.{% endblocktranslate %}</span>
+    </p>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Scans per day" %}</h2>
+  </div>
+  {% if by_day %}
+    <table>
+      <thead><tr><th>{% translate "Day" %}</th><th>{% translate "Scans" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_day %}<tr><td>{{ row.day|date:"j M Y" }}</td><td>{{ row.count }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="table-empty">{% translate "No scans in this window yet." %}</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Where the scans came from" %}</h2>
+  </div>
+  {% if by_region %}
+    <table>
+      <thead><tr><th>{% translate "Region" %}</th><th>{% translate "Scans" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_region %}<tr><td>{{ row.region }}</td><td>{{ row.count }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="table-empty">{% translate "No scans in this window yet." %}</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Top products by scans" %}</h2>
+  </div>
+  {% if by_product %}
+    <table>
+      <thead><tr><th>{% translate "Product" %}</th><th>{% translate "Passport" %}</th><th>{% translate "Scans" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_product %}
+          <tr><td>{{ row.product__name }}</td><td class="mono">{{ row.product__passport_code }}</td><td>{{ row.count }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="table-empty">{% translate "No scans in this window yet." %}</p>
+  {% endif %}
+</div>
+{% endblock %}

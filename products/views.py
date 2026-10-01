@@ -357,3 +357,180 @@ def transfer_claim(request):
         form = TransferClaimForm()
 
     return render(request, "products/transfer_claim.html", {"form": form})
+
+
+# ---- Analytics and revocation (Sprint 3+4, FR41-FR50) ----
+
+import csv
+from datetime import timedelta
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Count, F, Sum, Avg
+from django.db.models.functions import TruncDay
+from django.http import HttpResponse
+from django.utils import timezone
+
+from verification.models import ScanEvent, Verdict
+
+
+def _is_admin(user):
+    return user.is_authenticated and user.is_platform_admin
+
+
+@login_required
+def company_analytics(request):
+    """FR46-49: scan counts over a chosen range, region distribution, and the
+    ranked list of products. The company only ever sees its own data.
+    """
+    company = Company.objects.owned_by(request.user)
+    if company is None:
+        return redirect("companies:application_create")
+
+    days = int(request.GET.get("days", "30"))
+    if days not in (7, 30, 90, 365):
+        days = 30
+    since = timezone.now() - timedelta(days=days)
+
+    scans_qs = ScanEvent.objects.filter(product__company=company, scanned_at__gte=since)
+    by_day = (
+        scans_qs.annotate(day=TruncDay("scanned_at"))
+        .values("day")
+        .order_by("day")
+        .annotate(count=Count("id"))
+    )
+    by_region = (
+        scans_qs.values("region").order_by().annotate(count=Count("id")).order_by("-count")
+    )
+    by_product = (
+        scans_qs.values("product__name", "product__passport_code")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:20]
+    )
+    alerts = (
+        company.products.prefetch_related("alerts")
+        .filter(alerts__isnull=False)
+        .distinct()
+        .order_by("-alerts__created_at")[:10]
+    )
+
+    return render(
+        request,
+        "products/analytics.html",
+        {
+            "company": company,
+            "days": days,
+            "by_day": list(by_day),
+            "by_region": list(by_region),
+            "by_product": list(by_product),
+            "alerts": alerts,
+        },
+    )
+
+
+@login_required
+def company_analytics_csv(request):
+    """FR51: a CSV export of the same numbers, one row per day."""
+    company = Company.objects.owned_by(request.user)
+    if company is None:
+        return redirect("companies:application_create")
+
+    days = int(request.GET.get("days", "30"))
+    if days not in (7, 30, 90, 365):
+        days = 30
+    since = timezone.now() - timedelta(days=days)
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        f'attachment; filename="originpass-analytics-{company.pk}-{days}d.csv"'
+    )
+    writer = csv.writer(response)
+    writer.writerow(["day", "product", "region", "scans"])
+    scans = (
+        ScanEvent.objects.filter(product__company=company, scanned_at__gte=since)
+        .annotate(day=TruncDay("scanned_at"))
+        .values("day", "product__name", "region")
+        .annotate(count=Count("id"))
+        .order_by("day", "product__name")
+    )
+    for row in scans:
+        writer.writerow([row["day"], row["product__name"], row["region"], row["count"]])
+    return response
+
+
+@login_required
+def product_revoke(request, pk):
+    """FR41: a company revokes one of its passports; the row says why."""
+    company = Company.objects.owned_by(request.user)
+    product = get_object_or_404(Product, pk=pk, company=company)
+
+    if product.status == ProductStatus.REVOKED:
+        return _refuse(
+            request,
+            company,
+            heading=_("This passport has already been revoked"),
+            reason=_("A revoked passport is a record of what was issued and cannot be revoked again."),
+        )
+
+    if request.method == "POST":
+        reason = request.POST.get("reason", "").strip()
+        try:
+            product.revoke(actor=request.user, reason=reason)
+            messages.success(
+                request, _("%(product)s has been revoked.") % {"product": product.name}
+            )
+            return redirect("products:product_detail", pk=product.pk)
+        except ValueError as exc:
+            messages.error(request, str(exc))
+
+    return render(
+        request,
+        "products/product_revoke.html",
+        {"product": product, "company": company},
+    )
+
+
+@user_passes_test(_is_admin)
+def admin_overview(request):
+    """FR50: the platform totals, grouped by status, with the alerts."""
+    from companies.models import CompanyStatus
+
+    by_company_status = (
+        Company.objects.values("status").annotate(count=Count("id")).order_by("status")
+    )
+    by_product_status = (
+        Product.objects.values("status").annotate(count=Count("id")).order_by("status")
+    )
+    recent_alerts = (
+        Alert.objects.select_related("product", "scan")
+        .order_by("-created_at")[:20]
+    )
+    return render(
+        request,
+        "products/admin_overview.html",
+        {
+            "by_company_status": by_company_status,
+            "by_product_status": by_product_status,
+            "recent_alerts": recent_alerts,
+        },
+    )
+
+
+@user_passes_test(_is_admin)
+def admin_revoke_product(request, pk):
+    """FR42: the administrator revokes any passport, with the same obligation
+    to state the reason as a company has.
+    """
+    product = get_object_or_404(Product.objects.select_related("company"), pk=pk)
+    if request.method == "POST":
+        reason = request.POST.get("reason", "").strip()
+        try:
+            product.revoke(actor=request.user, reason=reason)
+            messages.success(request, _("%(product)s has been revoked.") % {"product": product.name})
+            return redirect("products:product_detail", pk=product.pk)
+        except ValueError as exc:
+            messages.error(request, str(exc))
+    return render(
+        request,
+        "products/product_revoke.html",
+        {"product": product, "company": product.company, "by_admin": True},
+    )

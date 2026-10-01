@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Revoke this passport" %} — OriginPass{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "Revoke this passport" %}</h1>
+  <p>
+    {% blocktranslate with name=product.name code=product.passport_code %}
+      You are about to revoke {{ name }} ({{ code }}). A revoked passport stays
+      on the record with the reason you write, and the public verification
+      page will say so.
+    {% endblocktranslate %}
+  </p>
+</div>
+<div class="card card--narrow">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="field-row">
+      <label for="id_reason">{% translate "Reason for the revocation" %}</label>
+      <textarea id="id_reason" name="reason" required rows="3"
+        >{{ request.POST.reason }}</textarea>
+      <p class="field-help">{% translate "Required. The buyer reading this ticket sees exactly this text." %}</p>
+    </div>
+    {% if messages %}
+      {% for message in messages %}
+        <p class="form-error">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn--danger">{% translate "Revoke the passport" %}</button>
+      <a class="btn" href="{% url 'products:product_detail' product.pk %}">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

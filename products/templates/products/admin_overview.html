@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Platform overview" %} — OriginPass{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "Platform overview" %}</h1>
+  <p>{% translate "The totals the administrator acts on." %}</p>
+</div>
+
+<div class="card">
+  <div class="card__head"><h2>{% translate "Companies by status" %}</h2></div>
+  <table>
+    <thead><tr><th>{% translate "Status" %}</th><th>{% translate "Count" %}</th></tr></thead>
+    <tbody>
+      {% for row in by_company_status %}
+        <tr><td>{{ row.status }}</td><td>{{ row.count }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card__head"><h2>{% translate "Products by status" %}</h2></div>
+  <table>
+    <thead><tr><th>{% translate "Status" %}</th><th>{% translate "Count" %}</th></tr></thead>
+    <tbody>
+      {% for row in by_product_status %}
+        <tr><td>{{ row.status }}</td><td>{{ row.count }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card__head"><h2>{% translate "Recent duplicate-scan alerts" %}</h2></div>
+  {% if recent_alerts %}
+    <table>
+      <thead><tr><th>{% translate "Product" %}</th><th>{% translate "When" %}</th><th></th></tr></thead>
+      <tbody>
+        {% for alert in recent_alerts %}
+          <tr>
+            <td>{{ alert.product.name }}</td>
+            <td>{{ alert.created_at|date:"j M Y, H:i" }}</td>
+            <td><a class="btn" href="{% url 'products:product_detail' alert.product.pk %}">{% translate "Open" %}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="table-empty">{% translate "No alerts yet." %}</p>
+  {% endif %}
+</div>
+{% endblock %}

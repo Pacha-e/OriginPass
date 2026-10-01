@@ -173,6 +173,14 @@ class Company(models.Model):
     SUSPEND_FROM = (CompanyStatus.APPROVED,)
     REACTIVATE_FROM = (CompanyStatus.SUSPENDED,)
 
+
+    @property
+    def active_products(self):
+        """
+        The passports this company has issued that are still valid.
+        """
+        return self.products.filter(status="ACTIVE")
+
     @property
     def can_be_approved(self):
         return self.status in self.APPROVE_FROM

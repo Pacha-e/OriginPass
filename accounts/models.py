@@ -48,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
+    password_reset_token = models.UUIDField(null=True, blank=True, unique=True, editable=False)
 
     objects = UserManager()
 

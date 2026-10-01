@@ -58,6 +58,31 @@ distinguish these colours reads the same answer as everyone else.
       <dt>{% translate "Passport code" %}</dt><dd class="mono">{{ product.passport_code }}</dd>
     </dl>
   </div>
+
+  {# FR32: the chain of custody, in the order it happened. The chain is what
+     separates OriginPass from a serial check: every hand is on the record. #}
+  {% if chain %}
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Chain of custody" %}</h2>
+      <p>{% translate "Everyone who has held this product, starting from the maker." %}</p>
+    </div>
+    <ol class="chain">
+      <li>
+        <strong>{{ product.company.legal_name }}</strong>
+        <span class="muted">{% translate "Registered the passport" %}</span>
+        <span class="faint">{{ product.registered_at|date:"j M Y" }}</span>
+      </li>
+      {% for entry in chain %}
+      <li>
+        <strong>{{ entry.to_holder.email }}</strong>
+        {% if entry.note %}<span class="muted">— {{ entry.note }}</span>{% endif %}
+        <span class="faint">{{ entry.resolved_at|date:"j M Y" }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
 {% else %}
   <div class="card card--narrow">
     <p class="muted">

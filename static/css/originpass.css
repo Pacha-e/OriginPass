@@ -1,34 +1,55 @@
 /* OriginPass — stylesheet
-   Written for this project. One set of custom properties drives every colour,
-   radius and space, so the look can be changed in one place. */
+
+   Design choices
+   - Palette: terracotta, forest green, cream and deep brown. A passport traces
+     where a physical thing came from, so the colours lean on earth and plant
+     tones instead of the usual software blue.
+   - Contrast (UR09): every text and background pair clears 4.5 to 1. Brand
+     terracotta #c75b39 does not (4.21 on white, 3.94 on cream), so it is kept
+     for marks, icons and borders, where 3 to 1 is enough. A darker terracotta
+     carries text and button fills.
+   - Headings use a serif already on the reader's system: a web font would be a
+     second request, and the verification page has a budget (UR06).
+   - Mobile first: base rules are the narrow screen, min-width queries add to
+     them. No framework, no script.
+   - Every colour, radius, space and duration is a custom property. Motion is
+     switched off for readers who ask for it. */
 
 :root {
-  --ink: #16181d;
-  --ink-soft: #5b6270;
-  /* Each of these three was moved to the darkest value that clears the 4.5 to 1
-     UR09 asks for, against the palest background it is ever drawn on, and no
-     further. The old values measured 2.94, 4.45 and 4.29 on the public
-     verification page, which is the one page read by people who cannot ask for
-     help. The faint ink is checked against all six surfaces it is drawn on, not
-     only white: its worst case is 4.52, on the danger wash. */
-  --ink-faint: #676d7c;
+  /* Brand */
+  --terracotta: #c75b39;
+  --terracotta-ink: #a94a2c;
+  --terracotta-deep: #8f3e25;
+  --forest: #4a6741;
+  --forest-deep: #3a5233;
+  --cream: #faf7f2;
+  --sand: #f3e7dc;
+  --brown: #3e2f25;
+
+  /* Text. Measured on the darkest surface each sits on (sand): soft ink 5.40,
+     faint ink 4.64. */
+  --ink: var(--brown);
+  --ink-soft: #6b5a4e;
+  --ink-faint: #75645a;
+
   --surface: #ffffff;
-  --surface-sunken: #f6f7f9;
-  --border: #e3e6ec;
-  --border-strong: #cdd2dc;
+  --surface-sunken: var(--cream);
+  --border: #e8dfd4;
+  /* Form outlines need 3 to 1 against the card (WCAG 1.4.11); this is 3.48. */
+  --border-strong: #998676;
 
-  --accent: #3f4bd8;
-  --accent-dark: #2f39b3;
-  --accent-wash: #eef0fd;
+  --accent: var(--terracotta-ink);
+  --accent-dark: var(--terracotta-deep);
+  --accent-wash: #fbeee9;
 
-  --ok: #197e51;
-  --ok-wash: #e7f5ee;
-  --warning: #a45f07;
+  --ok: var(--forest);
+  --ok-wash: #eef3ec;
+  --warning: #8a5a0f;
   --warning-wash: #fdf3e3;
-  --danger: #c02a2a;
-  --danger-wash: #fceceb;
+  --danger: #b3261e;
+  --danger-wash: #f9e9e5;
 
-  --radius: 12px;
+  --radius: 14px;
   --radius-sm: 8px;
   --radius-pill: 999px;
 
@@ -39,11 +60,22 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
+  --space-8: 72px;
 
-  --shadow: 0 1px 2px rgba(22, 24, 29, 0.06), 0 1px 3px rgba(22, 24, 29, 0.04);
+  /* Tinted brown, not black, so shadows read as depth on cream. */
+  --shadow: 0 1px 2px rgba(62, 47, 37, 0.06), 0 1px 3px rgba(62, 47, 37, 0.05);
+  --shadow-raised:
+    0 2px 4px rgba(62, 47, 37, 0.05), 0 12px 28px rgba(62, 47, 37, 0.1);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --fast: 0.15s;
+  --slow: 0.45s;
 
   --font:
     system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display:
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
+    serif;
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -67,21 +99,25 @@ body {
 h1,
 h2,
 h3 {
-  line-height: 1.25;
   margin: 0 0 var(--space-3);
+  line-height: 1.2;
   font-weight: 650;
+}
+h1,
+h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 h1 {
   font-size: 1.6rem;
-  letter-spacing: -0.015em;
 }
 h2 {
-  font-size: 1.2rem;
-  letter-spacing: -0.01em;
+  font-size: 1.25rem;
 }
 h3 {
   font-size: 1rem;
 }
+
 p {
   margin: 0 0 var(--space-3);
 }
@@ -93,6 +129,12 @@ a:hover {
   text-decoration: underline;
 }
 
+/* A visible ring for the keyboard only; mouse clicks do not draw it. */
+:focus-visible {
+  outline: 3px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
 .muted {
   color: var(--ink-soft);
 }
@@ -100,10 +142,10 @@ a:hover {
   color: var(--ink-faint);
   font-size: 0.85rem;
 }
-/* A passport code is forty-three characters with no spaces in it. Left to sit on
-   one line it set a floor under the width of its row, its card and the whole
-   page: on a 360 pixel screen the passport detail came out 109 pixels too wide
-   and had to be scrolled sideways. It breaks mid-code instead. */
+
+/* A passport code is 43 characters with no spaces. Kept on one line it pushed
+   the passport detail 109 pixels past a 360 pixel screen, so it breaks
+   mid-code instead. */
 .mono {
   overflow-wrap: anywhere;
   font-family: var(--font-mono);
@@ -121,23 +163,27 @@ a:hover {
 .layout {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 var(--space-5);
+  padding: 0 var(--space-4);
 }
 
 .site-header__inner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-3) var(--space-4);
   min-height: 60px;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-weight: 680;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--ink);
 }
 .brand:hover {
@@ -148,33 +194,27 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
-  background: var(--accent);
+  background: var(--terracotta-ink);
   color: #fff;
+  font-family: var(--font);
   font-size: 0.78rem;
   font-weight: 700;
 }
 
+/* Wraps rather than overflowing: a signed-in visitor gets more links, and on a
+   360 pixel screen they pushed the page 144 pixels wide. */
 .nav {
   display: flex;
-  align-items: center;
-  /* Wraps rather than running off the side. A signed-in visitor is offered more
-     links than a stranger, and on a 360 pixel screen they did not fit: the row
-     pushed the page up to 144 pixels wider than the screen, so every page had to
-     be scrolled sideways to be read. Wrapping costs nothing at any width where
-     the row already fits. */
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2) var(--space-4);
   font-size: 0.9rem;
 }
-/* Scoped away from buttons on purpose. `.nav a` outweighs `.btn--primary`, so
-   without the exclusion a button placed in the navigation lost its own colour
-   and rendered dark grey on the accent blue: a contrast ratio of 1.07 against
-   the 4.5 UR09 asks for, which is a control nobody can read. It was the Create
-   account button, in the header of every page including the public
-   verification page. */
+/* Buttons excluded on purpose: `.nav a` outweighs `.btn--primary` and turned
+   the header's Create account button unreadable on its own fill. */
 .nav a:not(.btn) {
   color: var(--ink-soft);
 }
@@ -196,20 +236,93 @@ a:hover {
   margin-bottom: var(--space-5);
 }
 .page-head p {
-  color: var(--ink-soft);
   margin-bottom: 0;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------------ hero */
+
+/* The hero sits in the 960 pixel column but its background runs edge to edge.
+   A spread shadow paints sideways and the clip stops it vertically; unlike a
+   100vw box it adds no scroll width, so the page never scrolls sideways. */
+.hero {
+  margin: 0 0 var(--space-6);
+  padding: var(--space-7) 0;
+  text-align: center;
+  background: var(--sand);
+  box-shadow: 0 0 0 100vmax var(--sand);
+  clip-path: inset(0 -100vmax);
+}
+/* Flush under the header instead of floating below the column padding. */
+.layout > .hero:first-child {
+  margin-top: calc(-1 * var(--space-6));
+}
+
+.hero h1 {
+  max-width: 18ch;
+  margin: 0 auto var(--space-4);
+  font-size: clamp(2rem, 6vw + 0.5rem, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--brown);
+}
+/* Brand terracotta at a size where it only has to be seen, not read. */
+.hero h1::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin: var(--space-4) auto 0;
+  border-radius: var(--radius-pill);
+  background: var(--terracotta);
+}
+.hero p {
+  max-width: 560px;
+  margin: 0 auto var(--space-6);
+  font-size: 1.02rem;
+  color: var(--ink-soft);
+}
+
+/* Stacked and full width on a phone for the thumb; side by side from 480px. */
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 320px;
+  margin: 0 auto;
+}
+.hero__actions .btn {
+  padding: 13px 26px;
+  font-size: 1rem;
+  box-shadow: var(--shadow);
+  transition:
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
+    background var(--fast) ease,
+    border-color var(--fast) ease;
+}
+.hero__actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-raised);
+}
+.hero__actions .btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow);
+}
+.hero__actions .btn:not(.btn--primary) {
+  border-color: var(--forest);
+  color: var(--forest-deep);
 }
 
 /* ------------------------------------------------------------------ card */
 
 .card {
+  padding: var(--space-5) var(--space-4);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--space-5);
   box-shadow: var(--shadow);
 }
-
 .card--narrow {
   max-width: 440px;
   margin: 0 auto;
@@ -218,9 +331,35 @@ a:hover {
   margin-bottom: var(--space-5);
 }
 .card__head p {
-  color: var(--ink-soft);
   margin-bottom: 0;
   font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------ auth pages */
+
+/* Log in and registration are the only pages with a password field, so that
+   field is the hook and the templates need no extra class. Browsers without
+   :has() keep the plain cream page, which is still correct. */
+body:has(.layout input[type="password"]) {
+  min-height: 100vh;
+  background: linear-gradient(
+    165deg,
+    var(--cream) 0%,
+    var(--sand) 55%,
+    var(--ok-wash) 100%
+  );
+}
+.layout:has(input[type="password"]) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+}
+.layout:has(input[type="password"]) .card--narrow {
+  width: 100%;
+  border-top: 4px solid var(--terracotta);
+  box-shadow: var(--shadow-raised);
 }
 
 /* ------------------------------------------------------------------ form */
@@ -244,35 +383,34 @@ a:hover {
 .field-row select,
 .field-row textarea {
   width: 100%;
-  padding: 9px 12px;
+  padding: 10px 12px;
   font: inherit;
-  font-size: 0.93rem;
+  /* 16 pixels or more, or iOS zooms the page in on focus. */
+  font-size: 1rem;
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   outline: none;
   transition:
-    border-color 0.12s ease,
-    box-shadow 0.12s ease;
+    border-color var(--fast) ease,
+    box-shadow var(--fast) ease;
 }
 
 .field-row textarea {
-  resize: vertical;
   min-height: 84px;
+  resize: vertical;
 }
 
 .field-row input:focus,
 .field-row select:focus,
 .field-row textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-wash);
+  box-shadow: 0 0 0 3px rgba(199, 91, 57, 0.22);
 }
 
-/* UR08: the cause of a refusal is shown beside the field that caused it. */
-/* The type selectors are repeated here on purpose: the base rule above is
-   `.field-row input[type="text"]`, so a plain `.field-row--invalid input`
-   would lose the border colour to it on specificity. */
+/* UR08: the cause of a refusal sits beside the field that caused it. The type
+   selectors repeat on purpose, or the base rule wins on specificity. */
 .field-row--invalid input[type="text"],
 .field-row--invalid input[type="email"],
 .field-row--invalid input[type="url"],
@@ -285,7 +423,7 @@ a:hover {
 .field-row--invalid input:focus,
 .field-row--invalid select:focus,
 .field-row--invalid textarea:focus {
-  box-shadow: 0 0 0 3px rgba(192, 42, 42, 0.12);
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.15);
 }
 
 .field-error {
@@ -307,15 +445,22 @@ a:hover {
   font-size: 0.88rem;
   color: var(--danger);
   background: var(--danger-wash);
-  border: 1px solid rgba(192, 42, 42, 0.25);
+  border: 1px solid rgba(179, 38, 30, 0.25);
   border-radius: var(--radius-sm);
 }
 
 .form-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   margin-top: var(--space-5);
+}
+
+/* A file input's intrinsic width pushed the registration form past a narrow
+   screen's edge. */
+input[type="file"] {
+  max-width: 100%;
 }
 
 /* ---------------------------------------------------------------- button */
@@ -325,6 +470,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
+  min-height: 40px;
   padding: 9px 18px;
   font: inherit;
   font-size: 0.9rem;
@@ -335,8 +481,8 @@ a:hover {
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
-    background 0.12s ease,
-    border-color 0.12s ease;
+    background var(--fast) ease,
+    border-color var(--fast) ease;
 }
 .btn:hover {
   background: var(--surface-sunken);
@@ -359,8 +505,8 @@ a:hover {
   border-color: var(--danger);
 }
 .btn--danger:hover {
-  background: #a12222;
-  border-color: #a12222;
+  background: #8e1e18;
+  border-color: #8e1e18;
 }
 
 .btn--block {
@@ -368,6 +514,7 @@ a:hover {
 }
 
 .btn--link {
+  min-height: 0;
   padding: 0;
   border: 0;
   background: none;
@@ -388,50 +535,46 @@ a:hover {
   font-size: 0.78rem;
   font-weight: 650;
   letter-spacing: 0.01em;
-  border-radius: var(--radius-pill);
   border: 1px solid transparent;
+  border-radius: var(--radius-pill);
 }
-
 .pill--pending {
   color: var(--warning);
   background: var(--warning-wash);
-  border-color: rgba(168, 99, 11, 0.22);
+  border-color: rgba(138, 90, 15, 0.22);
 }
-.pill--approved {
+.pill--approved,
+.pill--active {
   color: var(--ok);
   background: var(--ok-wash);
-  border-color: rgba(26, 127, 82, 0.22);
+  border-color: rgba(74, 103, 65, 0.25);
 }
-.pill--rejected {
+.pill--rejected,
+.pill--suspended,
+.pill--revoked {
   color: var(--danger);
   background: var(--danger-wash);
-  border-color: rgba(192, 42, 42, 0.22);
-}
-.pill--suspended {
-  color: var(--danger);
-  background: var(--danger-wash);
-  border-color: rgba(192, 42, 42, 0.22);
+  border-color: rgba(179, 38, 30, 0.22);
 }
 
 /* ---------------------------------------------------------------- notice */
 
 .notice {
   padding: var(--space-4);
-  border: 1px solid var(--border);
-  border-left-width: 3px;
-  border-radius: var(--radius-sm);
   background: var(--surface);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
 }
 .notice p:last-child {
   margin-bottom: 0;
 }
 .notice__title {
-  font-weight: 640;
   margin-bottom: var(--space-1);
+  font-weight: 640;
 }
-
 .notice--info {
-  border-left-color: var(--accent);
+  border-left-color: var(--terracotta);
   background: var(--accent-wash);
 }
 .notice--ok {
@@ -456,11 +599,12 @@ a:hover {
 
 /* ----------------------------------------------------------------- table */
 
+/* Scrolls inside its own box on a phone instead of widening the page. */
 .table-wrap {
+  overflow-x: auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
   box-shadow: var(--shadow);
 }
 
@@ -507,7 +651,6 @@ tbody tr:hover {
   gap: var(--space-2);
   margin-bottom: var(--space-4);
 }
-
 .filters a {
   padding: 5px 13px;
   font-size: 0.85rem;
@@ -524,76 +667,43 @@ tbody tr:hover {
 }
 .filters a[aria-current="page"] {
   color: #fff;
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--forest);
+  border-color: var(--forest);
 }
 
 /* -------------------------------------------------------- definition list */
 
+/* One column on a phone, label above value; two columns from 641 pixels. */
 .detail-list {
-  margin: 0;
   display: grid;
-  grid-template-columns: 190px 1fr;
-  gap: var(--space-3) var(--space-4);
+  grid-template-columns: 1fr;
+  gap: var(--space-1) 0;
+  margin: 0;
   font-size: 0.93rem;
 }
-/* A grid item will not shrink below its own minimum width unless told to, and
-   the minimum width of a forty-three character passport code is the whole code.
-   Without this the track, the card and the page all stretched to fit it, and
-   `overflow-wrap` on the code alone could not undo that. */
+/* A grid item will not shrink below its minimum width unless told to, and a
+   passport code's minimum width is the whole code; so is the verification
+   URL's. Without this the track, the card and the page all stretched. */
 .detail-list dt,
 .detail-list dd,
 .detail-list dd a {
   min-width: 0;
-  /* The public verification address is printed in full here, and a URL has no
-     spaces to break at either. */
   overflow-wrap: anywhere;
 }
 .detail-list dt {
   color: var(--ink-soft);
 }
 .detail-list dd {
-  margin: 0;
+  margin: 0 0 var(--space-3);
 }
 
 /* ------------------------------------------------------------------- misc */
 
 .divider {
   height: 1px;
+  margin: var(--space-5) 0;
   background: var(--border);
   border: 0;
-  margin: var(--space-5) 0;
-}
-
-.hero {
-  padding: var(--space-7) 0 var(--space-6);
-  text-align: center;
-}
-.hero h1 {
-  font-size: 2rem;
-}
-.hero p {
-  max-width: 560px;
-  margin: 0 auto var(--space-5);
-  color: var(--ink-soft);
-}
-.hero__actions {
-  display: flex;
-  gap: var(--space-3);
-  justify-content: center;
-}
-
-/* ------------------------------------------------------- product passport */
-
-.pill--active {
-  color: var(--ok);
-  background: var(--ok-wash);
-  border-color: rgba(26, 127, 82, 0.22);
-}
-.pill--revoked {
-  color: var(--danger);
-  background: var(--danger-wash);
-  border-color: rgba(192, 42, 42, 0.22);
 }
 
 .search {
@@ -604,8 +714,8 @@ tbody tr:hover {
   margin: 0 0 var(--space-4);
 }
 .search label {
-  color: var(--ink-soft);
   font-size: 0.9rem;
+  color: var(--ink-soft);
 }
 .search input[type="search"] {
   flex: 1 1 220px;
@@ -616,73 +726,160 @@ tbody tr:hover {
   display: block;
   max-width: 100%;
   height: auto;
-  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 /* ---------------------------------------------------------------- verdict */
 
-/* The answer a stranger came for, so it is the first and largest thing on the
-   page. The verdict is carried by the word as well as by the colour (UR03):
-   remove the colour and the page still answers the question. */
-
+/* The answer a stranger came for, so it is first and largest. The word carries
+   it as well as colour and icon (UR03). The icon is a CSS mask, so it costs no
+   request (UR06) and screen readers skip it, having already read the word. */
 .verdict {
-  padding: var(--space-5);
+  --verdict-icon: none;
   margin: 0 0 var(--space-5);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
   border: 1px solid transparent;
   border-radius: var(--radius);
-  text-align: center;
+  box-shadow: var(--shadow-raised);
+  animation: verdict-in var(--slow) var(--ease) both;
+}
+.verdict::before {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-4);
+  background: currentColor;
+  -webkit-mask: var(--verdict-icon) center / contain no-repeat;
+  mask: var(--verdict-icon) center / contain no-repeat;
+  animation: verdict-icon-in var(--slow) var(--ease) 0.12s both;
 }
 .verdict__label {
   margin: 0 0 var(--space-2);
-  font-size: 1.9rem;
+  font-size: 2rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
   line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 .verdict__detail {
-  margin: 0;
-  font-size: 0.95rem;
+  max-width: 46ch;
+  margin: 0 auto;
+  font-size: 0.98rem;
 }
 
 .verdict--genuine {
+  /* Check mark in a circle. */
+  --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m8 12.5 2.8 2.8L16.5 9'/%3E%3C/svg%3E");
   color: var(--ok);
   background: var(--ok-wash);
-  border-color: rgba(26, 127, 82, 0.28);
+  border-color: rgba(74, 103, 65, 0.3);
 }
 .verdict--revoked {
+  /* Cross in a circle. */
+  --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m15 9-6 6M9 9l6 6'/%3E%3C/svg%3E");
   color: var(--danger);
   background: var(--danger-wash);
-  border-color: rgba(192, 42, 42, 0.28);
+  border-color: rgba(179, 38, 30, 0.3);
 }
 .verdict--not_found {
+  /* Question mark in a circle. */
+  --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01'/%3E%3C/svg%3E");
   color: var(--warning);
   background: var(--warning-wash);
-  border-color: rgba(168, 99, 11, 0.28);
+  border-color: rgba(138, 90, 15, 0.3);
 }
 
-/* A file input carries its own intrinsic width, wider than the column it sits
-   in on a narrow screen, and pushed the registration form three pixels past the
-   edge. */
-input[type="file"] {
-  max-width: 100%;
+/* The card under the verdict follows a beat later: answer first, details
+   second. */
+.verdict + .card {
+  box-shadow: var(--shadow-raised);
+  animation: verdict-in var(--slow) var(--ease) 0.1s both;
 }
 
-@media (max-width: 640px) {
+@keyframes verdict-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes verdict-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------ wider screens */
+
+@media (min-width: 480px) {
+  .hero__actions {
+    flex-direction: row;
+    justify-content: center;
+    max-width: none;
+  }
+}
+
+@media (min-width: 641px) {
+  .site-header__inner,
+  .layout {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
   .site-header__inner {
-    flex-wrap: wrap;
-    padding-top: var(--space-3);
-    padding-bottom: var(--space-3);
+    flex-wrap: nowrap;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .card {
+    padding: var(--space-5);
+  }
+  .hero {
+    padding: var(--space-8) 0 var(--space-7);
+  }
+  .hero p {
+    font-size: 1.1rem;
   }
   .detail-list {
-    grid-template-columns: 1fr;
-    gap: var(--space-1) 0;
+    grid-template-columns: 190px 1fr;
+    gap: var(--space-3) var(--space-4);
   }
   .detail-list dd {
-    margin-bottom: var(--space-3);
+    margin-bottom: 0;
   }
-  .layout {
-    padding-left: var(--space-4);
-    padding-right: var(--space-4);
+  .verdict {
+    padding: var(--space-7) var(--space-6);
+  }
+  .verdict::before {
+    width: 88px;
+    height: 88px;
+  }
+  .verdict__label {
+    font-size: 2.4rem;
+  }
+}
+
+/* ----------------------------------------------------------- reduced motion */
+
+/* Nothing here depends on movement to be understood, so it is removed rather
+   than slowed. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .hero__actions .btn:hover {
+    transform: none;
   }
 }

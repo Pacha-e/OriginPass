@@ -329,3 +329,32 @@ class CustodyTransfer(models.Model):
 
     def decline(self, actor=None):
         self._resolve(TransferState.DECLINED, Action.CUSTODY_DECLINED, actor)
+
+
+class AlertKind(models.TextChoices):
+    DUPLICATE_SCAN = "DUPLICATE_SCAN", _("Duplicate scan")
+
+
+class Alert(models.Model):
+    """Raised when one passport is scanned from distant regions within a window."""
+    product = models.ForeignKey(
+        "products.Product", on_delete=models.PROTECT, related_name="alerts"
+    )
+    scan = models.ForeignKey(
+        "verification.ScanEvent",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="alerts",
+    )
+    kind = models.CharField(max_length=32, choices=AlertKind.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["product", "scan"], name="alert_once_per_scan"),
+        ]
+
+    def __str__(self):
+        return f"{self.get_kind_display()}: {self.product.passport_code}"

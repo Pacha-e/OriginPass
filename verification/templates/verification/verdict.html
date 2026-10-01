@@ -59,8 +59,10 @@ distinguish these colours reads the same answer as everyone else.
     </dl>
   </div>
 
-  {# FR32: the chain of custody, in the order it happened. The chain is what
-     separates OriginPass from a serial check: every hand is on the record. #}
+  {% comment %}
+    FR32: the chain of custody, in the order it happened. The chain is what
+    separates OriginPass from a serial check: every hand is on the record.
+  {% endcomment %}
   {% if chain %}
   <div class="card">
     <div class="card__head">

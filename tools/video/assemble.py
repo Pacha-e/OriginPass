@@ -93,12 +93,17 @@ def load_timing(silent):
 
 
 def main():
+    import os
+
     silent = "--silent" in sys.argv
     timing = load_timing(silent)
 
+    edition = os.environ.get("VIDEO_SCRIPT", "d3").lower()
+    delivery = "1" if edition == "d1" else "3"
+
     suffix = "-preview" if silent else ""
-    out = BUILD / f"OriginPass-Entrega-1{suffix}.mp4"
-    srt_out = BUILD / f"OriginPass-Entrega-1{suffix}.srt"
+    out = BUILD / f"OriginPass-Entrega-{delivery}{suffix}.mp4"
+    srt_out = BUILD / f"OriginPass-Entrega-{delivery}{suffix}.srt"
 
     clips, srt_blocks, index, offset = [], [], 1, 0.0
 

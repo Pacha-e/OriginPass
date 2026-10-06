@@ -15,6 +15,7 @@ The walkthrough stage drives the real application, so it needs the server up:
     python manage.py runserver 8765
 """
 
+import os
 import subprocess
 import sys
 import time
@@ -48,6 +49,8 @@ def run(filename, label, args=()):
 
 def main():
     preview = "--preview" in sys.argv
+    edition = os.environ.get("VIDEO_SCRIPT", "d3").lower()
+    demo_script = "record_demo.py" if edition == "d1" else "record_demo_d3.py"
 
     stages = [("slides.py", "slides", (), False)]
 
@@ -56,7 +59,7 @@ def main():
     else:
         stages.append(("voiceover.py", "your recordings", (), False))
 
-    stages.append(("record_demo.py", "walkthrough", (), True))
+    stages.append((demo_script, "walkthrough", (), True))
     stages.append(("assemble.py", "final video", ("--silent",) if preview else (), False))
 
     for filename, label, args, needs_server in stages:
@@ -70,7 +73,7 @@ def main():
             print(f"\n{label} failed")
             return code
 
-    name = "OriginPass-Entrega-1-preview.mp4" if preview else "OriginPass-Entrega-1.mp4"
+    name = f"OriginPass-Entrega-{'1' if edition == 'd1' else '3'}{'-preview' if preview else ''}.mp4"
     print(f"\nDone. tools/video/build/{name}")
     return 0
 

@@ -1,5 +1,5 @@
-{% load i18n %}{% blocktranslate with product=transfer.product.name from_holder=transfer.from_holder.email %}Hola,
+{% load i18n %}{% translate "Hello," %}
 
-{{ from_holder }} está ofreciéndote el producto {{ product }}.
+{% blocktranslate trimmed %}{{ sender }} is offering you custody of {{ product_name }}.{% endblocktranslate %}
 
-Entra a OriginPass para aceptar o rechazar la transferencia: {{ site_url }}{% endblocktranslate %}
+{% translate "Log in to OriginPass and open Custody to accept or decline it." %}

@@ -15,6 +15,7 @@ from .models import COMMERCIAL_TRACKS, Company, CompanyType, VerificationTrack
 #: Stated once because the form raises it twice: as the required-field message
 #: and again when the submitted reason turns out to be only whitespace.
 REJECTION_REASON_REQUIRED = _("A reason is required to reject an application.")
+SUSPENSION_REASON_REQUIRED = _("A reason is required to suspend a company.")
 
 
 class CompanyApplicationForm(forms.ModelForm):
@@ -39,10 +40,18 @@ class CompanyApplicationForm(forms.ModelForm):
             "registry_code": _("Official registry code"),
         }
         help_texts = {
-            "verification_track": _(
-                "A commercial company chooses one. An artisan workshop is reviewed by a person."
+            "legal_name": _("The name of your workshop or business, as buyers know it."),
+            "company_type": _(
+                "Artisan workshop: you make products by hand and have no commercial "
+                "registry. Commercial company: you have a NIT or a Chamber of Commerce record."
             ),
-            "website": _("Optional."),
+            "verification_track": _(
+                "Only for a commercial company: where your registry comes from. "
+                "An artisan workshop is reviewed by a person and leaves this empty."
+            ),
+            "description": _("What you make and since when. Buyers read this."),
+            "location": _("Town and department, for example: Tuchín, Córdoba."),
+            "website": _("Optional. A page or social network where buyers find you."),
             "registry_code": _(
                 "Required for a commercial company, for example a NIT "
                 "or a Chamber of Commerce code."
@@ -111,4 +120,20 @@ class RejectionForm(forms.Form):
         reason = self.cleaned_data["reason"].strip()
         if not reason:
             raise forms.ValidationError(REJECTION_REASON_REQUIRED)
+        return reason
+
+
+class SuspensionForm(forms.Form):
+    """A suspension is a negative decision too, so it carries its reason (FR15, DBR12)."""
+
+    reason = forms.CharField(
+        label=_("Reason for the suspension"),
+        widget=forms.Textarea(attrs={"rows": 3}),
+        error_messages={"required": SUSPENSION_REASON_REQUIRED},
+    )
+
+    def clean_reason(self):
+        reason = self.cleaned_data["reason"].strip()
+        if not reason:
+            raise forms.ValidationError(SUSPENSION_REASON_REQUIRED)
         return reason

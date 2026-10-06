@@ -6,4 +6,5 @@ app_name = "pages"
 
 urlpatterns = [
     path("", views.home, name="home"),
+    path("creditos/", views.credits, name="credits"),
 ]

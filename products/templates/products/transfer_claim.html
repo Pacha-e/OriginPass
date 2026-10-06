@@ -1,29 +1,38 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Claim a product you just bought" %} — OriginPass{% endblock %}
+
+{% block title %}{% translate "Claim a piece" %} — OriginPass{% endblock %}
+
 {% block content %}
-<div class="page-head">
-  <h1>{% translate "Claim a product you just bought" %}</h1>
-  <p>
-    {% translate "A transfer code is shared with you privately by the seller when you receive the product. It moves the product to your account once." %}
-  </p>
-</div>
 <div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Claim a piece with its codes" %}</h1>
+    <p>
+      {% blocktranslate trimmed %}
+        At the sale, the seller gives you a transfer code. Together with the passport
+        code printed on the label, it proves the piece was handed to you.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  <div class="claim-hint">
+    {% include "partials/label_hint.html" %}
+    <p class="muted">{% translate "The passport code is printed under the QR, on the label. The transfer code is the one the seller gave you." %}</p>
+  </div>
+
   <form method="post" novalidate>
     {% csrf_token %}
-    {% for field in form %}
-      <div class="field-row{% if field.errors %} field-row--invalid{% endif %}">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-        {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
+    {% for error in form.non_field_errors %}
+      <div class="form-error" role="alert">{{ error }}</div>
     {% endfor %}
-    {% if form.non_field_errors %}
-      <div class="form-error">{{ form.non_field_errors }}</div>
-    {% endif %}
+    {% include "partials/field.html" with field=form.passport_code %}
+    {% include "partials/field.html" with field=form.transfer_code %}
     <div class="form-actions">
-      <button type="submit" class="btn btn--primary">{% translate "Claim ownership" %}</button>
+      <span class="tip tip--start">
+        <button type="submit" class="btn btn--primary" aria-describedby="tip-claim-send">{% translate "Claim the piece" %}</button>
+        <span class="tip__text" id="tip-claim-send" role="tooltip">{% translate "If both codes match, the product goes to your name right away." %}</span>
+      </span>
+      <a class="btn" href="{% url 'products:custody' %}">{% translate "Cancel" %}</a>
     </div>
   </form>
 </div>

@@ -1,33 +1,39 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Offer this product to another account" %} — OriginPass{% endblock %}
+
+{% block title %}{% translate "Transfer a piece" %} — OriginPass{% endblock %}
+
 {% block content %}
-<div class="page-head">
-  <h1>{% translate "Offer this product to another account" %}</h1>
-  <p>
-    {% blocktranslate with code=product.passport_code %}
-      {{ product.name }} will keep passport {{ code }}. The recipient becomes the
-      new holder only when they accept.
-    {% endblocktranslate %}
-  </p>
-</div>
 <div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Transfer this piece" %}</h1>
+    <p>
+      {% blocktranslate trimmed with name=product.name %}
+        {{ name }} keeps its passport. The receiver becomes its holder only when they
+        accept, and the handover joins its public journey.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  <ol class="mini-steps">
+    <li>{% translate "Write the email of whoever receives the product." %}</li>
+    <li>{% translate "We tell them by email and show you a transfer code." %}</li>
+    <li>{% translate "When you hand over the product, give them that code too." %}</li>
+  </ol>
+
   <form method="post" novalidate>
     {% csrf_token %}
-    {% for field in form %}
-      <div class="field-row{% if field.errors %} field-row--invalid{% endif %}">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-        {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-      </div>
+    {% for error in form.non_field_errors %}
+      <div class="form-error" role="alert">{{ error }}</div>
     {% endfor %}
-    {% if form.non_field_errors %}
-      <div class="form-error">{{ form.non_field_errors }}</div>
-    {% endif %}
+    {% include "partials/field.html" with field=form.to_holder_email %}
+    {% include "partials/field.html" with field=form.note %}
     <div class="form-actions">
-      <button type="submit" class="btn btn--primary">{% translate "Offer the transfer" %}</button>
-      <a class="btn" href="{% url 'products:product_detail' product.pk %}">{% translate "Cancel" %}</a>
+      <span class="tip tip--start">
+        <button type="submit" class="btn btn--primary" aria-describedby="tip-send">{% translate "Send the offer" %}</button>
+        <span class="tip__text" id="tip-send" role="tooltip">{% translate "The product stays in your name until the other person receives it." %}</span>
+      </span>
+      <a class="btn" href="{% url 'products:custody' %}">{% translate "Cancel" %}</a>
     </div>
   </form>
 </div>

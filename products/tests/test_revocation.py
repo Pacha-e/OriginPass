@@ -1,10 +1,8 @@
 """FR41-42: revocation with reason and the admin platform overview."""
 
-from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from accounts.models import Role
 from products.models import ProductStatus
 from test_support.factories import (
     ADMIN_PASSWORD,
@@ -43,7 +41,16 @@ class ProductRevokeTests(TestCase):
         assert self.client.login(email=self.owner.email, password=OWNER_PASSWORD)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "already been revoked", status_code=403)
+        self.assertContains(response, "ya fue anulado", status_code=403)
+
+    def test_a_revocation_without_a_reason_is_refused_beside_the_field(self):
+        assert self.client.login(email=self.owner.email, password=OWNER_PASSWORD)
+        self.client.get(self.url)
+        csrf = self.client.cookies["csrftoken"].value
+        response = self.client.post(self.url, {"reason": "   ", "csrfmiddlewaretoken": csrf})
+        self.assertContains(response, "hace falta escribir un motivo")
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.status, ProductStatus.ACTIVE)
 
     def test_admin_revoke_requires_login(self):
         response = self.client.get(reverse("products:admin_revoke", args=[self.product.pk]))
@@ -62,11 +69,12 @@ class AdminOverviewTests(TestCase):
         client = Client(enforce_csrf_checks=True)
         assert client.login(email=self.admin.email, password=ADMIN_PASSWORD)
         response = client.get(self.url)
-        self.assertContains(response, "Companies by status", status_code=200)
-        self.assertContains(response, "Products by status", status_code=200)
+        self.assertContains(response, "Empresas por estado", status_code=200)
+        self.assertContains(response, "Pasaportes por estado", status_code=200)
+        self.assertContains(response, "Aprobada")
 
     def test_non_admin_cannot_open(self):
         client = Client(enforce_csrf_checks=True)
         assert client.login(email=self.owner.email, password=OWNER_PASSWORD)
         response = client.get(self.url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 403)

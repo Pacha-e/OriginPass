@@ -54,7 +54,7 @@
       <dt>{% translate "Company type" %}</dt>
       <dd>{{ company.get_company_type_display }}</dd>
 
-      <dt>{% translate "Verification track" %}</dt>
+      <dt>{% translate "Verification track" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "How OriginPass checked that this business is real: with its official registry, or with a review made by a person in the case of an artisan workshop." %}</span></details></dt>
       <dd>{{ company.get_verification_track_display }}</dd>
 
       {% if company.registry_code %}
@@ -78,7 +78,7 @@
     <hr class="divider">
 
     {% if company.is_editable %}
-      <a class="btn btn--primary" href="{% url 'companies:application_edit' %}">{% translate "Edit application" %}</a>
+      <span class="tip tip--start"><a class="btn btn--primary" href="{% url 'companies:application_edit' %}" aria-describedby="tip-edit-application">{% translate "Edit application" %}</a><span class="tip__text" id="tip-edit-application" role="tooltip">{% translate "Correct the details and send the application to be reviewed again." %}</span></span>
     {% else %}
       <p class="faint">{{ company.edit_refusal_reason }}</p>
     {% endif %}

@@ -353,7 +353,7 @@ msgid "Active"
 msgstr "Activo"
 
 msgid "Revoked"
-msgstr "Revocado"
+msgstr "Anulado"
 
 msgid "Initiated"
 msgstr "Iniciada"
@@ -424,9 +424,7 @@ msgstr ""
 msgid ""
 "This passport has been revoked. A revoked passport is a record of what was "
 "issued and is not edited."
-msgstr ""
-"Este pasaporte fue revocado. Un pasaporte revocado es el registro de lo que "
-"se emitió y no se edita."
+msgstr "Este pasaporte fue anulado. Un pasaporte anulado queda guardado tal como se emitió y ya no se puede editar."
 
 msgid "This company cannot issue a passport"
 msgstr "Esta empresa no puede emitir un pasaporte"
@@ -500,7 +498,7 @@ msgid "Back to my products"
 msgstr "Volver a mis productos"
 
 msgid "This passport was revoked."
-msgstr "Este pasaporte fue revocado."
+msgstr "Este pasaporte fue anulado."
 
 msgid "Edit passport"
 msgstr "Editar pasaporte"
@@ -526,7 +524,7 @@ msgid "Save changes"
 msgstr "Guardar cambios"
 
 msgid "Issue the passport"
-msgstr "Emitir el pasaporte"
+msgstr "Crear el pasaporte"
 
 msgid "Reason recorded"
 msgstr "Motivo registrado"
@@ -574,12 +572,10 @@ msgid "Verification"
 msgstr "Verificación"
 
 msgid "This passport matches an active product registered by a verified company."
-msgstr ""
-"Este pasaporte corresponde a un producto activo registrado por una empresa "
-"verificada."
+msgstr "Este pasaporte es de un producto vigente, registrado por un negocio verificado."
 
 msgid "This passport was withdrawn on %(withdrawn)s and is no longer valid."
-msgstr "Este pasaporte se retiró el %(withdrawn)s y ya no es válido."
+msgstr "Este pasaporte se anuló el %(withdrawn)s y ya no vale."
 
 msgid "This code does not match any passport issued by OriginPass."
 msgstr "Este código no corresponde a ningún pasaporte emitido por OriginPass."
@@ -627,10 +623,7 @@ msgid ""
 "OriginPass issues one digital passport per physical unit and records each "
 "change of custody along its journey, so a buyer can confirm a product is "
 "genuine without having to trust the seller."
-msgstr ""
-"OriginPass emite un pasaporte digital por unidad física y registra cada "
-"cambio de custodia en su recorrido, para que un comprador confirme que un "
-"producto es auténtico sin tener que confiar en el vendedor."
+msgstr "OriginPass le da a cada producto un pasaporte digital y anota cada vez que cambia de manos. Así, quien compra puede confirmar que es auténtico sin tener que creerle al vendedor."
 
 msgid "Not allowed"
 msgstr "Sin permiso"
@@ -646,3 +639,952 @@ msgstr "Página no encontrada"
 
 msgid "The address you opened does not match anything on this site."
 msgstr "La dirección que abriste no corresponde a nada de este sitio."
+
+msgid "Your application has been approved"
+msgstr "Tu solicitud fue aprobada"
+
+msgid "A product is waiting for your answer"
+msgstr "Te quieren entregar un producto"
+
+msgid "A product you hold has been revoked"
+msgstr "Se anuló el pasaporte de un producto que tienes"
+
+msgid "Your application has been rejected"
+msgstr "Tu solicitud fue rechazada"
+
+msgid "Origin cannot be imitated."
+msgstr "El origen no se imita."
+
+msgid "Workshops and companies issue one passport per piece. Buyers check it with their phone camera, without an account."
+msgstr "Talleres y empresas sacan un pasaporte para cada producto. Quien compra lo revisa con la cámara del celular, sin crear cuenta."
+
+msgid "Hello,"
+msgstr "Hola,"
+
+msgid "The application for %(company_name)s is now: %(status)s."
+msgstr "La solicitud de %(company_name)s ahora está: %(status)s."
+
+msgid "Reason recorded: %(reason)s"
+msgstr "Motivo registrado: %(reason)s"
+
+msgid "Log in to OriginPass to see your application."
+msgstr "Inicia sesión en OriginPass para ver tu solicitud."
+
+msgid "Someone asked to reset the password of your OriginPass account. Open this link to choose a new one:"
+msgstr "Alguien pidió restablecer la contraseña de tu cuenta de OriginPass. Abre este enlace para elegir una nueva:"
+
+msgid "If it was not you, ignore this message: your password stays as it is."
+msgstr "Si no fuiste tú, ignora este mensaje: tu contraseña sigue igual."
+
+msgid "Reset your OriginPass password"
+msgstr "Restablece tu contraseña de OriginPass"
+
+msgid "Forgot your password?"
+msgstr "¿Olvidaste tu contraseña?"
+
+msgid "Password saved"
+msgstr "Contraseña guardada"
+
+msgid "Your new password is in place. Use it to log in."
+msgstr "Tu nueva contraseña quedó guardada. Úsala para iniciar sesión."
+
+msgid "Choose a new password"
+msgstr "Elige una contraseña nueva"
+
+msgid "Save the new password"
+msgstr "Guardar la contraseña nueva"
+
+msgid "This link no longer works"
+msgstr "Este enlace ya no funciona"
+
+msgid "It was already used, it expired, or the password changed since it was sent. Ask for a new one."
+msgstr "Ya se usó, venció, o la contraseña cambió después de enviarlo. Pide uno nuevo."
+
+msgid "Ask for a new link"
+msgstr "Pedir un enlace nuevo"
+
+msgid "Check your email"
+msgstr "Revisa tu correo"
+
+msgid "If that address has an OriginPass account, a link to choose a new password is on its way. It works once, and only until you change the password."
+msgstr "Si esa dirección tiene una cuenta de OriginPass, va en camino un enlace para elegir una contraseña nueva. Sirve una sola vez, y solo hasta que cambies la contraseña."
+
+msgid "Back to log in"
+msgstr "Volver a iniciar sesión"
+
+msgid "Reset your password"
+msgstr "Restablece tu contraseña"
+
+msgid "Write the email address of your account and we will send you a link to choose a new password."
+msgstr "Escribe el correo de tu cuenta y te enviaremos un enlace para elegir una contraseña nueva."
+
+msgid "Send the link"
+msgstr "Enviar el enlace"
+
+msgid "Actor email"
+msgstr "Correo de quien actuó"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "From"
+msgstr "Desde"
+
+msgid "Until"
+msgstr "Hasta"
+
+msgid "The start date is after the end date."
+msgstr "La fecha inicial es posterior a la final."
+
+msgid "Any action"
+msgstr "Cualquier acción"
+
+msgid "Part of an email address"
+msgstr "Parte de un correo"
+
+msgid "Company application submitted"
+msgstr "Solicitud de empresa enviada"
+
+msgid "Company application resubmitted"
+msgstr "Solicitud de empresa reenviada"
+
+msgid "Company approved"
+msgstr "Empresa aprobada"
+
+msgid "Company rejected"
+msgstr "Empresa rechazada"
+
+msgid "Company suspended"
+msgstr "Empresa suspendida"
+
+msgid "Company reactivated"
+msgstr "Empresa reactivada"
+
+msgid "Product registered"
+msgstr "Pasaporte emitido"
+
+msgid "Product revoked"
+msgstr "Pasaporte anulado"
+
+msgid "Custody transfer accepted"
+msgstr "Entrega recibida"
+
+msgid "Custody transfer declined"
+msgstr "Entrega rechazada"
+
+msgid "Audit log"
+msgstr "Auditoría"
+
+msgid "Every change of status of a company or a passport, signed and linked to the one before it."
+msgstr "Cada cambio de estado de una empresa o de un pasaporte, firmado y enlazado con el anterior."
+
+msgid "The signed chain is intact: %(total)s entry checked."
+msgid_plural "The signed chain is intact: %(total)s entries checked."
+msgstr[0] "La cadena firmada está íntegra: se verificó %(total)s registro."
+msgstr[1] "La cadena firmada está íntegra: se verificaron %(total)s registros."
+
+msgid "No entry was edited or removed since it was written."
+msgstr "Ningún registro se editó ni se borró desde que se escribió."
+
+msgid "The signed chain is broken"
+msgstr "La cadena firmada está rota"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "When"
+msgstr "Cuándo"
+
+msgid "Actor"
+msgstr "Quién"
+
+msgid "Record"
+msgstr "Registro"
+
+msgid "Reason"
+msgstr "Motivo"
+
+msgid "No entries match these filters."
+msgstr "Ningún registro coincide con estos filtros."
+
+msgid "Pages"
+msgstr "Páginas"
+
+msgid "Newer"
+msgstr "Más recientes"
+
+msgid "Page %(number)s of %(pages)s"
+msgstr "Página %(number)s de %(pages)s"
+
+msgid "Older"
+msgstr "Anteriores"
+
+msgid "A reason is required to suspend a company."
+msgstr "Suspender una empresa exige un motivo."
+
+msgid "Reason for the suspension"
+msgstr "Motivo de la suspensión"
+
+msgid "Verified by OriginPass"
+msgstr "Verificada por OriginPass"
+
+msgid "How it was verified"
+msgstr "Cómo se verificó"
+
+msgid "About"
+msgstr "Quiénes son"
+
+msgid "Active passports"
+msgstr "Pasaportes vigentes"
+
+msgid "Open one to see its public verification page."
+msgstr "Abre uno para ver su página pública de verificación."
+
+msgid "This company has no active passports yet."
+msgstr "Esta empresa aún no tiene pasaportes vigentes."
+
+msgid "Suspend this company"
+msgstr "Suspender esta empresa"
+
+msgid "It stops issuing passports at once. The passports it already issued keep working."
+msgstr "Deja de emitir pasaportes de inmediato. Los que ya emitió siguen funcionando."
+
+msgid "Suspend the company"
+msgstr "Suspender la empresa"
+
+msgid "See its public profile"
+msgstr "Ver su perfil público"
+
+msgid "Reactivate this company"
+msgstr "Reactivar esta empresa"
+
+msgid "It is approved again and can issue passports."
+msgstr "Vuelve a estar aprobada y puede emitir pasaportes."
+
+msgid "Reactivate the company"
+msgstr "Reactivar la empresa"
+
+msgid "%(company)s has been suspended."
+msgstr "%(company)s quedó suspendida."
+
+msgid "%(company)s has been reactivated."
+msgstr "%(company)s quedó reactivada."
+
+msgid "Type the code under the QR"
+msgstr "Escribe el código que va bajo el QR"
+
+msgid "Verify"
+msgstr "Verificar"
+
+msgid "No account and no app: the camera of any phone opens the passport."
+msgstr "Sin cuenta y sin app: la cámara de cualquier celular abre el pasaporte."
+
+msgid "My company"
+msgstr "Mi negocio"
+
+msgid "Product passport"
+msgstr "Pasaporte de producto"
+
+msgid "Four moments, each one recorded and signed, so none of them can be rewritten later."
+msgstr "Cuatro momentos, cada uno registrado y firmado, para que ninguno se pueda reescribir después."
+
+msgid "The workshop is verified"
+msgstr "Se verifica el taller"
+
+msgid "A company shows its chamber of commerce registry; an artisan workshop goes through a manual review."
+msgstr "Una empresa muestra su registro de Cámara de Comercio; un taller artesanal pasa por una revisión manual."
+
+msgid "Each piece gets a passport"
+msgstr "Cada producto recibe su pasaporte"
+
+msgid "One code per unit, impossible to guess from another, printed as a QR on the label."
+msgstr "Un código por unidad, imposible de deducir de otro, impreso como QR en la etiqueta."
+
+msgid "Every handover is signed"
+msgstr "Cada entrega queda firmada"
+
+msgid "From the workshop to the distributor to the shop, each change of hands joins the chain."
+msgstr "Del taller al distribuidor y a la tienda, cada cambio de manos entra a la cadena."
+
+msgid "The buyer scans and knows"
+msgstr "Quien compra escanea y sabe"
+
+msgid "Genuine, revoked or not found, with the whole journey of the piece."
+msgstr "Auténtico, anulado o no encontrado, y todo el recorrido del producto."
+
+msgid "Two people need the same certainty"
+msgstr "Dos personas necesitan la misma certeza"
+
+msgid "If you make or sell"
+msgstr "Si haces o vendes"
+
+msgid "Register your workshop, issue a passport per piece and see where it is being scanned. If a code shows up in two places at once, you are told."
+msgstr "Registra tu taller, saca un pasaporte para cada producto y mira dónde lo escanean. Si un código aparece en dos lugares a la vez, te avisamos."
+
+msgid "Register your workshop"
+msgstr "Registrar mi taller"
+
+msgid "If you are buying"
+msgstr "Si estás comprando"
+
+msgid "Point the camera at the QR on the label. The answer is a word, Genuine, Revoked or Not found, and it does not depend on what the seller tells you."
+msgstr "Apunta la cámara al QR de la etiqueta. La respuesta es una palabra —Auténtico, Anulado o No encontrado— y no depende de lo que diga quien vende."
+
+msgid "Made to protect what is copied most"
+msgstr "Hecho para proteger lo que más se copia"
+
+msgid "Crafts with a denomination of origin lose the most to machine-made copies sold beside them."
+msgstr "Las artesanías con denominación de origen son las que más pierden frente a copias hechas a máquina vendidas a su lado."
+
+msgid "Raquira ceramics"
+msgstr "Cerámica de Ráquira"
+
+msgid "San Jacinto hammock"
+msgstr "Hamaca de San Jacinto"
+
+msgid "Email address of the receiver"
+msgstr "Correo de quien recibe"
+
+msgid "Note for the chain of custody"
+msgstr "Nota para el recorrido"
+
+msgid "Optional. It is shown publicly on the verification page."
+msgstr "Opcional. Se muestra públicamente en la página de verificación."
+
+msgid "Printed under the QR code of the product."
+msgstr "Va impreso debajo del código QR, en la etiqueta del producto."
+
+msgid "Transfer code"
+msgstr "Código de entrega"
+
+msgid "The seller gives it to you at the moment of the sale."
+msgstr "Te lo entrega quien vende en el momento de la venta."
+
+msgid "Reason for the revocation"
+msgstr "Motivo de la anulación"
+
+msgid "Required. A buyer who scans this passport reads exactly this text."
+msgstr "Obligatorio. Quien escanee este pasaporte leerá exactamente este texto."
+
+msgid "No account uses that email address. The receiver has to register first."
+msgstr "Ninguna cuenta usa ese correo. Quien recibe tiene que registrarse primero."
+
+msgid "You already hold this product."
+msgstr "Este producto ya está a tu nombre."
+
+msgid "A transfer code looks like 8-4-4-4-12 letters and digits."
+msgstr "El código de entrega tiene letras y números separados por guiones, así: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d."
+
+msgid "No open transfer to your account matches those two codes. Check them with the seller."
+msgstr "Ninguna entrega pendiente para tu cuenta coincide con esos dos códigos. Revísalos con quien te vendió el producto."
+
+msgid "A revocation needs a reason."
+msgstr "Para anular hace falta escribir un motivo."
+
+msgid "Duplicate scan"
+msgstr "Posible copia"
+
+msgid "A revoked product cannot change hands."
+msgstr "Un producto anulado no puede cambiar de manos."
+
+msgid "A product cannot be transferred to its current holder."
+msgstr "No puedes entregarle un producto a quien ya lo tiene."
+
+msgid "Only the current holder can transfer this product."
+msgstr "Solo quien tiene el producto ahora puede entregarlo."
+
+msgid "This product already has an open offer. It has to be answered first."
+msgstr "Este producto ya tiene una entrega pendiente. Primero hay que responderla."
+
+msgid "Overview"
+msgstr "Panel"
+
+msgid "Platform overview"
+msgstr "Panel de la plataforma"
+
+msgid "What OriginPass vouches for today, and what needs a look."
+msgstr "Lo que OriginPass respalda hoy, y lo que necesita revisión."
+
+msgid "Review pending applications"
+msgstr "Revisar solicitudes pendientes"
+
+msgid "Companies"
+msgstr "Empresas"
+
+msgid "Passports issued"
+msgstr "Pasaportes emitidos"
+
+msgid "Verifications"
+msgstr "Verificaciones"
+
+msgid "Recent duplicate-scan alerts"
+msgstr "Avisos recientes de posible copia"
+
+msgid "Companies by status"
+msgstr "Empresas por estado"
+
+msgid "Passports by status"
+msgstr "Pasaportes por estado"
+
+msgid "Duplicate-scan alerts"
+msgstr "Avisos de posible copia"
+
+msgid "A passport scanned from two regions within a day. One of the labels may be a copy."
+msgstr "Un pasaporte escaneado desde dos regiones en menos de un día. Una de las etiquetas puede ser una copia."
+
+msgid "Region of the scan"
+msgstr "Región del escaneo"
+
+msgid "Detected"
+msgstr "Detectada"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Revoke"
+msgstr "Anular"
+
+msgid "No alerts. No passport has been scanned from two regions at once."
+msgstr "Sin alertas. Ningún pasaporte se ha escaneado desde dos regiones a la vez."
+
+msgid "Latest passports"
+msgstr "Últimos pasaportes"
+
+msgid "Analytics"
+msgstr "Escaneos"
+
+msgid "Where your passports are being scanned"
+msgstr "Dónde escanean tus productos"
+
+msgid "Date range"
+msgstr "Periodo"
+
+msgid "Last %(days)s day"
+msgid_plural "Last %(days)s days"
+msgstr[0] "Último día"
+msgstr[1] "Últimos %(days)s días"
+
+msgid "Export as CSV"
+msgstr "Descargar en Excel (CSV)"
+
+msgid "Scans in this period"
+msgstr "Escaneos en este periodo"
+
+msgid "Scans in the period before"
+msgstr "Escaneos en el periodo anterior"
+
+msgid "Change against the period before"
+msgstr "Cambio frente al periodo anterior"
+
+msgid "Possible copies"
+msgstr "Posibles copias"
+
+msgid "These passports were scanned from two different regions within a day. One of the two labels may be a copy."
+msgstr "Estos pasaportes se escanearon desde dos regiones distintas en menos de un día. Una de las dos etiquetas puede ser una copia."
+
+msgid "Scans per day"
+msgstr "Escaneos por día"
+
+msgid "No scans in this period yet."
+msgstr "Aún no hay escaneos en este periodo."
+
+msgid "By region"
+msgstr "Por región"
+
+msgid "Coarse region only: enough to notice a copy, never enough to locate a buyer."
+msgstr "Solo la región aproximada: alcanza para notar una copia, nunca para ubicar a quien compra."
+
+msgid "Most scanned products"
+msgstr "Productos más escaneados"
+
+msgid "Custody"
+msgstr "Entregas"
+
+msgid "The pieces in your hands, the ones offered to you and the ones you are handing over."
+msgstr "Los productos que tienes, los que te quieren entregar y los que tú estás entregando."
+
+msgid "Claim a piece with its codes"
+msgstr "Recibir un producto con sus códigos"
+
+msgid "Waiting for your answer"
+msgstr "Te quieren entregar"
+
+msgid "Accepting adds you to the public journey of the piece."
+msgstr "Al recibirlo, quedas en el recorrido público del producto."
+
+msgid "Offered by"
+msgstr "Lo entrega"
+
+msgid "Offered on"
+msgstr "Fecha"
+
+msgid "Answer"
+msgstr "Responder"
+
+msgid "In your hands"
+msgstr "A tu nombre"
+
+msgid "The pieces whose current holder is your account."
+msgstr "Los productos que están a tu nombre ahora."
+
+msgid "Made by"
+msgstr "Hecho por"
+
+msgid "Transfer"
+msgstr "Entregar"
+
+msgid "You hold no pieces yet. When someone transfers one to you, it appears here."
+msgstr "Aún no tienes productos a tu nombre. Cuando alguien te entregue uno, aparecerá aquí."
+
+msgid "You are offering"
+msgstr "Estás entregando"
+
+msgid "Give the transfer code to the buyer in person. Nobody else sees it."
+msgstr "Dale el código de entrega en persona a quien compra. Nadie más lo puede ver."
+
+msgid "To"
+msgstr "Para"
+
+msgid "You have no open offers."
+msgstr "No estás entregando ningún producto."
+
+msgid "The passport of %(product_name)s has been revoked."
+msgstr "El pasaporte de %(product_name)s fue anulado."
+
+msgid "%(sender)s is offering you custody of %(product_name)s."
+msgstr "%(sender)s te quiere entregar %(product_name)s."
+
+msgid "Log in to OriginPass and open Custody to accept or decline it."
+msgstr "Entra a OriginPass y abre Entregas para recibirlo o rechazarlo."
+
+msgid "See the public page"
+msgstr "Ver la página pública"
+
+msgid "Times verified"
+msgstr "Veces verificado"
+
+msgid "QR code for the label"
+msgstr "Código QR para la etiqueta"
+
+msgid "It opens the public verification page of this piece. Print it with the code below it."
+msgstr "Abre la página donde cualquiera revisa este producto. Imprímelo con el código debajo."
+
+msgid "QR code of this passport"
+msgstr "Código QR de este pasaporte"
+
+msgid "Who holds this piece now, and whether it is being handed over."
+msgstr "Quién tiene el producto ahora, y si lo estás entregando."
+
+msgid "Current holder"
+msgstr "Lo tiene ahora"
+
+msgid "Your company"
+msgstr "Tu negocio"
+
+msgid "Offered to %(who)s, waiting for an answer."
+msgstr "Se lo estás entregando a %(who)s; falta que lo reciba."
+
+msgid "Give this transfer code to the buyer at the moment of the sale. With it and the passport code they claim the piece."
+msgstr "Dale este código de entrega a quien compra, en el momento de la venta. Con este código y el del pasaporte, el producto queda a su nombre."
+
+msgid "Transfer this piece"
+msgstr "Entregar este producto"
+
+msgid "Revoke this passport"
+msgstr "Anular este pasaporte"
+
+msgid "Revoke a passport"
+msgstr "Anular un pasaporte"
+
+msgid "You are about to revoke %(name)s (%(code)s). Anyone who scans it from now on reads Revoked, with the reason you write. This cannot be undone."
+msgstr "Vas a anular %(name)s (%(code)s). Desde ahora, quien lo escanee verá «Anulado» y el motivo que escribas. No se puede deshacer."
+
+msgid "As administrator, on behalf of OriginPass. It was registered by %(company)s."
+msgstr "Como administración, en nombre de OriginPass. Lo registró %(company)s."
+
+msgid "Revoke the passport"
+msgstr "Anular el pasaporte"
+
+msgid "Back to custody"
+msgstr "Volver a Entregas"
+
+msgid "Claim a piece"
+msgstr "Recibir un producto"
+
+msgid "At the sale, the seller gives you a transfer code. Together with the passport code printed on the label, it proves the piece was handed to you."
+msgstr "Cuando compras, quien vende te da un código de entrega. Escríbelo aquí junto con el código del pasaporte, que está en la etiqueta, y el producto quedará a tu nombre."
+
+msgid "Claim the piece"
+msgstr "Recibir el producto"
+
+msgid "Transfer a piece"
+msgstr "Entregar un producto"
+
+msgid "%(name)s keeps its passport. The receiver becomes its holder only when they accept, and the handover joins its public journey."
+msgstr "%(name)s conserva su pasaporte. Quien recibe pasa a tenerla solo cuando acepta, y la entrega entra a su recorrido público."
+
+msgid "Send the offer"
+msgstr "Avisar a quien recibe"
+
+msgid "Answer a transfer"
+msgstr "Responder una entrega"
+
+msgid "%(who)s is offering you custody of this piece."
+msgstr "%(who)s te quiere entregar este producto."
+
+msgid "Note"
+msgstr "Nota"
+
+msgid "Accept only if you have the piece in your hands. Accepting adds you to its public journey."
+msgstr "Recíbelo solo si ya lo tienes en tus manos. Al recibirlo, quedas en su recorrido público."
+
+msgid "Accept the piece"
+msgstr "Recibir el producto"
+
+msgid "Decline"
+msgstr "Rechazar"
+
+msgid "This transfer had already been answered."
+msgstr "Esta entrega ya se había respondido."
+
+msgid "%(product)s has been revoked."
+msgstr "%(product)s quedó anulado."
+
+msgid "This passport had already been revoked."
+msgstr "Este pasaporte ya estaba anulado."
+
+msgid "This product cannot change hands"
+msgstr "Este producto no puede cambiar de manos"
+
+msgid "Its passport was revoked, and a revoked product accepts no transfer."
+msgstr "Su pasaporte fue anulado, y un producto anulado no se puede entregar."
+
+msgid "Only the current holder can transfer it, and your account does not hold it now."
+msgstr "Solo quien tiene el producto ahora puede entregarlo, y tu cuenta no lo tiene."
+
+msgid "You now hold %(product)s."
+msgstr "Listo: %(product)s ya está a tu nombre."
+
+msgid "You declined %(product)s."
+msgstr "Rechazaste %(product)s."
+
+msgid "This passport has already been revoked"
+msgstr "Este pasaporte ya fue anulado"
+
+msgid "Offer sent to %(who)s. Give them the transfer code when you hand the product over."
+msgstr "Listo: avisamos a %(who)s. Cuando le des el producto, dale también el código de entrega."
+
+msgid "The code is the line of letters and digits printed under the QR on the label."
+msgstr "El código es la línea de letras y números impresa bajo el QR de la etiqueta."
+
+msgid "Reason given for the revocation"
+msgstr "Motivo de la anulación"
+
+msgid "Journey of this piece"
+msgstr "Recorrido de este producto"
+
+msgid "Every hand it has passed through, starting from the one that made it."
+msgstr "Todas las manos por las que ha pasado, empezando por las que la hicieron."
+
+msgid "Issued the passport"
+msgstr "Sacó el pasaporte"
+
+msgid "Private holder"
+msgstr "Comprador particular"
+
+msgid "Received the piece"
+msgstr "Lo recibió"
+
+msgid "How to read this result"
+msgstr "Cómo leer este resultado"
+
+msgid "Genuine means the code belongs to an active passport. Revoked means its company or OriginPass withdrew it, and the reason is shown. Not found means no passport has that code: a copied or invented label looks like this."
+msgstr "Auténtico significa que el código es de un pasaporte vigente. Anulado significa que su negocio u OriginPass lo anuló, y se muestra el motivo. No encontrado significa que ningún pasaporte tiene ese código: así se ve una etiqueta copiada o inventada."
+
+msgid "OriginPass issues a verifiable passport for each handmade piece, so a buyer can check it is genuine with the phone camera."
+msgstr "OriginPass da un pasaporte verificable a cada producto artesanal, para que quien compra confirme con la cámara del celular que es auténtico."
+
+msgid "Main"
+msgstr "Principal"
+
+msgid "OriginPass shows what the registering company declared and who verified that company."
+msgstr "OriginPass muestra lo que declaró el negocio que registró el producto y quién verificó a ese negocio."
+
+msgid "The code belongs to an active passport issued by a verified company. Check that the piece in front of you matches the description and the photograph."
+msgstr "El código es de un pasaporte vigente, emitido por un negocio verificado. Comprueba que el producto que tienes enfrente se parece a la descripción y a la foto."
+
+msgid "Its company or OriginPass withdrew this passport, and the reason is above. Do not take this piece as the one the passport was issued for."
+msgstr "El negocio u OriginPass anuló este pasaporte; el motivo está arriba. No compres este producto creyendo que es el del pasaporte."
+
+msgid "No passport has this code. A copied or invented label looks like this. If you typed it, check each character."
+msgstr "Ningún pasaporte tiene este código. Así se ve una etiqueta copiada o inventada. Si lo escribiste a mano, revisa cada carácter."
+
+msgid "From the workshop to the buyer's hands"
+msgstr "Del taller a las manos de quien compra"
+
+msgid "The name of your workshop or business, as buyers know it."
+msgstr "El nombre de tu taller o negocio, como lo conocen quienes te compran."
+
+msgid "Artisan workshop: you make products by hand and have no commercial registry. Commercial company: you have a NIT or a Chamber of Commerce record."
+msgstr "Taller artesanal: haces productos a mano y no tienes registro mercantil. Empresa comercial: tienes NIT o registro en la Cámara de Comercio."
+
+msgid "Only for a commercial company: where your registry comes from. An artisan workshop is reviewed by a person and leaves this empty."
+msgstr "Solo para empresas comerciales: dónde está tu registro. Si eres taller artesanal, déjalo vacío: una persona revisará tu taller."
+
+msgid "What you make and since when. Buyers read this."
+msgstr "Qué haces y desde cuándo. Quienes te compran leen esto."
+
+msgid "Town and department, for example: Tuchín, Córdoba."
+msgstr "Municipio y departamento, por ejemplo: Tuchín, Córdoba."
+
+msgid "Optional. A page or social network where buyers find you."
+msgstr "Opcional. Una página o red social donde te encuentran."
+
+msgid "What does this mean?"
+msgstr "¿Qué significa esto?"
+
+msgid "How OriginPass checked that this business is real: with its official registry, or with a review made by a person in the case of an artisan workshop."
+msgstr "Cómo comprobó OriginPass que este negocio es real: con su registro oficial o, si es un taller artesanal, con la revisión de una persona."
+
+msgid "Correct the details and send the application to be reviewed again."
+msgstr "Corrige los datos y envía la solicitud para que la revisen otra vez."
+
+msgid "A person from OriginPass reviews it. You see the answer on the page My company and by email."
+msgstr "Una persona de OriginPass la revisa. Verás la respuesta en Mi negocio y por correo."
+
+msgid "The business can start issuing passports right away, and is told by email."
+msgstr "El negocio puede sacar pasaportes de inmediato, y le llega un correo avisándole."
+
+msgid "The business is told by email with the reason you write, and can correct and apply again."
+msgstr "Al negocio le llega un correo con el motivo que escribas, y puede corregir y volver a solicitar."
+
+msgid "It cannot issue new passports until you reactivate it. Its products keep their passports."
+msgstr "No podrá sacar pasaportes nuevos hasta que lo reactives. Sus productos conservan sus pasaportes."
+
+msgid "It can issue passports again."
+msgstr "Vuelve a poder sacar pasaportes."
+
+msgid "Photo credits"
+msgstr "Créditos de las fotos"
+
+msgid "The photographs on this site come from Wikimedia Commons, under licences that allow showing them as long as their author is named."
+msgstr "Las fotos de este sitio vienen de Wikimedia Commons, con licencias que permiten mostrarlas siempre que se nombre a su autor."
+
+msgid "Photo by"
+msgstr "Foto de"
+
+msgid "Original on Wikimedia Commons"
+msgstr "Original en Wikimedia Commons"
+
+msgid "What do you want to do?"
+msgstr "¿Qué quieres hacer?"
+
+msgid "I am buying"
+msgstr "Voy a comprar"
+
+msgid "Check that a product is genuine before you pay for it."
+msgstr "Revisa que un producto sea auténtico antes de pagarlo."
+
+msgid "I make or sell crafts"
+msgstr "Hago o vendo artesanías"
+
+msgid "Review the businesses that applied."
+msgstr "Revisa los negocios que se registraron."
+
+msgid "See your business and the passports of your products."
+msgstr "Mira tu negocio y los pasaportes de tus productos."
+
+msgid "Register your workshop and give each product its passport."
+msgstr "Registra tu taller y saca el pasaporte de cada producto."
+
+msgid "Check a product now"
+msgstr "Revisa un producto ahora"
+
+msgid "Point your phone camera at the QR on the label. If it does not scan, type the code printed under it."
+msgstr "Apunta la cámara del celular al QR de la etiqueta. Si no lo lee, escribe el código que está debajo."
+
+msgid "Where is the code?"
+msgstr "¿Dónde está el código?"
+
+msgid "It is the line of letters and digits printed under the QR, on the product label."
+msgstr "Es la línea de letras y números impresa debajo del QR, en la etiqueta del producto."
+
+msgid "A sombrero vueltiao woven in black and natural caña flecha, seen from above"
+msgstr "Un sombrero vueltiao tejido en caña flecha negra y natural, visto desde arriba"
+
+msgid "A red Wayuu mochila with long tassels, hanging from a tree"
+msgstr "Una mochila wayuu roja con borlas largas, colgada de un árbol"
+
+msgid "A clay donkey carrying two jars, made in Ráquira"
+msgstr "Un burrito de barro con dos cántaros, hecho en Ráquira"
+
+msgid "A craft stall in San Jacinto with hammocks, bags and drums"
+msgstr "Un puesto de artesanías en San Jacinto, con hamacas, mochilas y tambores"
+
+msgid "San Jacinto crafts"
+msgstr "Artesanías de San Jacinto"
+
+msgid "The name a buyer would recognise, with what makes this one different."
+msgstr "El nombre con que lo reconocería quien compra, y lo que lo hace distinto."
+
+msgid "How it was made, with what material and how long it took."
+msgstr "Cómo se hizo, con qué material y cuánto tiempo tomó."
+
+msgid "The kind of product, in one or two words."
+msgstr "Qué tipo de producto es, en una o dos palabras."
+
+msgid "The town or region where this product was made."
+msgstr "El municipio o la región donde se hizo este producto."
+
+msgid "Optional. Take it with your phone or choose one from your photos. Whoever scans the QR sees it."
+msgstr "Opcional. Tómala con el celular o escoge una de tus fotos. Quien escanee el QR la verá."
+
+msgid "The email of the person or business receiving the product. They need an OriginPass account."
+msgstr "El correo de la persona o el negocio que recibe el producto. Necesita una cuenta en OriginPass."
+
+msgid "Optional. Anyone who scans the product reads it, for example: Sold at the Cartagena fair."
+msgstr "Opcional. Cualquiera que escanee el producto la lee, por ejemplo: Vendido en la feria de Cartagena."
+
+msgid "For example: Sombrero vueltiao 21 vueltas"
+msgstr "Por ejemplo: Sombrero vueltiao 21 vueltas"
+
+msgid "For example: Woven in caña flecha over three weeks."
+msgstr "Por ejemplo: Tejido en caña flecha durante tres semanas."
+
+msgid "For example: Hats"
+msgstr "Por ejemplo: Sombreros"
+
+msgid "For example: Tuchín, Córdoba"
+msgstr "Por ejemplo: Tuchín, Córdoba"
+
+msgid "The businesses that applied and are waiting for your decision."
+msgstr "Los negocios que se registraron y esperan tu decisión."
+
+msgid "One code scanned in two distant places in less than a day. Someone may have copied the label."
+msgstr "Un mismo código escaneado en dos lugares lejanos en menos de un día. Alguien pudo haber copiado la etiqueta."
+
+msgid "Downloads these scans as a file that opens in Excel or Google Sheets."
+msgstr "Descarga estos escaneos en un archivo que abre en Excel o Google Sheets."
+
+msgid "How many times someone opened the passport of one of your products, with the QR or the code."
+msgstr "Cuántas veces alguien abrió el pasaporte de uno de tus productos, con el QR o con el código."
+
+msgid "If it goes up, more people are checking your products than in the period of the same length before."
+msgstr "Si sube, más gente está revisando tus productos que en el periodo anterior de la misma duración."
+
+msgid "If you bought a product and the seller gave you a transfer code, put it in your name here."
+msgstr "Si compraste un producto y te dieron un código de entrega, ponlo aquí a tu nombre."
+
+msgid "See the product and choose whether to receive it."
+msgstr "Mira el producto y decide si lo recibes."
+
+msgid "Hand this product to another person or business: a distributor, a shop or the buyer."
+msgstr "Pasa este producto a otra persona o negocio: un distribuidor, una tienda o quien lo compra."
+
+msgid "A secret code for this handover only. Whoever receives the product types it with the passport code, and the product goes to their name."
+msgstr "Un código secreto solo para esta entrega. Quien recibe el producto lo escribe junto con el código del pasaporte, y el producto queda a su nombre."
+
+msgid "What a buyer sees after scanning the QR of this product."
+msgstr "Lo que ve quien compra al escanear el QR de este producto."
+
+msgid "Correct the name, the description or the photo. The code does not change."
+msgstr "Corrige el nombre, la descripción o la foto. El código no cambia."
+
+msgid "Photograph of %(name)s"
+msgstr "Foto de %(name)s"
+
+msgid "The letters and digits printed under the QR on the label. Every product has a different one, and nobody can guess it from another."
+msgstr "Las letras y números impresos debajo del QR, en la etiqueta. Cada producto tiene uno distinto y nadie puede adivinarlo a partir de otro."
+
+msgid "How many times someone opened this passport by scanning the QR or typing the code."
+msgstr "Cuántas veces alguien abrió este pasaporte escaneando el QR o escribiendo el código."
+
+msgid "Saves the QR as an image, to print and stick on the product label."
+msgstr "Guarda el QR como imagen, para imprimirlo y pegarlo en la etiqueta del producto."
+
+msgid "Cancel the passport if the product was lost, damaged or copied. Whoever scans it will read Revoked and your reason."
+msgstr "Anula el pasaporte si el producto se perdió, se dañó o lo copiaron. Quien lo escanee verá «Anulado» y tu motivo."
+
+msgid "Write what the product is and where it was made."
+msgstr "Escribe qué producto es y dónde se hizo."
+
+msgid "Add a photo, if you have one."
+msgstr "Agrega una foto, si tienes."
+
+msgid "Press Issue the passport: you get its code and its QR to print."
+msgstr "Oprime «Crear el pasaporte»: recibes su código y su QR para imprimir."
+
+msgid "Saves the new name, description or photo. The code stays the same."
+msgstr "Guarda el nuevo nombre, descripción o foto. El código sigue igual."
+
+msgid "Creates the passport with its own code and QR. You can download the QR right after."
+msgstr "Crea el pasaporte con su propio código y QR. Puedes descargar el QR enseguida."
+
+msgid "Give a new product its passport: write its name and where it was made, add a photo, and you get its QR code."
+msgstr "Saca el pasaporte de un producto nuevo: escribe su nombre y dónde se hizo, agrega una foto y recibes su código QR."
+
+msgid "You have not registered any product yet. Start with the button Register a product."
+msgstr "Aún no has registrado productos. Empieza con el botón «Registrar un producto»."
+
+msgid "Do this when the product was lost, stolen, damaged or copied. If you only want to give it to someone, use Transfer instead."
+msgstr "Hazlo cuando el producto se perdió, lo robaron, se dañó o lo copiaron. Si solo quieres pasárselo a alguien, usa «Entregar»."
+
+msgid "From now on its QR says Revoked. It cannot be undone."
+msgstr "Desde ahora su QR dirá «Anulado». No se puede deshacer."
+
+msgid "The passport code is printed under the QR, on the label. The transfer code is the one the seller gave you."
+msgstr "El código del pasaporte está impreso debajo del QR, en la etiqueta. El código de entrega es el que te dio quien te vendió."
+
+msgid "If both codes match, the product goes to your name right away."
+msgstr "Si los dos códigos coinciden, el producto queda a tu nombre de inmediato."
+
+msgid "Write the email of whoever receives the product."
+msgstr "Escribe el correo de quien recibe el producto."
+
+msgid "We tell them by email and show you a transfer code."
+msgstr "Le avisamos por correo y a ti te mostramos un código de entrega."
+
+msgid "When you hand over the product, give them that code too."
+msgstr "Cuando le entregues el producto, dale también ese código."
+
+msgid "The product stays in your name until the other person receives it."
+msgstr "El producto sigue a tu nombre hasta que la otra persona lo reciba."
+
+msgid "The product goes to your name and you can hand it on later."
+msgstr "El producto queda a tu nombre y después lo puedes entregar a otra persona."
+
+msgid "The product stays with whoever sent it. Nothing else changes."
+msgstr "El producto se queda con quien lo envió. Nada más cambia."
+
+msgid "You will see one of three answers: Genuine, Revoked or Not found, with what each one means."
+msgstr "Verás una de tres respuestas: Auténtico, Anulado o No encontrado, con lo que significa cada una."
+
+msgid "Each time the product changed hands it was written down and signed. Nobody can erase or change a step afterwards."
+msgstr "Cada vez que el producto cambió de manos quedó anotado y firmado. Nadie puede borrar ni cambiar un paso después."
+
+msgid "Check with its code or QR whether a product is genuine. No account needed."
+msgstr "Revisa con el código o el QR si un producto es auténtico. No necesitas cuenta."
+
+msgid "Totals of the platform and the alerts that need a look."
+msgstr "Los totales de la plataforma y los avisos que necesitan revisión."
+
+msgid "The businesses waiting to be approved or rejected."
+msgstr "Los negocios que esperan ser aprobados o rechazados."
+
+msgid "Every decision taken on the platform, signed so it cannot be erased."
+msgstr "Cada decisión tomada en la plataforma, firmada para que no se pueda borrar."
+
+msgid "The products you made a passport for, each with its QR code."
+msgstr "Los productos a los que les sacaste pasaporte, cada uno con su código QR."
+
+msgid "How many times and from where your products are checked, and warnings of possible copies."
+msgstr "Cuántas veces y desde dónde revisan tus productos, y avisos de posibles copias."
+
+msgid "The products you have, the ones someone wants to hand you and the ones you are handing over."
+msgstr "Los productos que tienes, los que te quieren entregar y los que tú estás entregando."
+
+msgid "The registration of your workshop or business, and whether it is approved."
+msgstr "El registro de tu taller o negocio, y si ya está aprobado."
+
+msgid "A product label: the QR code, and under it the passport code"
+msgstr "Una etiqueta de producto: el código QR y, debajo, el código del pasaporte"

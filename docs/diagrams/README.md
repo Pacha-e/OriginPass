@@ -1,6 +1,7 @@
 # Diagrams
 
-The diagrams required by Deliverable 2. Each one is a draw.io file, editable at
+The diagrams required by Deliverables 2 and 3. What Sprint 3 changed is drawn in orange in
+each one, with its own legend entry, as Deliverable 3 asks the changes to be marked. Each one is a draw.io file, editable at
 [app.diagrams.net](https://app.diagrams.net) or in the draw.io desktop application,
 with no export step needed to read it.
 

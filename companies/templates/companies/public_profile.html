@@ -1,39 +1,62 @@
 {% extends "base.html" %}
 {% load i18n %}
+
 {% block title %}{{ company.legal_name }} — OriginPass{% endblock %}
+
 {% block content %}
+{% comment %}
+FR18: what OriginPass vouches for about a company, open to anyone. Only fields
+the company published in its application, never its owner's account.
+{% endcomment %}
 <div class="page-head">
-  <h1>{{ company.legal_name }}</h1>
-  <p class="muted">{{ company.get_company_type_display }} · {{ company.location }}</p>
+  <div>
+    <h1>{{ company.legal_name }}</h1>
+    <p>{{ company.location }}</p>
+  </div>
+  <div class="page-head__actions">
+    <span class="pill pill--approved">{% translate "Verified by OriginPass" %}</span>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "How it was verified" %}</h2>
+    </div>
+    <dl class="detail-list">
+      <dt>{% translate "Company type" %}</dt><dd>{{ company.get_company_type_display }}</dd>
+      <dt>{% translate "Verified through" %}</dt><dd>{{ company.get_verification_track_display }}</dd>
+      <dt>{% translate "Located in" %}</dt><dd>{{ company.location }}</dd>
+      {% if company.website %}
+        <dt>{% translate "Website" %}</dt><dd><a href="{{ company.website }}" rel="nofollow noopener">{{ company.website }}</a></dd>
+      {% endif %}
+    </dl>
+  </div>
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "About" %}</h2>
+    </div>
+    <p>{{ company.description|linebreaksbr }}</p>
+  </div>
 </div>
 
 <div class="card">
   <div class="card__head">
-    <h2>{% translate "Verified company" %}</h2>
-    <p>{% translate "This company was verified by OriginPass and can issue passports." %}</p>
+    <h2>{% translate "Active passports" %}</h2>
+    <p>{% translate "Open one to see its public verification page." %}</p>
   </div>
-  <dl class="detail-list">
-    <dt>{% translate "Type" %}</dt><dd>{{ company.get_company_type_display }}</dd>
-    <dt>{% translate "Verified through" %}</dt><dd>{{ company.get_verification_track_display }}</dd>
-    <dt>{% translate "Location" %}</dt><dd>{{ company.location }}</dd>
-    <dt>{% translate "Registered" %}</dt><dd>{{ company.submitted_at|date:"j F Y" }}</dd>
-  </dl>
-</div>
-
-<div class="card">
-  <div class="card__head"><h2>{% translate "Products" %}</h2></div>
-  <p class="muted">{% translate "Products this company has issued. Open one to verify it." %}</p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>{% translate "Product" %}</th><th>{% translate "Passport" %}</th></tr></thead>
+      <thead><tr><th>{% translate "Product" %}</th><th>{% translate "Category" %}</th><th>{% translate "Made in" %}</th></tr></thead>
       <tbody>
-        {% for product in company.active_products.all %}
-        <tr>
-          <td>{{ product.name }}</td>
-          <td class="mono">{{ product.passport_code }}</td>
-        </tr>
+        {% for product in products %}
+          <tr>
+            <td><a href="{% url 'verification:verify' product.passport_code %}">{{ product.name }}</a></td>
+            <td class="muted">{{ product.category }}</td>
+            <td class="muted">{{ product.origin }}</td>
+          </tr>
         {% empty %}
-        <tr><td colspan="2" class="table-empty">{% translate "No active products yet." %}</td></tr>
+          <tr><td colspan="3" class="table-empty">{% translate "This company has no active passports yet." %}</td></tr>
         {% endfor %}
       </tbody>
     </table>

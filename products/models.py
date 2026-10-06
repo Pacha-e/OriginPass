@@ -57,6 +57,26 @@ def generate_passport_code():
     return secrets.token_urlsafe(24)
 
 
+class ProductQuerySet(models.QuerySet):
+    def held_by(self, user):
+        """The products whose current holder is this account, in one query.
+
+        The holder is the receiver of the latest accepted transfer, or the
+        company owner while no transfer has been accepted: the same rule as
+        `Product.current_holder`, stated for many rows at once.
+        """
+        last_receiver = (
+            CustodyTransfer.objects.filter(
+                product=models.OuterRef("pk"), state=TransferState.ACCEPTED
+            )
+            .order_by("-resolved_at")
+            .values("to_holder")[:1]
+        )
+        return self.annotate(last_receiver=models.Subquery(last_receiver)).filter(
+            Q(last_receiver=user.pk) | Q(last_receiver__isnull=True, company__owner=user)
+        )
+
+
 class Product(models.Model):
     company = models.ForeignKey(
         "companies.Company", on_delete=models.PROTECT, related_name="products"
@@ -77,6 +97,8 @@ class Product(models.Model):
     revocation_reason = models.TextField(blank=True)
     registered_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ProductQuerySet.as_manager()
 
     class Meta:
         ordering = ["-registered_at"]
@@ -169,19 +191,33 @@ class Product(models.Model):
         return last.to_holder if last else self.company.owner
 
     def revoke(self, actor, reason):
-        if self.status == ProductStatus.REVOKED:
-            raise ValueError("This product has already been revoked.")
+        """FR41, FR42: the passport stops being valid and the record says why.
+
+        Asked of the locked row rather than of this copy, so two revocations
+        submitted together cannot both pass the check and both write an entry
+        to the trail.
+        """
         if not reason.strip():
             raise ValueError("A reason is required to revoke a product.")
-        self.status = ProductStatus.REVOKED
-        self.revocation_reason = reason.strip()
-        self.save(update_fields=["status", "revocation_reason"])
-        AuditEntry.record(
-            actor=actor,
-            action=Action.PRODUCT_REVOKED,
-            target=self,
-            reason=self.revocation_reason,
-        )
+        with transaction.atomic():
+            stored_status = (
+                type(self)
+                .objects.select_for_update()
+                .filter(pk=self.pk)
+                .values_list("status", flat=True)
+                .first()
+            )
+            if stored_status == ProductStatus.REVOKED:
+                raise ValueError("This product has already been revoked.")
+            self.status = ProductStatus.REVOKED
+            self.revocation_reason = reason.strip()
+            self.save(update_fields=["status", "revocation_reason"])
+            AuditEntry.record(
+                actor=actor,
+                action=Action.PRODUCT_REVOKED,
+                target=self,
+                reason=self.revocation_reason,
+            )
 
 
 class CustodyTransfer(models.Model):
@@ -227,6 +263,13 @@ class CustodyTransfer(models.Model):
             models.UniqueConstraint(
                 fields=["product", "previous_hash"],
                 name="custody_transfer_links_to_one_predecessor",
+            ),
+            # A product is offered to one account at a time. Two open offers
+            # could both be accepted, and the product would have two holders.
+            models.UniqueConstraint(
+                fields=["product"],
+                condition=Q(state="INITIATED"),
+                name="custody_transfer_one_open_offer",
             ),
         ]
 
@@ -299,12 +342,23 @@ class CustodyTransfer(models.Model):
         )
 
     def clean(self):
+        """FR38 and FR39, with the reason a person can act on."""
         if self.product_id and self.product.status == ProductStatus.REVOKED:
-            raise ValidationError("A revoked product accepts no custody transfer.")
+            raise ValidationError(_("A revoked product cannot change hands."))
         if self.from_holder_id == self.to_holder_id:
-            raise ValidationError("A product cannot be transferred to its current holder.")
+            raise ValidationError(_("A product cannot be transferred to its current holder."))
         if self.product_id and self.from_holder_id != self.product.current_holder.pk:
-            raise ValidationError("Only the current holder can transfer this product.")
+            raise ValidationError(_("Only the current holder can transfer this product."))
+        if (
+            self.product_id
+            and type(self)
+            .objects.filter(product_id=self.product_id, state=TransferState.INITIATED)
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                _("This product already has an open offer. It has to be answered first.")
+            )
 
     def _resolve(self, state, action, actor):
         with transaction.atomic():
@@ -341,9 +395,8 @@ class AlertKind(models.TextChoices):
 
 class Alert(models.Model):
     """Raised when one passport is scanned from distant regions within a window."""
-    product = models.ForeignKey(
-        "products.Product", on_delete=models.PROTECT, related_name="alerts"
-    )
+
+    product = models.ForeignKey("products.Product", on_delete=models.PROTECT, related_name="alerts")
     scan = models.ForeignKey(
         "verification.ScanEvent",
         on_delete=models.SET_NULL,

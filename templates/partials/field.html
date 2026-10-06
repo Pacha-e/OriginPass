@@ -1,7 +1,11 @@
-{# One form field with its cause of refusal rendered directly beside it (UR08). #}
+{% comment %}
+One form field. The help comes before the input, where it is read before typing,
+and Django points the input's aria-describedby at it. The cause of a refusal is
+rendered directly beside the field (UR08).
+{% endcomment %}
 <div class="field-row{% if field.errors %} field-row--invalid{% endif %}">
   <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {% if field.help_text %}<p class="field-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
   {{ field }}
-  {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
   {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
 </div>

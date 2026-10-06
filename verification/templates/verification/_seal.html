@@ -1,0 +1,31 @@
+{% comment %}
+The seal on the verdict: a guilloche rosette, the interlaced fine line printed
+on banknotes and passports because it is hard to reproduce, with the answer in
+its centre. Drawn in currentColor, so the verdict colours it. Decorative: the
+verdict is also written as the heading next to it (UR03).
+{% endcomment %}
+<svg class="seal" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+  <g class="seal__rosette" fill="none" stroke="currentColor" stroke-width="0.7">
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(0 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(12 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(24 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(36 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(48 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(60 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(72 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(84 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(96 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(108 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(120 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(132 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(144 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(156 60 60)"/>
+    <ellipse cx="60" cy="60" rx="50" ry="19" transform="rotate(168 60 60)"/>
+  </g>
+  <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="53" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2.4"/>
+  <circle class="seal__core" cx="60" cy="60" r="26" fill="currentColor"/>
+  {% if verdict == "GENUINE" %}<path class="seal__icon" d="M48 60.5l8.5 8.5L73 52.5" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  {% elif verdict == "REVOKED" %}<path class="seal__icon" d="M50 50l20 20M70 50L50 70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  {% else %}<path class="seal__icon" d="M53 53.5a7 7 0 1 1 9.5 6.5c-1.6.7-2.5 2-2.5 3.7v1.8M60 71.5v.5" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>{% endif %}
+</svg>

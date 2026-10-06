@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block body_class %}page-auth{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <aside class="auth__aside">
+    {% include "partials/logo_mark.html" with size=56 %}
+    <p class="auth__slogan">{% translate "Origin cannot be imitated." %}</p>
+    <p class="auth__note">
+      {% blocktranslate trimmed %}
+        Workshops and companies issue one passport per piece. Buyers check it with
+        their phone camera, without an account.
+      {% endblocktranslate %}
+    </p>
+  </aside>
+
+  <div class="auth__panel">
+    {% block auth %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

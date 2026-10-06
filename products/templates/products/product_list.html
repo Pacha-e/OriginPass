@@ -5,13 +5,19 @@
 
 {% block content %}
 <div class="page-head">
-  <h1>{% blocktranslate with name=company.legal_name %}Products of {{ name }}{% endblocktranslate %}</h1>
-  <p>{% translate "Every passport this company has issued." %}</p>
+  <div>
+    <h1>{% blocktranslate with name=company.legal_name %}Products of {{ name }}{% endblocktranslate %}</h1>
+    <p>{% translate "Every passport this company has issued." %}</p>
+  </div>
+  {% if can_register %}
+    <div class="page-head__actions">
+      <span class="tip">
+        <a class="btn btn--primary" href="{% url 'products:product_create' %}" aria-describedby="tip-new">{% translate "Register a product" %}</a>
+        <span class="tip__text" id="tip-new" role="tooltip">{% translate "Give a new product its passport: write its name and where it was made, add a photo, and you get its QR code." %}</span>
+      </span>
+    </div>
+  {% endif %}
 </div>
-
-{% if can_register %}
-  <p><a class="btn btn--primary" href="{% url 'products:product_create' %}">{% translate "Register a product" %}</a></p>
-{% endif %}
 
 {# FR24: filter by status. #}
 <div class="filters">
@@ -44,7 +50,12 @@
     <tbody>
       {% for product in products %}
         <tr>
-          <td><a href="{% url 'products:product_detail' product.pk %}">{{ product.name }}</a></td>
+          <td>
+            <a class="cell-product" href="{% url 'products:product_detail' product.pk %}">
+              {% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="" width="56" height="56" loading="lazy">{% else %}<span class="thumb" aria-hidden="true"></span>{% endif %}
+              {{ product.name }}
+            </a>
+          </td>
           <td class="muted">{{ product.category }}</td>
           <td class="mono">{{ product.passport_code }}</td>
           <td class="muted">{{ product.registered_at|date:"j M Y" }}</td>
@@ -55,6 +66,8 @@
           <td colspan="5" class="table-empty">
             {% if query or selected_status %}
               {% translate "No products match this search." %}
+            {% elif can_register %}
+              {% translate "You have not registered any product yet. Start with the button Register a product." %}
             {% else %}
               {% translate "No passports have been issued yet." %}
             {% endif %}

@@ -1,5 +1,5 @@
-{% load i18n %}{% blocktranslate with product=product.name reason=product.revocation_reason %}Hola,
+{% load i18n %}{% translate "Hello," %}
 
-El pasaporte de {{ product }} ha sido revocado.
+{% blocktranslate trimmed %}The passport of {{ product_name }} has been revoked.{% endblocktranslate %}
 
-Motivo: {{ reason }}{% endblocktranslate %}
+{% blocktranslate trimmed %}Reason recorded: {{ reason }}{% endblocktranslate %}

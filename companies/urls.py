@@ -12,4 +12,7 @@ urlpatterns = [
     path("review/<int:pk>/", views.review_detail, name="review_detail"),
     path("review/<int:pk>/approve/", views.review_approve, name="review_approve"),
     path("review/<int:pk>/reject/", views.review_reject, name="review_reject"),
+    path("review/<int:pk>/suspend/", views.suspend_company, name="suspend"),
+    path("review/<int:pk>/reactivate/", views.reactivate_company, name="reactivate"),
+    path("<int:pk>/", views.public_profile, name="public_profile"),
 ]

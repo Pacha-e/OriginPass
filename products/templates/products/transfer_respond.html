@@ -1,29 +1,41 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Answer the transfer" %} — OriginPass{% endblock %}
+
+{% block title %}{% translate "Answer a transfer" %} — OriginPass{% endblock %}
+
 {% block content %}
-<div class="page-head">
-  <h1>{% translate "Answer the transfer" %}</h1>
-  <p>
-    {% blocktranslate with code=transfer.product.passport_code %}
-      {{ transfer.product.name }} ({{ code }}) is being offered to you by
-      {{ transfer.from_holder.email }}.
-    {% endblocktranslate %}
-  </p>
-</div>
 <div class="card card--narrow">
-  <form method="post" style="display:inline">
+  <div class="card__head">
+    <h1>{{ transfer.product.name }}</h1>
+    <p>
+      {% blocktranslate trimmed with who=transfer.from_holder.email %}
+        {{ who }} is offering you custody of this piece.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  {% if transfer.product.image %}
+    <img class="product-image" src="{{ transfer.product.image.url }}" alt="{% blocktranslate with name=transfer.product.name %}Photograph of {{ name }}{% endblocktranslate %}" width="220" height="220">
+  {% endif %}
+
+  <dl class="detail-list spaced">
+    <dt>{% translate "Made by" %}</dt><dd>{{ transfer.product.company.legal_name }}</dd>
+    <dt>{% translate "Passport code" %}</dt><dd class="mono">{{ transfer.product.passport_code }}</dd>
+    {% if transfer.note %}<dt>{% translate "Note" %}</dt><dd>{{ transfer.note }}</dd>{% endif %}
+  </dl>
+
+  <p class="muted spaced">{% translate "Accept only if you have the piece in your hands. Accepting adds you to its public journey." %}</p>
+
+  <form method="post" class="form-actions">
     {% csrf_token %}
-    <input type="hidden" name="action" value="accept">
-    <button type="submit" class="btn btn--primary">{% translate "Accept — become the holder" %}</button>
+    <span class="tip tip--start">
+      <button type="submit" name="action" value="accept" class="btn btn--primary" aria-describedby="tip-accept">{% translate "Accept the piece" %}</button>
+      <span class="tip__text" id="tip-accept" role="tooltip">{% translate "The product goes to your name and you can hand it on later." %}</span>
+    </span>
+    <span class="tip">
+      <button type="submit" name="action" value="decline" class="btn" aria-describedby="tip-decline">{% translate "Decline" %}</button>
+      <span class="tip__text" id="tip-decline" role="tooltip">{% translate "The product stays with whoever sent it. Nothing else changes." %}</span>
+    </span>
   </form>
-  <form method="post" style="display:inline">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="decline">
-    <button type="submit" class="btn btn--danger">{% translate "Decline" %}</button>
-  </form>
-  <p class="muted" style="margin-top: var(--space-3);">
-    {% translate "Once answered, a transfer cannot be answered again." %}
-  </p>
 </div>
 {% endblock %}

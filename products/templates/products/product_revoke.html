@@ -1,34 +1,40 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Revoke this passport" %} — OriginPass{% endblock %}
+
+{% block title %}{% translate "Revoke a passport" %} — OriginPass{% endblock %}
+
 {% block content %}
-<div class="page-head">
-  <h1>{% translate "Revoke this passport" %}</h1>
-  <p>
-    {% blocktranslate with name=product.name code=product.passport_code %}
-      You are about to revoke {{ name }} ({{ code }}). A revoked passport stays
-      on the record with the reason you write, and the public verification
-      page will say so.
-    {% endblocktranslate %}
-  </p>
-</div>
 <div class="card card--narrow">
-  <form method="post" novalidate>
-    {% csrf_token %}
-    <div class="field-row">
-      <label for="id_reason">{% translate "Reason for the revocation" %}</label>
-      <textarea id="id_reason" name="reason" required rows="3"
-        >{{ request.POST.reason }}</textarea>
-      <p class="field-help">{% translate "Required. The buyer reading this ticket sees exactly this text." %}</p>
-    </div>
-    {% if messages %}
-      {% for message in messages %}
-        <p class="form-error">{{ message }}</p>
-      {% endfor %}
+  <div class="card__head">
+    <h1>{% translate "Revoke this passport" %}</h1>
+    <p>
+      {% blocktranslate trimmed with name=product.name code=product.passport_code %}
+        You are about to revoke {{ name }} ({{ code }}). Anyone who scans it from now on
+        reads Revoked, with the reason you write. This cannot be undone.
+      {% endblocktranslate %}
+    </p>
+    {% if by_admin %}
+      <p class="muted">
+        {% blocktranslate trimmed with company=product.company.legal_name %}
+          As administrator, on behalf of OriginPass. It was registered by {{ company }}.
+        {% endblocktranslate %}
+      </p>
     {% endif %}
+  </div>
+
+  <div class="notice notice--warning">
+    <p>{% translate "Do this when the product was lost, stolen, damaged or copied. If you only want to give it to someone, use Transfer instead." %}</p>
+  </div>
+
+  <form method="post" class="spaced" novalidate>
+    {% csrf_token %}
+    {% include "partials/field.html" with field=form.reason %}
     <div class="form-actions">
-      <button type="submit" class="btn btn--danger">{% translate "Revoke the passport" %}</button>
-      <a class="btn" href="{% url 'products:product_detail' product.pk %}">{% translate "Cancel" %}</a>
+      <span class="tip tip--start">
+        <button type="submit" class="btn btn--danger" aria-describedby="tip-confirm-revoke">{% translate "Revoke the passport" %}</button>
+        <span class="tip__text" id="tip-confirm-revoke" role="tooltip">{% translate "From now on its QR says Revoked. It cannot be undone." %}</span>
+      </span>
+      <a class="btn" href="{{ cancel_url }}">{% translate "Cancel" %}</a>
     </div>
   </form>
 </div>

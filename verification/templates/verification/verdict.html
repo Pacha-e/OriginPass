@@ -3,15 +3,18 @@
 
 {% block title %}{% translate "Verification" %} — OriginPass{% endblock %}
 
+{% block body_class %}page-verdict{% endblock %}
+
 {% block content %}
 {% comment %}
 The page a stranger reaches from a QR code. No session, no script, one
 stylesheet: the whole page is one request and its budget is UR06.
 
-UR03: the verdict is a word, not only a colour. Someone who does not
+UR03: the verdict is a word, not only a colour or a seal. Someone who does not
 distinguish these colours reads the same answer as everyone else.
 {% endcomment %}
-<div class="verdict verdict--{{ verdict|lower }}">
+<section class="verdict verdict--{{ verdict|lower }}">
+  {% include "verification/_seal.html" %}
   {% comment %}
   The heading of the page, because it is the answer to the question the page was
   opened to ask. An unmatched code has no product to name, so making the product
@@ -33,58 +36,80 @@ distinguish these colours reads the same answer as everyone else.
       {% translate "This code does not match any passport issued by OriginPass." %}
     {% endif %}
   </p>
-</div>
+  {% if verdict == "REVOKED" and product.revocation_reason %}
+    <p class="verdict__reason">
+      <strong>{% translate "Reason given for the revocation" %}</strong>
+      {{ product.revocation_reason }}
+    </p>
+  {% endif %}
+</section>
 
 {% if product %}
-  <div class="card">
-    <div class="card__head">
-      <h2>{{ product.name }}</h2>
-      <p class="muted">{{ product.category }}</p>
+  <article class="datapage" aria-labelledby="product-name">
+    <div class="datapage__band">
+      <span>{% translate "Product passport" %}</span>
+      <span>OriginPass</span>
     </div>
+    <div class="datapage__body">
+      {% if product.image %}
+        <img class="datapage__photo" src="{{ product.image.url }}" alt="{% blocktranslate with name=product.name %}Photograph of {{ name }}{% endblocktranslate %}" width="220" height="220">
+      {% else %}
+        <div class="datapage__photo" role="presentation"></div>
+      {% endif %}
+      <div>
+        <h2 class="datapage__title" id="product-name">{{ product.name }}</h2>
+        <p class="muted">{{ product.category }}</p>
+        {% if product.description %}<p>{{ product.description|linebreaksbr }}</p>{% endif %}
 
-    {% if product.image %}
-      <p><img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}"></p>
-    {% endif %}
-
-    <p>{{ product.description|linebreaksbr }}</p>
-
-    <dl class="detail-list">
-      <dt>{% translate "Made in" %}</dt><dd>{{ product.origin }}</dd>
-      <dt>{% translate "Registered by" %}</dt><dd>{{ product.company.legal_name }}</dd>
-      <dt>{% translate "Company type" %}</dt><dd>{{ product.company.get_company_type_display }}</dd>
-      <dt>{% translate "Verified through" %}</dt><dd>{{ product.company.get_verification_track_display }}</dd>
-      <dt>{% translate "Located in" %}</dt><dd>{{ product.company.location }}</dd>
-      <dt>{% translate "Passport issued" %}</dt><dd>{{ product.registered_at|date:"j F Y" }}</dd>
-      <dt>{% translate "Passport code" %}</dt><dd class="mono">{{ product.passport_code }}</dd>
-    </dl>
-  </div>
+        <dl class="datapage__fields">
+          <div><dt>{% translate "Made in" %}</dt><dd>{{ product.origin }}</dd></div>
+          <div>
+            <dt>{% translate "Registered by" %}</dt>
+            <dd>
+              {% if product.company.status == "APPROVED" %}
+                <a href="{% url 'companies:public_profile' product.company.pk %}">{{ product.company.legal_name }}</a>
+              {% else %}
+                {{ product.company.legal_name }}
+              {% endif %}
+            </dd>
+          </div>
+          <div><dt>{% translate "Company type" %}</dt><dd>{{ product.company.get_company_type_display }}</dd></div>
+          <div><dt>{% translate "Verified through" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "How OriginPass checked that this business is real: with its official registry, or with a review made by a person in the case of an artisan workshop." %}</span></details></dt><dd>{{ product.company.get_verification_track_display }}</dd></div>
+          <div><dt>{% translate "Located in" %}</dt><dd>{{ product.company.location }}</dd></div>
+          <div><dt>{% translate "Passport issued" %}</dt><dd>{{ product.registered_at|date:"j F Y" }}</dd></div>
+          <div><dt>{% translate "Passport code" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "The letters and digits printed under the QR on the label. Every product has a different one, and nobody can guess it from another." %}</span></details></dt><dd class="mono">{{ product.passport_code }}</dd></div>
+        </dl>
+      </div>
+    </div>
+    <p class="mrz" aria-hidden="true">{{ mrz }}</p>
+  </article>
 
   {% comment %}
-    FR32: the chain of custody, in the order it happened. The chain is what
-    separates OriginPass from a serial check: every hand is on the record.
+  FR32: the chain of custody, in the order it happened. Holders are named the
+  way a stranger may see them: a company by its public name, anyone else as a
+  private holder, never by an email address.
   {% endcomment %}
-  {% if chain %}
-  <div class="card">
+  <section class="card journey" aria-labelledby="journey">
     <div class="card__head">
-      <h2>{% translate "Chain of custody" %}</h2>
-      <p>{% translate "Everyone who has held this product, starting from the maker." %}</p>
+      <div class="head-info"><h2 id="journey">{% translate "Journey of this piece" %}</h2><details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "Each time the product changed hands it was written down and signed. Nobody can erase or change a step afterwards." %}</span></details></div>
+      <p>{% translate "Every hand it has passed through, starting from the one that made it." %}</p>
     </div>
-    <ol class="chain">
+    <ol>
       <li>
-        <strong>{{ product.company.legal_name }}</strong>
-        <span class="muted">{% translate "Registered the passport" %}</span>
-        <span class="faint">{{ product.registered_at|date:"j M Y" }}</span>
+        <span class="journey__who">{{ product.company.legal_name }}</span>
+        <span class="journey__what">{% translate "Issued the passport" %}</span>
+        <span class="journey__when">{{ product.registered_at|date:"j F Y" }}</span>
       </li>
-      {% for entry in chain %}
-      <li>
-        <strong>{{ entry.to_holder.email }}</strong>
-        {% if entry.note %}<span class="muted">— {{ entry.note }}</span>{% endif %}
-        <span class="faint">{{ entry.resolved_at|date:"j M Y" }}</span>
-      </li>
+      {% for step in chain %}
+        <li>
+          <span class="journey__who">{% if step.company %}{{ step.company.legal_name }}{% else %}{% translate "Private holder" %}{% endif %}</span>
+          <span class="journey__what">{% translate "Received the piece" %}</span>
+          {% if step.note %}<q class="journey__note">{{ step.note }}</q>{% endif %}
+          <span class="journey__when">{{ step.date|date:"j F Y" }}</span>
+        </li>
       {% endfor %}
     </ol>
-  </div>
-  {% endif %}
+  </section>
 {% else %}
   <div class="card card--narrow">
     <p class="muted">
@@ -102,10 +127,35 @@ distinguish these colours reads the same answer as everyone else.
   </div>
 {% endif %}
 
-<p class="faint">
-  {% blocktranslate trimmed %}
-    OriginPass shows what the registering company declared and who verified that
-    company. No account is needed to check a product.
-  {% endblocktranslate %}
-</p>
+<details class="verify-help">
+  <summary>{% translate "How to read this result" %}</summary>
+  <p>
+    {% blocktranslate trimmed %}
+      OriginPass shows what the registering company declared and who verified that
+      company. No account is needed to check a product.
+    {% endblocktranslate %}
+  </p>
+  {% comment %}
+  One explanation per verdict, so a revoked page never carries the word for a
+  genuine one, even in passing.
+  {% endcomment %}
+  <p>
+    {% if verdict == "GENUINE" %}
+      {% blocktranslate trimmed %}
+        The code belongs to an active passport issued by a verified company. Check that
+        the piece in front of you matches the description and the photograph.
+      {% endblocktranslate %}
+    {% elif verdict == "REVOKED" %}
+      {% blocktranslate trimmed %}
+        Its company or OriginPass withdrew this passport, and the reason is above. Do not
+        take this piece as the one the passport was issued for.
+      {% endblocktranslate %}
+    {% else %}
+      {% blocktranslate trimmed %}
+        No passport has this code. A copied or invented label looks like this. If you
+        typed it, check each character.
+      {% endblocktranslate %}
+    {% endif %}
+  </p>
+</details>
 {% endblock %}

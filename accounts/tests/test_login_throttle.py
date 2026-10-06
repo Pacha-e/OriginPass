@@ -15,7 +15,7 @@ from django.utils import timezone
 
 from accounts.forms import AUTHENTICATION_ERROR
 from accounts.models import LoginAttempt
-from test_support.factories import make_user, OWNER_PASSWORD
+from test_support.factories import OWNER_PASSWORD, make_user
 
 
 class LoginThrottleTests(TestCase):
@@ -81,11 +81,13 @@ class LoginThrottleTests(TestCase):
         for _ in range(LoginAttempt.MAX_FAILURES):
             self._post()
         attempt = LoginAttempt.objects.get(email=self.user.email)
-        attempt.first_failed_at = timezone.now() - timedelta(minutes=LoginAttempt.WINDOW_MINUTES + 1)
+        attempt.first_failed_at = timezone.now() - timedelta(
+            minutes=LoginAttempt.WINDOW_MINUTES + 1
+        )
         attempt.failed_count = 1
         attempt.locked_until = None
         attempt.save()
-        response = self._post()
+        self._post()
         attempt.refresh_from_db()
         # Outside the window the streak starts over at 1, not 2.
         self.assertEqual(attempt.failed_count, 1)
@@ -99,3 +101,13 @@ class LoginThrottleTests(TestCase):
         self.assertTrue(attempt.is_locked())
         response = self._post(email="holder@example.com")
         self.assertContains(response, AUTHENTICATION_ERROR, status_code=200)
+
+    def test_an_address_longer_than_the_column_is_refused_not_crashed(self):
+        """Defect: an address over 254 characters failed the insert with a server error."""
+        response = self._post(email="a" * 300 + "@example.com")
+        self.assertContains(response, AUTHENTICATION_ERROR, status_code=200)
+
+    def test_changing_the_case_of_the_address_does_not_dodge_the_lock(self):
+        for _ in range(LoginAttempt.MAX_FAILURES):
+            self._post(email="Holder@Example.com")
+        self.assertTrue(LoginAttempt.is_locked_out("holder@example.com", "127.0.0.1"))

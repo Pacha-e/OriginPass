@@ -1,53 +1,131 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Platform overview" %} — OriginPass{% endblock %}
+
+{% block title %}{% translate "Overview" %} — OriginPass{% endblock %}
+
 {% block content %}
 <div class="page-head">
-  <h1>{% translate "Platform overview" %}</h1>
-  <p>{% translate "The totals the administrator acts on." %}</p>
+  <div>
+    <h1>{% translate "Platform overview" %}</h1>
+    <p>{% translate "What OriginPass vouches for today, and what needs a look." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <span class="tip"><a class="btn btn--primary" href="{% url 'companies:review_list' %}?status=PENDING" aria-describedby="tip-pending">{% translate "Review pending applications" %}</a><span class="tip__text" id="tip-pending" role="tooltip">{% translate "The businesses that applied and are waiting for your decision." %}</span></span>
+    <a class="btn" href="{% url 'audit:log' %}">{% translate "Audit log" %}</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <span class="stat__value">{{ company_count }}</span>
+    <span class="stat__label">{% translate "Companies" %}</span>
+  </div>
+  <div class="stat">
+    <span class="stat__value">{{ product_count }}</span>
+    <span class="stat__label">{% translate "Passports issued" %}</span>
+  </div>
+  <div class="stat">
+    <span class="stat__value">{{ scan_count }}</span>
+    <span class="stat__label">{% translate "Verifications" %}</span>
+  </div>
+  <div class="stat {% if recent_alerts %}stat--danger{% else %}stat--ok{% endif %}">
+    <span class="stat__value">{{ recent_alerts|length }}</span>
+    <span class="stat__label">{% translate "Recent duplicate-scan alerts" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "One code scanned in two distant places in less than a day. Someone may have copied the label." %}</span></details></span>
+  </div>
+</div>
+
+{# FR50: the totals grouped by status. #}
+<div class="grid-2">
+  <div class="card">
+    <div class="card__head"><h2>{% translate "Companies by status" %}</h2></div>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          {% for value, label, count in company_totals %}
+            <tr>
+              <td><a href="{% url 'companies:review_list' %}?status={{ value }}"><span class="pill pill--{{ value|lower }}">{{ label }}</span></a></td>
+              <td class="num">{{ count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card__head"><h2>{% translate "Passports by status" %}</h2></div>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          {% for value, label, count in product_totals %}
+            <tr>
+              <td><span class="pill pill--{{ value|lower }}">{{ label }}</span></td>
+              <td class="num">{{ count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div class="card">
-  <div class="card__head"><h2>{% translate "Companies by status" %}</h2></div>
-  <table>
-    <thead><tr><th>{% translate "Status" %}</th><th>{% translate "Count" %}</th></tr></thead>
-    <tbody>
-      {% for row in by_company_status %}
-        <tr><td>{{ row.status }}</td><td>{{ row.count }}</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<div class="card">
-  <div class="card__head"><h2>{% translate "Products by status" %}</h2></div>
-  <table>
-    <thead><tr><th>{% translate "Status" %}</th><th>{% translate "Count" %}</th></tr></thead>
-    <tbody>
-      {% for row in by_product_status %}
-        <tr><td>{{ row.status }}</td><td>{{ row.count }}</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<div class="card">
-  <div class="card__head"><h2>{% translate "Recent duplicate-scan alerts" %}</h2></div>
-  {% if recent_alerts %}
+  <div class="card__head">
+    <h2>{% translate "Duplicate-scan alerts" %}</h2>
+    <p>{% translate "A passport scanned from two regions within a day. One of the labels may be a copy." %}</p>
+  </div>
+  <div class="table-wrap">
     <table>
-      <thead><tr><th>{% translate "Product" %}</th><th>{% translate "When" %}</th><th></th></tr></thead>
+      <thead>
+        <tr>
+          <th>{% translate "Product" %}</th>
+          <th>{% translate "Company" %}</th>
+          <th>{% translate "Region of the scan" %}</th>
+          <th>{% translate "Detected" %}</th>
+          <th><span class="visually-hidden">{% translate "Actions" %}</span></th>
+        </tr>
+      </thead>
       <tbody>
         {% for alert in recent_alerts %}
           <tr>
-            <td>{{ alert.product.name }}</td>
-            <td>{{ alert.created_at|date:"j M Y, H:i" }}</td>
-            <td><a class="btn" href="{% url 'products:product_detail' alert.product.pk %}">{% translate "Open" %}</a></td>
+            <td><a href="{% url 'verification:verify' alert.product.passport_code %}">{{ alert.product.name }}</a></td>
+            <td class="muted">{{ alert.product.company.legal_name }}</td>
+            <td>{{ alert.scan.region|default:"—" }}</td>
+            <td class="muted">{{ alert.created_at|date:"j M Y, H:i" }}</td>
+            <td>{% if alert.product.status == "ACTIVE" %}<a class="btn btn--danger" href="{% url 'products:admin_revoke' alert.product.pk %}">{% translate "Revoke" %}</a>{% endif %}</td>
           </tr>
+        {% empty %}
+          <tr><td colspan="5" class="table-empty">{% translate "No alerts. No passport has been scanned from two regions at once." %}</td></tr>
         {% endfor %}
       </tbody>
     </table>
-  {% else %}
-    <p class="table-empty">{% translate "No alerts yet." %}</p>
-  {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card__head"><h2>{% translate "Latest passports" %}</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{% translate "Product" %}</th>
+          <th>{% translate "Company" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th><span class="visually-hidden">{% translate "Actions" %}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in recent_products %}
+          <tr>
+            <td><a href="{% url 'verification:verify' product.passport_code %}">{{ product.name }}</a></td>
+            <td class="muted">{{ product.company.legal_name }}</td>
+            <td><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></td>
+            <td>{% if product.status == "ACTIVE" %}<a class="btn" href="{% url 'products:admin_revoke' product.pk %}">{% translate "Revoke" %}</a>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="table-empty">{% translate "No passports have been issued yet." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

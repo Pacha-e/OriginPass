@@ -42,7 +42,7 @@ def project_template_dirs():
 def project_templates():
     """Every template of this project, as (loader name, path) pairs."""
     for directory in project_template_dirs():
-        for path in sorted(directory.rglob("*.html")):
+        for path in sorted([*directory.rglob("*.html"), *directory.rglob("*.txt")]):
             yield path.relative_to(directory).as_posix(), path
 
 

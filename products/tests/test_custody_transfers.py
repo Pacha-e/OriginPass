@@ -1,12 +1,31 @@
-"""Custody transfers (FR35-FR40)."""
+"""Custody transfers through the views: FR35 to FR40, FR54 and FR55.
 
+Each test below that names a defect was written to fail against the code that
+had it: a claim that reported success without moving the product, an admin
+revocation that ended on a missing page, a receiver told their product had been
+revoked when they accepted it, and offers made by an account that no longer
+held the product.
+"""
+
+from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.utils import timezone
 
-from accounts.models import User
-from products.models import ProductStatus, TransferState
-from test_support.factories import OWNER_PASSWORD, make_company, make_product, make_user
+from products.models import CustodyTransfer, TransferState
+from test_support.factories import (
+    ADMIN_PASSWORD,
+    OWNER_PASSWORD,
+    make_admin,
+    make_company,
+    make_product,
+    make_user,
+)
+
+
+def logged_in(user, password=OWNER_PASSWORD):
+    client = Client()
+    assert client.login(email=user.email, password=password)
+    return client
 
 
 class TransferFlowTests(TestCase):
@@ -15,136 +34,192 @@ class TransferFlowTests(TestCase):
         self.buyer = make_user(email="buyer@example.com")
         self.company = make_company(owner=self.owner, status="APPROVED")
         self.product = make_product(company=self.company)
-        self.seller_client = Client(enforce_csrf_checks=True)
-        assert self.seller_client.login(email=self.owner.email, password=OWNER_PASSWORD)
-        self.buyer_client = Client(enforce_csrf_checks=True)
-        assert self.buyer_client.login(email=self.buyer.email, password=OWNER_PASSWORD)
+        self.seller_client = logged_in(self.owner)
+        self.buyer_client = logged_in(self.buyer)
 
-    def _initiate(self):
-        url = reverse("products:transfer_initiate", args=[self.product.pk])
-        self.seller_client.get(url)
-        csrf = self.seller_client.cookies["csrftoken"].value
-        return self.seller_client.post(
-            url,
-            {
-                "to_holder_email": self.buyer.email,
-                "note": "Sold in Montería",
-                "csrfmiddlewaretoken": csrf,
-            },
+    def _offer(self, client=None, to=None, note="Sold in Montería"):
+        return (client or self.seller_client).post(
+            reverse("products:transfer_initiate", args=[self.product.pk]),
+            {"to_holder_email": (to or self.buyer).email, "note": note},
         )
+
+    # FR35, FR54
 
     def test_current_holder_offers_a_transfer(self):
-        response = self._initiate()
-        self.assertEqual(response.status_code, 302)
+        response = self._offer()
+        self.assertRedirects(response, reverse("products:custody"))
         transfer = self.product.custody_transfers.get()
         self.assertEqual(transfer.state, TransferState.INITIATED)
-        self.assertEqual(transfer.from_holder, self.owner)
         self.assertEqual(transfer.to_holder, self.buyer)
         self.assertEqual(transfer.note, "Sold in Montería")
-        # The transfer code the seller shares in person.
-        self.assertIsNotNone(transfer.transfer_code)
 
-    def test_a_non_holder_cannot_offer_a_transfer(self):
+    def test_the_receiver_is_emailed_when_a_transfer_is_offered(self):
+        self._offer()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, [self.buyer.email])
+        self.assertIn(self.product.name, mail.outbox[0].body)
+
+    def test_the_transfer_code_is_shown_to_the_seller_only(self):
+        self._offer()
+        code = str(self.product.custody_transfers.get().transfer_code)
+        self.assertContains(self.seller_client.get(reverse("products:custody")), code)
+        self.assertNotContains(self.buyer_client.get(reverse("products:custody")), code)
+        self.assertNotIn(code, mail.outbox[0].body)
+
+    # FR38, FR39
+
+    def test_a_non_holder_is_refused_with_the_reason(self):
         stranger = make_user(email="stranger@example.com")
-        stranger_client = Client(enforce_csrf_checks=True)
-        assert stranger_client.login(email=stranger.email, password=OWNER_PASSWORD)
-        url = reverse("products:transfer_initiate", args=[self.product.pk])
-        stranger_client.get(url)
-        csrf = stranger_client.cookies["csrftoken"].value
-        response = stranger_client.post(
-            url,
-            {"to_holder_email": self.buyer.email, "csrfmiddlewaretoken": csrf},
-        )
-        # 404 because the company-owner lookup breaks: the seller is not
-        # the owner of this product's company.
-        self.assertEqual(response.status_code, 404)
+        response = self._offer(client=logged_in(stranger))
+        self.assertContains(response, "Solo quien tiene el producto ahora", status_code=403)
+        self.assertFalse(CustodyTransfer.objects.exists())
 
-    def test_receiver_can_accept(self):
-        self._initiate()
-        transfer = self.product.custody_transfers.get()
-        url = reverse("products:transfer_respond", args=[transfer.pk])
-        self.buyer_client.get(url)
-        csrf = self.buyer_client.cookies["csrftoken"].value
-        response = self.buyer_client.post(
-            url, {"action": "accept", "csrfmiddlewaretoken": csrf}
-        )
-        self.assertEqual(response.status_code, 302)
-        transfer.refresh_from_db()
-        self.assertEqual(transfer.state, TransferState.ACCEPTED)
-        self.assertIsNotNone(transfer.resolved_at)
-
-    def test_receiver_can_decline(self):
-        self._initiate()
-        transfer = self.product.custody_transfers.get()
-        url = reverse("products:transfer_respond", args=[transfer.pk])
-        self.buyer_client.get(url)
-        csrf = self.buyer_client.cookies["csrftoken"].value
-        response = self.buyer_client.post(
-            url, {"action": "decline", "csrfmiddlewaretoken": csrf}
-        )
-        self.assertEqual(response.status_code, 302)
-        transfer.refresh_from_db()
-        self.assertEqual(transfer.state, TransferState.DECLINED)
-
-    def test_a_resolved_transfer_cannot_be_answered_again(self):
-        self._initiate()
-        transfer = self.product.custody_transfers.get()
-        transfer.accept(actor=self.buyer)
-        url = reverse("products:transfer_respond", args=[transfer.pk])
-        response = self.buyer_client.get(url)
+    def test_the_maker_cannot_offer_a_piece_it_no_longer_holds(self):
+        """Defect: the company could still offer a product it had handed over."""
+        self._offer()
+        self.product.custody_transfers.get().accept(actor=self.buyer)
+        stranger = make_user(email="stranger@example.com")
+        response = self._offer(to=stranger)
         self.assertEqual(response.status_code, 403)
+        self.assertFalse(CustodyTransfer.objects.filter(state=TransferState.INITIATED).exists())
 
-    def test_a_stranger_cannot_answer(self):
-        self._initiate()
-        transfer = self.product.custody_transfers.get()
-        url = reverse("products:transfer_respond", args=[transfer.pk])
-        response = self.seller_client.get(url)
-        # The seller cannot accept or decline their own offer.
-        self.assertEqual(response.status_code, 404)
-
-    def test_buyer_claims_with_passport_and_transfer_code(self):
-        self._initiate()
-        transfer = self.product.custody_transfers.get()
-        claimer = make_user(email="claimer@example.com")
-        claimer_client = Client(enforce_csrf_checks=True)
-        assert claimer_client.login(email=claimer.email, password=OWNER_PASSWORD)
-        url = reverse("products:transfer_claim")
-        claimer_client.get(url)
-        csrf = claimer_client.cookies["csrftoken"].value
-        response = claimer_client.post(
-            url,
-            {
-                "passport_code": self.product.passport_code,
-                "transfer_code": str(transfer.transfer_code),
-                "csrfmiddlewaretoken": csrf,
-            },
+    def test_the_new_holder_can_pass_it_on(self):
+        """A distributor or a buyer holds products too, without a company."""
+        self._offer()
+        self.product.custody_transfers.get().accept(actor=self.buyer)
+        third = make_user(email="third@example.com")
+        response = self._offer(client=self.buyer_client, to=third)
+        self.assertRedirects(response, reverse("products:custody"))
+        self.assertTrue(
+            CustodyTransfer.objects.filter(
+                from_holder=self.buyer, to_holder=third, state=TransferState.INITIATED
+            ).exists()
         )
-        self.assertEqual(response.status_code, 302)
-        transfer.refresh_from_db()
-        self.assertEqual(transfer.state, TransferState.ACCEPTED)
 
-    def test_a_wrong_transfer_code_is_refused(self):
-        self._initiate()
-        claimer = make_user(email="claimer2@example.com")
-        claimer_client = Client(enforce_csrf_checks=True)
-        assert claimer_client.login(email=claimer.email, password=OWNER_PASSWORD)
-        url = reverse("products:transfer_claim")
-        claimer_client.get(url)
-        csrf = claimer_client.cookies["csrftoken"].value
-        response = claimer_client.post(
-            url,
-            {
-                "passport_code": self.product.passport_code,
-                "transfer_code": "00000000-0000-0000-0000-000000000000",
-                "csrfmiddlewaretoken": csrf,
-            },
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No pending transfer matches those codes")
+    def test_only_one_offer_is_open_at_a_time(self):
+        """Defect: two open offers could both be accepted, and the product sold twice."""
+        self._offer()
+        response = self._offer(to=make_user(email="second@example.com"))
+        self.assertContains(response, "ya tiene una entrega pendiente")
+        self.assertEqual(CustodyTransfer.objects.filter(state=TransferState.INITIATED).count(), 1)
 
     def test_a_revoked_product_cannot_be_transferred(self):
         self.product.revoke(actor=self.owner, reason="Recalled.")
-        url = reverse("products:transfer_initiate", args=[self.product.pk])
-        response = self.seller_client.get(url)
-        self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "revoked product", status_code=403)
+        response = self.seller_client.get(
+            reverse("products:transfer_initiate", args=[self.product.pk])
+        )
+        self.assertContains(response, "producto anulado no se puede entregar", status_code=403)
+
+    # FR36, FR37
+
+    def test_receiver_can_accept(self):
+        self._offer()
+        transfer = self.product.custody_transfers.get()
+        response = self.buyer_client.post(
+            reverse("products:transfer_respond", args=[transfer.pk]), {"action": "accept"}
+        )
+        self.assertRedirects(response, reverse("products:custody"))
+        transfer.refresh_from_db()
+        self.assertEqual(transfer.state, TransferState.ACCEPTED)
+        self.assertEqual(self.product.current_holder, self.buyer)
+
+    def test_accepting_sends_no_revocation_notice(self):
+        """Defect: accepting a transfer emailed the holder that it had been revoked."""
+        self._offer()
+        mail.outbox.clear()
+        transfer = self.product.custody_transfers.get()
+        self.buyer_client.post(
+            reverse("products:transfer_respond", args=[transfer.pk]), {"action": "accept"}
+        )
+        self.assertEqual(mail.outbox, [])
+
+    def test_receiver_can_decline(self):
+        self._offer()
+        transfer = self.product.custody_transfers.get()
+        self.buyer_client.post(
+            reverse("products:transfer_respond", args=[transfer.pk]), {"action": "decline"}
+        )
+        transfer.refresh_from_db()
+        self.assertEqual(transfer.state, TransferState.DECLINED)
+        self.assertEqual(self.product.current_holder, self.owner)
+
+    def test_a_resolved_transfer_is_not_answered_again(self):
+        self._offer()
+        transfer = self.product.custody_transfers.get()
+        transfer.accept(actor=self.buyer)
+        response = self.buyer_client.post(
+            reverse("products:transfer_respond", args=[transfer.pk]), {"action": "decline"}
+        )
+        self.assertRedirects(response, reverse("products:custody"))
+        transfer.refresh_from_db()
+        self.assertEqual(transfer.state, TransferState.ACCEPTED)
+
+    def test_the_sender_cannot_answer_their_own_offer(self):
+        self._offer()
+        transfer = self.product.custody_transfers.get()
+        response = self.seller_client.get(reverse("products:transfer_respond", args=[transfer.pk]))
+        self.assertEqual(response.status_code, 404)
+
+    # FR40
+
+    def _claim(self, client, transfer_code):
+        return client.post(
+            reverse("products:transfer_claim"),
+            {"passport_code": self.product.passport_code, "transfer_code": transfer_code},
+        )
+
+    def test_the_buyer_claims_with_both_codes_and_becomes_the_holder(self):
+        """Defect: the claim reported success and left the product where it was."""
+        self._offer()
+        transfer = self.product.custody_transfers.get()
+        response = self._claim(self.buyer_client, str(transfer.transfer_code))
+        self.assertRedirects(response, reverse("products:custody"))
+        self.assertEqual(self.product.current_holder, self.buyer)
+        ok, problem = CustodyTransfer.verify_chain(self.product)
+        self.assertTrue(ok, problem)
+
+    def test_codes_read_over_a_shoulder_move_nothing(self):
+        self._offer()
+        transfer = self.product.custody_transfers.get()
+        thief = make_user(email="thief@example.com")
+        response = self._claim(logged_in(thief), str(transfer.transfer_code))
+        self.assertContains(response, "Ninguna entrega pendiente para tu cuenta")
+        transfer.refresh_from_db()
+        self.assertEqual(transfer.state, TransferState.INITIATED)
+        self.assertEqual(self.product.current_holder, self.owner)
+
+    def test_a_wrong_transfer_code_is_refused(self):
+        self._offer()
+        response = self._claim(self.buyer_client, "00000000-0000-0000-0000-000000000000")
+        self.assertContains(response, "Ninguna entrega pendiente para tu cuenta")
+
+
+class RevocationNoticeTests(TestCase):
+    def setUp(self):
+        self.owner = make_user(email="maker@tuchin.co")
+        self.holder = make_user(email="holder@example.com")
+        self.product = make_product(company=make_company(owner=self.owner, status="APPROVED"))
+        CustodyTransfer.objects.create(
+            product=self.product, from_holder=self.owner, to_holder=self.holder
+        ).accept(actor=self.holder)
+
+    def test_the_holder_is_told_when_the_company_revokes(self):
+        logged_in(self.owner).post(
+            reverse("products:product_revoke", args=[self.product.pk]),
+            {"reason": "Recalled for a defect."},
+        )
+        self.assertEqual(mail.outbox[-1].to, [self.holder.email])
+        self.assertIn("Recalled for a defect.", mail.outbox[-1].body)
+
+    def test_an_admin_revocation_lands_on_the_public_page(self):
+        """Defect: the administrator's revocation ended on a missing page."""
+        admin = make_admin()
+        response = logged_in(admin, ADMIN_PASSWORD).post(
+            reverse("products:admin_revoke", args=[self.product.pk]),
+            {"reason": "Fraud confirmed."},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Anulado")
+        self.assertContains(response, "Fraud confirmed.")
+        self.assertEqual(mail.outbox[-1].to, [self.holder.email])

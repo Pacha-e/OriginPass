@@ -1,78 +1,135 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Verification analytics" %} — OriginPass{% endblock %}
+
+{% block title %}{% translate "Analytics" %} — OriginPass{% endblock %}
+
 {% block content %}
 <div class="page-head">
-  <h1>{% blocktranslate with name=company.legal_name %}Verification analytics of {{ name }}{% endblocktranslate %}</h1>
-  <p>{% translate "Who has been scanning this company's passports." %}</p>
+  <div>
+    <h1>{% translate "Where your passports are being scanned" %}</h1>
+    <p>{{ company.legal_name }}</p>
+  </div>
+  <div class="page-head__actions">
+    <nav class="range-picker filters" aria-label="{% translate 'Date range' %}">
+      {% for range in ranges %}
+        <a href="?days={{ range }}"{% if range == days %} aria-current="page"{% endif %}>
+          {% blocktranslate trimmed count days=range %}Last {{ days }} day{% plural %}Last {{ days }} days{% endblocktranslate %}
+        </a>
+      {% endfor %}
+    </nav>
+    <span class="tip"><a class="btn" href="{% url 'products:analytics_csv' %}?days={{ days }}" aria-describedby="tip-csv">{% translate "Export as CSV" %}</a><span class="tip__text" id="tip-csv" role="tooltip">{% translate "Downloads these scans as a file that opens in Excel or Google Sheets." %}</span></span>
+  </div>
 </div>
 
-<div class="filters">
-  {% for value, label in window_choices %}
-    <a href="{% url 'products:analytics' %}?days={{ value }}"{% if days == value %} aria-current="page"{% endif %}>{{ label }}</a>
-  {% endfor %}
-  <a class="btn" href="{% url 'products:analytics_csv' %}?days={{ days }}">{% translate "Export as CSV" %}</a>
+{# FR46 the count, FR52 the change against the period of equal length before it. #}
+<div class="stats">
+  <div class="stat">
+    <span class="stat__value">{{ total }}</span>
+    <span class="stat__label">{% translate "Scans in this period" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "How many times someone opened the passport of one of your products, with the QR or the code." %}</span></details></span>
+  </div>
+  <div class="stat">
+    <span class="stat__value">{{ previous_total }}</span>
+    <span class="stat__label">{% translate "Scans in the period before" %}</span>
+  </div>
+  <div class="stat {% if change is None %}{% elif change >= 0 %}stat--ok{% else %}stat--warn{% endif %}">
+    <span class="stat__value">
+      {% if change is None %}—{% elif change >= 0 %}+{{ change }}%{% else %}{{ change }}%{% endif %}
+    </span>
+    <span class="stat__label">{% translate "Change against the period before" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "If it goes up, more people are checking your products than in the period of the same length before." %}</span></details></span>
+  </div>
+  <div class="stat {% if alerts %}stat--danger{% else %}stat--ok{% endif %}">
+    <span class="stat__value">{{ alerts|length }}</span>
+    <span class="stat__label">{% translate "Duplicate-scan alerts" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "One code scanned in two distant places in less than a day. Someone may have copied the label." %}</span></details></span>
+  </div>
 </div>
 
+{# FR49: the signal that a QR was copied. Shown first because it asks for action. #}
 {% if alerts %}
-<div class="notice notice--warning">
-  <p class="notice__title">{% translate "Duplicate-scan alerts" %}</p>
-  {% for product in alerts %}
-    <p>
-      <a href="{% url 'products:product_detail' product.pk %}">{{ product.name }}</a>
-      <span class="muted">{% blocktranslate with when=product.alerts.first.created_at|date:"j M Y, H:i" %}was scanned in more than one region around {{ when }}.{% endblocktranslate %}</span>
-    </p>
-  {% endfor %}
-</div>
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Possible copies" %}</h2>
+      <p>{% translate "These passports were scanned from two different regions within a day. One of the two labels may be a copy." %}</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate "Product" %}</th>
+            <th>{% translate "Region of the scan" %}</th>
+            <th>{% translate "Detected" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for alert in alerts %}
+            <tr>
+              <td><a href="{% url 'products:product_detail' alert.product.pk %}">{{ alert.product.name }}</a></td>
+              <td>{{ alert.scan.region|default:"—" }}</td>
+              <td class="muted">{{ alert.created_at|date:"j M Y, H:i" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endif %}
 
-<div class="card">
-  <div class="card__head">
-    <h2>{% translate "Scans per day" %}</h2>
+<div class="grid-2 spaced">
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Scans per day" %}</h2>
+    </div>
+    {% if by_day %}
+      <ul class="bars">
+        {% for row in by_day %}
+          <li>
+            <span>{{ row.day|date:"j M" }}</span>
+            <span class="bars__track"><span class="bars__fill" style="width: {{ row.share }}%"></span></span>
+            <span class="bars__value">{{ row.count }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">{% translate "No scans in this period yet." %}</p>
+    {% endif %}
   </div>
-  {% if by_day %}
-    <table>
-      <thead><tr><th>{% translate "Day" %}</th><th>{% translate "Scans" %}</th></tr></thead>
-      <tbody>
-        {% for row in by_day %}<tr><td>{{ row.day|date:"j M Y" }}</td><td>{{ row.count }}</td></tr>{% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="table-empty">{% translate "No scans in this window yet." %}</p>
-  {% endif %}
+
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "By region" %}</h2>
+      <p>{% translate "Coarse region only: enough to notice a copy, never enough to locate a buyer." %}</p>
+    </div>
+    {% if by_region %}
+      <ul class="bars">
+        {% for row in by_region %}
+          <li>
+            <span>{{ row.region|default:_("Unknown") }}</span>
+            <span class="bars__track"><span class="bars__fill" style="width: {{ row.share }}%"></span></span>
+            <span class="bars__value">{{ row.count }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">{% translate "No scans in this period yet." %}</p>
+    {% endif %}
+  </div>
 </div>
 
 <div class="card">
   <div class="card__head">
-    <h2>{% translate "Where the scans came from" %}</h2>
-  </div>
-  {% if by_region %}
-    <table>
-      <thead><tr><th>{% translate "Region" %}</th><th>{% translate "Scans" %}</th></tr></thead>
-      <tbody>
-        {% for row in by_region %}<tr><td>{{ row.region }}</td><td>{{ row.count }}</td></tr>{% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="table-empty">{% translate "No scans in this window yet." %}</p>
-  {% endif %}
-</div>
-
-<div class="card">
-  <div class="card__head">
-    <h2>{% translate "Top products by scans" %}</h2>
+    <h2>{% translate "Most scanned products" %}</h2>
   </div>
   {% if by_product %}
-    <table>
-      <thead><tr><th>{% translate "Product" %}</th><th>{% translate "Passport" %}</th><th>{% translate "Scans" %}</th></tr></thead>
-      <tbody>
-        {% for row in by_product %}
-          <tr><td>{{ row.product__name }}</td><td class="mono">{{ row.product__passport_code }}</td><td>{{ row.count }}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <ul class="bars">
+      {% for row in by_product %}
+        <li>
+          <span>{{ row.product__name }}</span>
+          <span class="bars__track"><span class="bars__fill" style="width: {{ row.share }}%"></span></span>
+          <span class="bars__value">{{ row.count }}</span>
+        </li>
+      {% endfor %}
+    </ul>
   {% else %}
-    <p class="table-empty">{% translate "No scans in this window yet." %}</p>
+    <p class="muted">{% translate "No scans in this period yet." %}</p>
   {% endif %}
 </div>
 {% endblock %}

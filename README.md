@@ -57,8 +57,8 @@ python manage.py makemessages -l es    # collect the strings into the .po
 python manage.py compilemessages       # build the .mo Django serves
 ```
 
-Both need GNU gettext installed. The compiled `.mo` is a build artefact and is not
-committed; the `.po` is.
+Both need GNU gettext installed. The compiled `.mo` is committed beside the `.po`, so a
+fresh clone is served in Spanish without gettext; recompile it whenever the `.po` changes.
 
 ## Running the project locally
 
@@ -93,9 +93,22 @@ python manage.py seed_demo
 ```
 
 Five company applications, one in each status, and four passports issued by the two
-approved ones, with one revoked so that verdict can be shown and a history of scans
-behind them. It prints each passport's verification path, so the walkthrough does not
-need the codes to be looked up first.
+approved ones, with one revoked so that verdict can be shown and a month of scans from
+several regions behind them. One passport travels the whole chain of custody, from the
+workshop to a distributor to a private buyer, and carries a duplicate-scan alert; another
+has an open offer, so its transfer code can be shown. It prints each passport's
+verification path and the transfer code, so the walkthrough does not need them looked up.
+
+| Account | Role in the demo |
+|---|---|
+| `admin@originpass.co` | Platform administrator: overview, applications, audit log |
+| `taller@tuchin.co` | Approved artisan workshop: passports, analytics, custody |
+| `contacto@labonga.co` | Approved distributor: receives and passes on pieces |
+| `comprador@correo.co` | Private buyer with no company: holds a piece |
+| `info@mochilaswayuu.co` | Application still pending review |
+
+Running it again adds nothing that is already there, and brings the text of an older
+dataset up to date.
 
 The data goes through the same model rules the application does, so it cannot create a
 row the application would refuse: the product type is derived from the company rather
@@ -103,6 +116,14 @@ than written down, exactly as the registration view derives it.
 
 Every account it creates shares one known password, which it prints, so it refuses
 to run unless `DEBUG` is on.
+
+Two settings matter for a demo and default to what development needs:
+
+- Notification emails (FR53 to FR55, the password reset of FR06) are printed in the
+  console running the server. A deployment sets `EMAIL_BACKEND` to its SMTP service.
+- The region of a scan is read from the geolocation headers of a CDN only when
+  `TRUST_GEO_HEADERS` is on, which it is whenever `DEBUG` is. Behind no such proxy a
+  client writes those headers itself, so a deployment turns it on only behind one.
 
 Generate a secret key with:
 
@@ -140,7 +161,8 @@ OriginPass/
 ├── templates/        base template, shared partials and the error pages
 ├── test_support/     factories and helpers shared by the apps' test suites
 ├── locale/es/        the Spanish the interface is served in
-├── static/           the stylesheet and the favicon, written for this project
+├── static/           the stylesheet, the favicon and the brand marks
+├── docs/brand/       logo, slogan, palette and screenshots of the identity
 ├── docs/diagrams/    deployment, component and data models
 ├── tools/video/      builds the deliverable presentation video from a script
 ├── .github/workflows/ci.yml
@@ -187,7 +209,19 @@ Sprint 2 delivers what the product exists to do: an approved company registers a
 gets a QR code for it, and any buyer scans that code and reads a verdict without an
 account. It also serves the whole interface in Spanish.
 
-Custody transfers and the analytics follow in later sprints; their tables already exist.
+Sprint 3 delivers the chain of custody and what the scans say. The current holder of a
+piece offers it to another account, which accepts or declines; a buyer can claim it at the
+point of sale with the passport code and a transfer code only the seller sees. The public
+page shows the journey of each piece without naming anyone by their email. A company sees
+its scans by day, region and product, compared with the period before, exports them as CSV
+and is alerted when one passport is scanned from two regions within a day. Logins lock
+after five failures in fifteen minutes, and scans are capped per address per hour.
+
+Sprint 4 work already in place: revocation by the company and by the administrator with
+a stored reason and an email to the holder, suspension and reactivation of a company, a
+public profile per approved company, password reset by email and the audit log filtered
+by actor, action and date. Bulk registration from CSV, the language switch and publishing
+the head of the integrity chain externally remain open.
 
 ## Licence
 

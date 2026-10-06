@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="OriginPass" version="24.7.17">
   <diagram name="Data model" id="originpass-data-model">
-    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1180" math="0" shadow="0">
+    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1540" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,7 +8,7 @@
         <mxCell id="title" value="OriginPass — Relational data model" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="80" y="24" width="700" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="PostgreSQL 17 · six tables · read from the running database, not from models.py" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="subtitle" value="PostgreSQL 17 · eight tables · read from the running database, not from models.py" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="80" y="58" width="560" height="22" as="geometry" />
         </mxCell>
 
@@ -119,7 +119,7 @@
 
         <!-- ================= products_custodytransfer ================= -->
         <mxCell id="cust" value="products_custodytransfer" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="560" y="550" width="340" height="292" as="geometry" />
+          <mxGeometry x="560" y="550" width="340" height="318" as="geometry" />
         </mxCell>
         <mxCell id="cust1" value="PK  id : bigint" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="cust">
           <mxGeometry y="32" width="340" height="26" as="geometry" />
@@ -150,6 +150,10 @@
         </mxCell>
         <mxCell id="cust10" value="entry_hash : varchar(64)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="cust">
           <mxGeometry y="266" width="340" height="26" as="geometry" />
+        </mxCell>
+
+                <mxCell id="cust_tc" value="transfer_code : uuid  «unique»  (Sprint 3)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="cust">
+          <mxGeometry y="292" width="340" height="26" as="geometry" />
         </mxCell>
 
         <!-- ================= products_product ================= -->
@@ -319,9 +323,86 @@
           <mxGeometry relative="1" as="geometry"><mxPoint x="46" as="offset" /></mxGeometry>
         </mxCell>
 
+        <!-- ================= Sprint 3: accounts_loginattempt (FR57) ================= -->
+        <mxCell id="login" value="accounts_loginattempt" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="490" width="320" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="login0" value="PK  id : bigint" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="32" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login1" value="email : varchar(254)  «index»" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="58" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login2" value="ip_address : inet" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="84" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login3" value="failed_count : integer" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="110" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login4" value="first_failed_at : timestamptz" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="136" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login5" value="locked_until : timestamptz  NULL" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="162" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login6" value="last_attempt : timestamptz" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="188" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="login7" value="«unique» (email, ip_address)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="login">
+          <mxGeometry y="214" width="320" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- ================= Sprint 3: products_alert (FR49) ================= -->
+        <mxCell id="alert" value="products_alert" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="790" width="320" height="188" as="geometry" />
+        </mxCell>
+        <mxCell id="alert0" value="PK  id : bigint" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="alert">
+          <mxGeometry y="32" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="alert1" value="FK  product_id : bigint" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="alert">
+          <mxGeometry y="58" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="alert2" value="FK  scan_id : bigint  NULL" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="alert">
+          <mxGeometry y="84" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="alert3" value="kind : varchar(32)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="alert">
+          <mxGeometry y="110" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="alert4" value="created_at : timestamptz" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="alert">
+          <mxGeometry y="136" width="320" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="alert5" value="«unique» (product_id, scan_id)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=12;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="alert">
+          <mxGeometry y="162" width="320" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ra1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#d79b00;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=1;entryY=0.9;entryDx=0;entryDy=0;" edge="1" parent="1" source="alert" target="prod">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1410" y="846" /><mxPoint x="1410" y="415" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="ra1a" value="*" style="edgeLabel;html=1;resizable=0;fontSize=13;fontStyle=1;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="ra1">
+          <mxGeometry x="-0.92" relative="1" as="geometry"><mxPoint y="-12" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="ra1b" value="1" style="edgeLabel;html=1;resizable=0;fontSize=13;fontStyle=1;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="ra1">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint y="-12" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="ra1c" value="raises · ON DELETE PROTECT" style="edgeLabel;html=1;resizable=0;fontSize=11;fontColor=#666666;labelBackgroundColor=#ffffff;rotation=-90;" vertex="1" connectable="0" parent="ra1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="-12" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="ra2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#d79b00;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="alert" target="scan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ra2a" value="*" style="edgeLabel;html=1;resizable=0;fontSize=13;fontStyle=1;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="ra2">
+          <mxGeometry x="-0.6" relative="1" as="geometry"><mxPoint x="-14" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="ra2b" value="0..1" style="edgeLabel;html=1;resizable=0;fontSize=13;fontStyle=1;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="ra2">
+          <mxGeometry x="0.6" relative="1" as="geometry"><mxPoint x="-22" as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="ra2c" value="triggers · ON DELETE SET NULL" style="edgeLabel;html=1;resizable=0;fontSize=11;fontColor=#666666;labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="ra2">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="100" as="offset" /></mxGeometry>
+        </mxCell>
+
         <!-- ================= legend ================= -->
         <mxCell id="legendbox" value="&lt;b&gt;Legend&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=none;strokeColor=#666666;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="1430" y="120" width="300" height="290" as="geometry" />
+          <mxGeometry x="1430" y="120" width="300" height="330" as="geometry" />
         </mxCell>
         <mxCell id="lg1" value="Created and exercised in Sprint 1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="1450" y="156" width="260" height="34" as="geometry" />
@@ -329,11 +410,14 @@
         <mxCell id="lg2" value="Written by the Sprint 2 features" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="1450" y="198" width="260" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="lg3" value="Table exists, filled from Sprint 3 on" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+        <mxCell id="lg5" value="Added in Sprint 3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="282" width="260" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="lg3" value="Written by the Sprint 3 features" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="1450" y="240" width="260" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="lg4" value="Sprint 1 created every table. Sprint 2 added no table, but did add the signature and link columns to the two chained tables and the constraints that keep those chains linear.&lt;br&gt;&lt;br&gt;PK primary key · FK foreign key&lt;br&gt;1 exactly one · 0..1 at most one · * many" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=11;fontColor=#555555;" vertex="1" parent="1">
-          <mxGeometry x="1450" y="286" width="260" height="110" as="geometry" />
+        <mxCell id="lg4" value="Sprint 3 added two tables and one column, in orange: the login lockout (FR57), the duplicate-scan alert (FR49) and the transfer code a buyer claims with (FR40); plus a partial unique index that allows one open offer per product.&lt;br&gt;&lt;br&gt;PK primary key · FK foreign key&lt;br&gt;1 exactly one · 0..1 at most one · * many" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=11;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="326" width="260" height="120" as="geometry" />
         </mxCell>
 
         <!-- ================= notes ================= -->
@@ -341,12 +425,12 @@
           <mxGeometry x="80" y="890" width="620" height="220" as="geometry" />
         </mxCell>
 
-        <mxCell id="constraints" value="&lt;b&gt;Rules the database holds itself — a rule here survives a view that forgets it&lt;br&gt;&lt;br&gt;&lt;b&gt;Check constraints&lt;/b&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;company_track_matches_type&lt;/b&gt;&amp;nbsp; a commercial company uses CHAMBER_OF_COMMERCE or OFFICIAL_REGISTRY; an artisan company uses ARTISAN_REVIEW&lt;br&gt;&lt;br&gt;&lt;b&gt;commercial_company_has_registry_code&lt;/b&gt;&amp;nbsp; registry_code is filled for COMMERCIAL and empty for ARTISAN&amp;nbsp; (FR08, FR09)&lt;br&gt;&lt;br&gt;&lt;b&gt;negative_decision_states_a_reason&lt;/b&gt;&amp;nbsp; status_reason is filled when status is REJECTED or SUSPENDED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;revocation_states_a_reason&lt;/b&gt;&amp;nbsp; revocation_reason is filled when status is REVOKED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_changes_holder&lt;/b&gt;&amp;nbsp; from_holder_id is not to_holder_id&lt;br&gt;&lt;br&gt;&lt;b&gt;Unique constraints&lt;/b&gt; &amp;#8212; each chain of signed records stays linear&lt;br&gt;&lt;br&gt;&lt;b&gt;audit_entry_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; no audit entry is the predecessor of two others&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; within one product, no handover is the predecessor of two others" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="740" y="890" width="640" height="350" as="geometry" />
+        <mxCell id="constraints" value="&lt;b&gt;Rules the database holds itself — a rule here survives a view that forgets it&lt;br&gt;&lt;br&gt;&lt;b&gt;Check constraints&lt;/b&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;company_track_matches_type&lt;/b&gt;&amp;nbsp; a commercial company uses CHAMBER_OF_COMMERCE or OFFICIAL_REGISTRY; an artisan company uses ARTISAN_REVIEW&lt;br&gt;&lt;br&gt;&lt;b&gt;commercial_company_has_registry_code&lt;/b&gt;&amp;nbsp; registry_code is filled for COMMERCIAL and empty for ARTISAN&amp;nbsp; (FR08, FR09)&lt;br&gt;&lt;br&gt;&lt;b&gt;negative_decision_states_a_reason&lt;/b&gt;&amp;nbsp; status_reason is filled when status is REJECTED or SUSPENDED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;revocation_states_a_reason&lt;/b&gt;&amp;nbsp; revocation_reason is filled when status is REVOKED&amp;nbsp; (DBR12)&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_changes_holder&lt;/b&gt;&amp;nbsp; from_holder_id is not to_holder_id&lt;br&gt;&lt;br&gt;&lt;b&gt;Unique constraints&lt;/b&gt; &amp;#8212; each chain of signed records stays linear&lt;br&gt;&lt;br&gt;&lt;b&gt;audit_entry_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; no audit entry is the predecessor of two others&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_links_to_one_predecessor&lt;/b&gt;&amp;nbsp; within one product, no handover is the predecessor of two others&lt;br&gt;&lt;br&gt;&lt;b&gt;custody_transfer_one_open_offer&lt;/b&gt;&amp;nbsp; partial unique index on product_id WHERE state = INITIATED: one open offer per product, so a piece cannot be sold twice&amp;nbsp; (FR35, Sprint 3)&lt;br&gt;&lt;br&gt;&lt;b&gt;alert_once_per_scan&lt;/b&gt;&amp;nbsp; one alert per (product, scan)&amp;nbsp; (FR49, Sprint 3)&lt;br&gt;&lt;br&gt;&lt;b&gt;accounts_loginattempt (email, ip_address)&lt;/b&gt;&amp;nbsp; one failure streak per address and origin&amp;nbsp; (FR57, Sprint 3)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1010" width="640" height="470" as="geometry" />
         </mxCell>
 
-        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 2, section 1.3" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
-          <mxGeometry x="80" y="1270" width="800" height="20" as="geometry" />
+        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 3, section 1.3" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1500" width="800" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

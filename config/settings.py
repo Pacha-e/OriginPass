@@ -137,6 +137,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
+# Notifications (FR06, FR53-FR55). Development prints every message to the
+# console running the server, so a demo shows them without a mail account; a
+# deployment names its SMTP or transactional backend in the environment.
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "OriginPass <no-reply@originpass.co>")
+
+# FR33 stores a coarse region per scan, read from the geolocation headers a CDN
+# such as Cloudflare adds. Outside such a proxy those headers are written by the
+# client, and trusting them would let anyone raise a duplicate-scan alert
+# (FR49) against a genuine product, so they are ignored unless the deployment
+# says a proxy sets them. Development trusts them so the alert can be shown.
+TRUST_GEO_HEADERS = env_flag("TRUST_GEO_HEADERS", "True" if DEBUG else "False")
+
 # Transport hardening is driven by its own variables rather than by DEBUG,
 # because whether the site is served over HTTPS is a property of the
 # deployment, not of whether debugging is on. A deployment behind TLS turns

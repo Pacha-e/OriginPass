@@ -3,13 +3,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render, resolve_url
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from .forms import LoginForm, RegistrationForm, AUTHENTICATION_ERROR
+from .forms import AUTHENTICATION_ERROR, LoginForm, RegistrationForm
 from .models import LoginAttempt
 
 
@@ -72,11 +71,13 @@ def log_in(request):
         return redirect("pages:home")
 
     if request.method == "POST":
-        email = request.POST.get("email", "").strip()
+        # Normalised and bounded here, before it reaches the table: the streak
+        # must not be dodged by changing the case of the address, and an address
+        # longer than the column would fail the insert instead of the login.
+        email = request.POST.get("email", "").strip().lower()[:254]
         ip = _client_ip(request)
-        attempt = LoginAttempt.get_or_create_for_ip(email, ip)
 
-        if attempt.is_locked():
+        if email and LoginAttempt.is_locked_out(email, ip):
             form = LoginForm(request, data=request.POST)
             # The lock is not announced: the same error a wrong password would
             # return is shown, so probing cannot enumerate accounts.
@@ -89,12 +90,11 @@ def log_in(request):
 
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
-            attempt.reset()
+            LoginAttempt.clear(email, ip)
             login(request, form.get_user())
             return redirect(_destination_after_login(request))
-        else:
-            if email:
-                attempt.register_failure()
+        if email:
+            LoginAttempt.record_failure(email, ip)
     else:
         form = LoginForm(request)
 

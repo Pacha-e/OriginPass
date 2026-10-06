@@ -71,7 +71,7 @@
         {# FR13 #}
         <form method="post" action="{% url 'companies:review_approve' company.pk %}">
           {% csrf_token %}
-          <button type="submit" class="btn btn--primary">{% translate "Approve application" %}</button>
+          <span class="tip tip--start"><button type="submit" class="btn btn--primary" aria-describedby="tip-approve">{% translate "Approve application" %}</button><span class="tip__text" id="tip-approve" role="tooltip">{% translate "The business can start issuing passports right away, and is told by email." %}</span></span>
         </form>
       {% endif %}
 
@@ -82,9 +82,39 @@
         <form method="post" action="{% url 'companies:review_reject' company.pk %}" novalidate>
           {% csrf_token %}
           {% include "partials/field.html" with field=rejection_form.reason %}
-          <button type="submit" class="btn btn--danger">{% translate "Reject application" %}</button>
+          <span class="tip tip--start"><button type="submit" class="btn btn--danger" aria-describedby="tip-reject">{% translate "Reject application" %}</button><span class="tip__text" id="tip-reject" role="tooltip">{% translate "The business is told by email with the reason you write, and can correct and apply again." %}</span></span>
         </form>
       {% endif %}
+    </div>
+  {% endif %}
+
+  {% if company.can_be_suspended %}
+    <div class="card">
+      <div class="card__head">
+        <h2>{% translate "Suspend this company" %}</h2>
+        <p>{% translate "It stops issuing passports at once. The passports it already issued keep working." %}</p>
+      </div>
+      {# FR15: the reason is required and stored with the decision. #}
+      <form method="post" action="{% url 'companies:suspend' company.pk %}" novalidate>
+        {% csrf_token %}
+        {% include "partials/field.html" with field=suspension_form.reason %}
+        <span class="tip tip--start"><button type="submit" class="btn btn--danger" aria-describedby="tip-suspend">{% translate "Suspend the company" %}</button><span class="tip__text" id="tip-suspend" role="tooltip">{% translate "It cannot issue new passports until you reactivate it. Its products keep their passports." %}</span></span>
+      </form>
+      <p class="faint spaced"><a href="{% url 'companies:public_profile' company.pk %}">{% translate "See its public profile" %}</a></p>
+    </div>
+  {% endif %}
+
+  {% if company.can_be_reactivated %}
+    <div class="card">
+      <div class="card__head">
+        <h2>{% translate "Reactivate this company" %}</h2>
+        <p>{% translate "It is approved again and can issue passports." %}</p>
+      </div>
+      {# FR16 #}
+      <form method="post" action="{% url 'companies:reactivate' company.pk %}">
+        {% csrf_token %}
+        <span class="tip tip--start"><button type="submit" class="btn btn--primary" aria-describedby="tip-reactivate">{% translate "Reactivate the company" %}</button><span class="tip__text" id="tip-reactivate" role="tooltip">{% translate "It can issue passports again." %}</span></span>
+      </form>
     </div>
   {% endif %}
 

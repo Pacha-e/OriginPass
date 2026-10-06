@@ -3,8 +3,10 @@
 A buyer verifying a product is not a User: verification is anonymous by design.
 """
 
+from datetime import timedelta
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -48,7 +50,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
-    password_reset_token = models.UUIDField(null=True, blank=True, unique=True, editable=False)
 
     objects = UserManager()
 
@@ -75,6 +76,7 @@ class LoginAttempt(models.Model):
     never announces itself. The same message keeps it impossible to tell a
     blocked address from an unknown one.
     """
+
     MAX_FAILURES = 5
     WINDOW_MINUTES = 15
     LOCK_MINUTES = 15
@@ -99,30 +101,47 @@ class LoginAttempt(models.Model):
         """The streak is in its cool-off period."""
         return self.locked_until is not None and self.locked_until > timezone.now()
 
-    def reset(self):
-        """Successful login wipes the streak."""
-        self.failed_count = 0
-        self.first_failed_at = timezone.now()
-        self.locked_until = None
-        self.save(update_fields=["failed_count", "first_failed_at", "locked_until", "last_attempt"])
-
     def register_failure(self):
         """A failed attempt increments the streak and locks after the cap."""
         now = timezone.now()
-        window_start = now - timezone.timedelta(minutes=self.WINDOW_MINUTES)
-        if self.first_failed_at < window_start:
+        if self.first_failed_at < now - timedelta(minutes=self.WINDOW_MINUTES):
             # Streak expired; start over.
             self.failed_count = 1
             self.first_failed_at = now
         else:
             self.failed_count += 1
         if self.failed_count >= self.MAX_FAILURES:
-            self.locked_until = now + timezone.timedelta(minutes=self.LOCK_MINUTES)
+            self.locked_until = now + timedelta(minutes=self.LOCK_MINUTES)
         self.save(update_fields=["failed_count", "first_failed_at", "locked_until", "last_attempt"])
 
     @classmethod
-    def get_or_create_for_ip(cls, email, ip):
-        return cls.objects.get_or_create(
-            email=email, ip_address=ip,
-            defaults={"first_failed_at": timezone.now()},
-        )[0]
+    def is_locked_out(cls, email, ip):
+        return cls.objects.filter(
+            email=email, ip_address=ip, locked_until__gt=timezone.now()
+        ).exists()
+
+    @classmethod
+    def record_failure(cls, email, ip):
+        """Count one failure for the pair.
+
+        Read and written under a row lock, because a count read without one lets
+        a burst of parallel guesses all read four and all write five, which is
+        how a cap of five becomes a cap of fifty.
+        """
+        with transaction.atomic():
+            try:
+                with transaction.atomic():
+                    attempt, _created = cls.objects.select_for_update().get_or_create(
+                        email=email, ip_address=ip
+                    )
+            except IntegrityError:
+                # Another request created the row between our read and our insert.
+                attempt = cls.objects.select_for_update().get(email=email, ip_address=ip)
+            attempt.register_failure()
+
+    @classmethod
+    def clear(cls, email, ip):
+        """A successful login wipes the streak of that pair, if it has one."""
+        cls.objects.filter(email=email, ip_address=ip).update(
+            failed_count=0, first_failed_at=timezone.now(), locked_until=None
+        )

@@ -1,29 +1,143 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block body_class %}page-home{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <h1>{% translate "A verifiable passport for every product" %}</h1>
-  <p>
-    {% blocktranslate trimmed %}
-      OriginPass issues one digital passport per physical unit and records each change of
-      custody along its journey, so a buyer can confirm a product is genuine without having
-      to trust the seller.
-    {% endblocktranslate %}
-  </p>
-  {% if not user.is_authenticated %}
-    <div class="hero__actions">
-      <a class="btn btn--primary" href="{% url 'accounts:register' %}">{% translate "Create an account" %}</a>
-      <a class="btn" href="{% url 'accounts:login' %}">{% translate "Log in" %}</a>
+<section class="home-hero">
+  <div>
+    <p class="home-hero__slogan">{% translate "Origin cannot be imitated." %}</p>
+    <h1>{% translate "A verifiable passport for every product" %}</h1>
+    <p class="home-hero__lead">
+      {% blocktranslate trimmed %}
+        OriginPass issues one digital passport per physical unit and records each change of
+        custody along its journey, so a buyer can confirm a product is genuine without having
+        to trust the seller.
+      {% endblocktranslate %}
+    </p>
+
+    {% comment %}
+    The first question the page asks is the visitor's own: what did you come to
+    do. Two doors, each saying who it is for and what happens behind it.
+    {% endcomment %}
+    <h2 class="visually-hidden">{% translate "What do you want to do?" %}</h2>
+    <div class="choices">
+      <a class="choice" href="#verificar">
+        <span class="choice__icon" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg>
+        </span>
+        <span>
+          <strong>{% translate "I am buying" %}</strong>
+          <span>{% translate "Check that a product is genuine before you pay for it." %}</span>
+        </span>
+      </a>
+      {% if user.is_authenticated and user.is_platform_admin %}
+        <a class="choice" href="{% url 'companies:review_list' %}">
+      {% elif user.is_authenticated %}
+        <a class="choice" href="{% url 'companies:application_detail' %}">
+      {% else %}
+        <a class="choice" href="{% url 'accounts:register' %}">
+      {% endif %}
+        <span class="choice__icon" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="16" rx="10" ry="4"/><path d="M7 15V9a5 5 0 0 1 10 0v6"/><path d="M7 11.5h10"/></svg>
+        </span>
+        <span>
+          <strong>{% translate "I make or sell crafts" %}</strong>
+          <span>
+            {% if user.is_authenticated and user.is_platform_admin %}{% translate "Review the businesses that applied." %}
+            {% elif user.is_authenticated %}{% translate "See your business and the passports of your products." %}
+            {% else %}{% translate "Register your workshop and give each product its passport." %}{% endif %}
+          </span>
+        </span>
+      </a>
     </div>
-  {% elif not user.is_platform_admin %}
-    <div class="hero__actions">
-      <a class="btn btn--primary" href="{% url 'companies:application_detail' %}">{% translate "My application" %}</a>
+
+    <div class="verify-panel" id="verificar">
+      <h2>{% translate "Check a product now" %}</h2>
+      <p class="muted">{% translate "Point your phone camera at the QR on the label. If it does not scan, type the code printed under it." %}</p>
+      <form class="verify-box" method="get" action="{% url 'verification:lookup' %}" role="search">
+        <label class="visually-hidden" for="hero-code">{% translate "Passport code" %}</label>
+        <input type="text" id="hero-code" name="code" placeholder="{% translate 'Type the code under the QR' %}" autocomplete="off" spellcheck="false" maxlength="64">
+        <button type="submit" class="btn btn--primary">{% translate "Verify" %}</button>
+      </form>
+      <details class="info info--block">
+        <summary>{% translate "Where is the code?" %}</summary>
+        <div class="info__body">
+          {% include "partials/label_hint.html" %}
+          <p>{% translate "It is the line of letters and digits printed under the QR, on the product label." %}</p>
+        </div>
+      </details>
+      {% if not user.is_authenticated %}
+        <p class="faint spaced">{% url 'accounts:login' as login_url %}{% blocktranslate trimmed %}Already have an account? <a href="{{ login_url }}">Log in</a>.{% endblocktranslate %}</p>
+      {% endif %}
     </div>
-  {% else %}
-    <div class="hero__actions">
-      <a class="btn btn--primary" href="{% url 'companies:review_list' %}">{% translate "Review applications" %}</a>
+  </div>
+
+  <div class="passport-mock" aria-hidden="true">
+    <div class="datapage">
+      <div class="datapage__band"><span>{% translate "Product passport" %}</span><span>OriginPass</span></div>
+      <div class="datapage__body">
+        <img class="datapage__photo" src="{% static 'img/passport-sample.jpg' %}" alt="" width="150" height="150">
+        <div>
+          <p class="datapage__title">Sombrero vueltiao</p>
+          <dl class="datapage__fields">
+            <div><dt>{% translate "Made in" %}</dt><dd>Tuchín, Córdoba</dd></div>
+            <div><dt>{% translate "Registered by" %}</dt><dd>Taller Artesanal Tuchín</dd></div>
+            <div><dt>{% translate "Verified through" %}</dt><dd>{% translate "Manual artisan review" %}</dd></div>
+          </dl>
+        </div>
+      </div>
+      <p class="mrz">OP&lt;COL&lt;SOMBRERO&lt;VUELTIAO&lt;21&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+MOBNVXGF4QRUK8HSN3X7T286&lt;&lt;&lt;&lt;&lt;&lt;&lt;</p>
     </div>
-  {% endif %}
+    {% include "verification/_seal.html" with verdict="GENUINE" %}
+  </div>
+</section>
+
+<section class="home-section" aria-labelledby="how">
+  <h2 id="how">{% translate "From the workshop to the buyer's hands" %}</h2>
+  <p>{% translate "Four moments, each one recorded and signed, so none of them can be rewritten later." %}</p>
+  <ol class="steps">
+    <li>
+      <h3>{% translate "The workshop is verified" %}</h3>
+      <p>{% translate "A company shows its chamber of commerce registry; an artisan workshop goes through a manual review." %}</p>
+    </li>
+    <li>
+      <h3>{% translate "Each piece gets a passport" %}</h3>
+      <p>{% translate "One code per unit, impossible to guess from another, printed as a QR on the label." %}</p>
+    </li>
+    <li>
+      <h3>{% translate "Every handover is signed" %}</h3>
+      <p>{% translate "From the workshop to the distributor to the shop, each change of hands joins the chain." %}</p>
+    </li>
+    <li>
+      <h3>{% translate "The buyer scans and knows" %}</h3>
+      <p>{% translate "Genuine, revoked or not found, with the whole journey of the piece." %}</p>
+    </li>
+  </ol>
+</section>
+
+<section class="home-section" aria-labelledby="crafts">
+  <h2 id="crafts">{% translate "Made to protect what is copied most" %}</h2>
+  <p>{% translate "Crafts with a denomination of origin lose the most to machine-made copies sold beside them." %}</p>
+  <ul class="crafts">
+    <li>
+      <img src="{% static 'img/crafts/sombrero.jpg' %}" alt="{% translate 'A sombrero vueltiao woven in black and natural caña flecha, seen from above' %}" width="280" height="280" loading="lazy">
+      <strong>Sombrero vueltiao</strong><span>Tuchín, Córdoba</span>
+    </li>
+    <li>
+      <img src="{% static 'img/crafts/mochila.jpg' %}" alt="{% translate 'A red Wayuu mochila with long tassels, hanging from a tree' %}" width="280" height="280" loading="lazy">
+      <strong>Mochila wayuu</strong><span>Uribia, La Guajira</span>
+    </li>
+    <li>
+      <img src="{% static 'img/crafts/ceramica.jpg' %}" alt="{% translate 'A clay donkey carrying two jars, made in Ráquira' %}" width="280" height="280" loading="lazy">
+      <strong>{% translate "Raquira ceramics" %}</strong><span>Ráquira, Boyacá</span>
+    </li>
+    <li>
+      <img src="{% static 'img/crafts/san-jacinto.jpg' %}" alt="{% translate 'A craft stall in San Jacinto with hammocks, bags and drums' %}" width="280" height="280" loading="lazy">
+      <strong>{% translate "San Jacinto crafts" %}</strong><span>San Jacinto, Bolívar</span>
+    </li>
+  </ul>
+  <p class="faint spaced"><a href="{% url 'pages:credits' %}">{% translate "Photo credits" %}</a></p>
 </section>
 {% endblock %}

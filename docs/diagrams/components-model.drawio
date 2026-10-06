@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="OriginPass" version="24.7.17">
   <diagram name="Component model" id="originpass-component-model">
-    <mxGraphModel dx="1960" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1960" pageHeight="1000" math="0" shadow="0">
+    <mxGraphModel dx="1960" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1960" pageHeight="1300" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,18 +8,18 @@
         <mxCell id="title" value="OriginPass — Component model" style="text;html=1;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="100" y="24" width="700" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="One component per Django app · every requirement of Sprints 1 and 2 is implemented by a function drawn here · the functions with no requirement beside them exist to support the work: a landing page, a seed command, a schema report" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="subtitle" value="One component per Django app · every requirement of Sprints 1 to 3, and the Sprint 4 work already done, is implemented by a function drawn here · the functions with no requirement beside them exist to support the work: a landing page, a seed command, a schema report" style="text;html=1;fontSize=13;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="100" y="58" width="1000" height="22" as="geometry" />
         </mxCell>
 
         <!-- ================= accounts ================= -->
         <mxCell id="accounts" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;accounts&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="100" y="140" width="340" height="136" as="geometry" />
+          <mxGeometry x="100" y="140" width="340" height="192" as="geometry" />
         </mxCell>
         <mxCell id="acc_register" value="register  —  FR01, FR02" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="accounts">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
         </mxCell>
-        <mxCell id="acc_login" value="login  —  FR03, FR04" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="accounts">
+        <mxCell id="acc_login" value="login  —  FR03, FR04, FR57 lockout" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="accounts">
           <mxGeometry y="80" width="340" height="28" as="geometry" />
         </mxCell>
         <mxCell id="acc_logout" value="logout  —  FR05" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="accounts">
@@ -28,7 +28,7 @@
 
         <!-- ================= companies ================= -->
         <mxCell id="companies" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;companies&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="100" y="340" width="340" height="276" as="geometry" />
+          <mxGeometry x="100" y="396" width="340" height="360" as="geometry" />
         </mxCell>
         <mxCell id="co_create" value="application_create  —  FR07, FR08, FR09" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="companies">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
@@ -57,7 +57,7 @@
 
         <!-- ================= audit ================= -->
         <mxCell id="audit" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;audit&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="100" y="660" width="340" height="136" as="geometry" />
+          <mxGeometry x="100" y="800" width="340" height="164" as="geometry" />
         </mxCell>
         <mxCell id="au_record" value="record_entry  —  FR43" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="audit">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
@@ -71,7 +71,7 @@
 
         <!-- ================= config ================= -->
         <mxCell id="config" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;pages&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="100" y="830" width="340" height="80" as="geometry" />
+          <mxGeometry x="100" y="998" width="340" height="80" as="geometry" />
         </mxCell>
         <mxCell id="cfg_home" value="home  —  the public landing page, reachable with no account" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="config">
           <mxGeometry y="52" width="340" height="28" as="geometry" />
@@ -79,7 +79,7 @@
 
         <!-- ================= products ================= -->
         <mxCell id="products" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;products&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="680" y="170" width="400" height="192" as="geometry" />
+          <mxGeometry x="680" y="170" width="400" height="444" as="geometry" />
         </mxCell>
         <mxCell id="pr_create" value="product_create  —  FR19, FR20, FR21, FR23, UR10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="products">
           <mxGeometry y="52" width="400" height="28" as="geometry" />
@@ -99,7 +99,7 @@
 
         <!-- ================= verification ================= -->
         <mxCell id="verification" value="&lt;i&gt;&amp;laquo;component&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;verification&lt;/b&gt;" style="swimlane;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=52;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=15;" vertex="1" parent="1">
-          <mxGeometry x="680" y="400" width="400" height="136" as="geometry" />
+          <mxGeometry x="680" y="652" width="400" height="136" as="geometry" />
         </mxCell>
         <mxCell id="ve_verify" value="verify  —  FR28, FR29, FR30, FR31" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fontStyle=1;" vertex="1" parent="verification">
           <mxGeometry y="52" width="400" height="28" as="geometry" />
@@ -107,7 +107,7 @@
         <mxCell id="ve_lookup" value="lookup  —  a code typed by hand, for a QR that will not scan" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="verification">
           <mxGeometry y="80" width="400" height="28" as="geometry" />
         </mxCell>
-        <mxCell id="ve_scan" value="record_scan  —  FR33   (analytics in Sprint 3)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="verification">
+        <mxCell id="ve_scan" value="record_scan  —  FR33 region, FR49 alert, FR58 cap" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;" vertex="1" parent="verification">
           <mxGeometry y="108" width="400" height="28" as="geometry" />
         </mxCell>
 
@@ -120,21 +120,21 @@
         </mxCell>
 
         <mxCell id="i_company" value="CompanyStatus" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=3;verticalLabelPosition=top;verticalAlign=bottom;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="520" y="453" width="22" height="22" as="geometry" />
+          <mxGeometry x="520" y="509" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_company_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#6c8ebf;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="companies" target="i_company">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
         <mxCell id="i_audit" value="AuditTrail" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#9673a6;strokeWidth=3;verticalLabelPosition=top;verticalAlign=bottom;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="520" y="703" width="22" height="22" as="geometry" />
+          <mxGeometry x="520" y="843" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_audit_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#9673a6;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="audit" target="i_audit">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
         <mxCell id="i_passport" value="PassportLookup" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=3;verticalLabelPosition=middle;verticalAlign=middle;align=left;labelPosition=right;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="869" y="382" width="22" height="22" as="geometry" />
+          <mxGeometry x="869" y="634" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_passport_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#82b366;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="products" target="i_passport">
           <mxGeometry relative="1" as="geometry" />
@@ -154,46 +154,31 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="d3" value="&amp;laquo;use&amp;raquo;  refuses a company that is not Approved (FR20)&lt;br&gt;and matches product type to company type (FR23)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;exitX=0;exitY=0.8;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;verticalAlign=bottom;" edge="1" parent="1" source="products" target="i_company">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="620" y="271" />
-              <mxPoint x="620" y="464" />
-            </Array>
-          </mxGeometry>
+        <mxCell id="d3" value="&amp;laquo;use&amp;raquo;  FR20, FR23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;exitX=0;exitY=0.8;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;verticalAlign=bottom;" edge="1" parent="1" source="products" target="i_company">
+          <mxGeometry x="0.35" relative="1" as="geometry"><Array as="points"><mxPoint x="620" y="525" /><mxPoint x="620" y="520" /></Array><mxPoint x="0" y="-6" as="offset" /></mxGeometry>
         </mxCell>
 
         <mxCell id="d4" value="&amp;laquo;use&amp;raquo;  looks the passport code up" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;verticalAlign=bottom;" edge="1" parent="1" source="ve_verify" target="i_passport">
           <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1120" y="466" />
-              <mxPoint x="1120" y="351" />
-            </Array>
+            <Array as="points"><mxPoint x="1120" y="718" /><mxPoint x="1120" y="645" /></Array>
           </mxGeometry>
         </mxCell>
 
         <mxCell id="d5" value="&amp;laquo;use&amp;raquo;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="co_approve" target="i_audit">
           <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="480" y="546" />
-              <mxPoint x="480" y="714" />
-            </Array>
+            <Array as="points"><mxPoint x="480" y="602" /><mxPoint x="480" y="854" /></Array>
           </mxGeometry>
         </mxCell>
 
         <mxCell id="d6" value="&amp;laquo;use&amp;raquo;  writes PRODUCT_REGISTERED" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="pr_create" target="i_audit">
           <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1180" y="206" />
-              <mxPoint x="1180" y="800" />
-              <mxPoint x="531" y="800" />
-            </Array>
+            <Array as="points"><mxPoint x="1180" y="236" /><mxPoint x="1180" y="1030" /><mxPoint x="531" y="1030" /></Array>
           </mxGeometry>
         </mxCell>
 
         <!-- ================= design note ================= -->
         <mxCell id="note_anon" value="&lt;b&gt;verification depends on products, and on nothing else.&lt;/b&gt;&lt;br&gt;&lt;br&gt;It has no dependency on accounts, because a buyer verifies a product without an account (FR28).&lt;br&gt;&lt;br&gt;This is the shortest path in the system by design. It is the one page opened by people the project cannot contact and cannot support, so it depends on the smallest number of components." style="shape=note;whiteSpace=wrap;html=1;size=18;align=left;verticalAlign=top;spacing=12;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="680" y="560" width="400" height="200" as="geometry" />
+          <mxGeometry x="680" y="812" width="400" height="200" as="geometry" />
         </mxCell>
 
         <!-- ================= requirement mapping, three aligned columns ================= -->
@@ -220,10 +205,10 @@
         <mxCell id="a17" value="UR01, UR02, UR03, UR06" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="476" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a18" value="UR04" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="502" width="270" height="26" as="geometry" /></mxCell>
         <mxCell id="a19" value="DBR02, DBR03, DBR04, DBR10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="528" width="270" height="26" as="geometry" /></mxCell>
-        <mxCell id="a20" value="LATER SPRINTS — model exists, views pending" style="text;strokeColor=none;fillColor=#e1d5e7;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;fontStyle=1;" vertex="1" parent="mapA"><mxGeometry y="554" width="270" height="26" as="geometry" /></mxCell>
-        <mxCell id="a21" value="FR32, FR35, FR37" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="580" width="270" height="26" as="geometry" /></mxCell>
-        <mxCell id="a22" value="FR33, FR46 – FR50" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="606" width="270" height="26" as="geometry" /></mxCell>
-        <mxCell id="a23" value="FR43, FR45" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="632" width="270" height="26" as="geometry" /></mxCell>
+        <mxCell id="a20" value="SPRINT 3 — delivered, + Sprint 4 early" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="mapA"><mxGeometry y="554" width="270" height="26" as="geometry" /></mxCell>
+        <mxCell id="a21" value="FR32, FR35 – FR40, FR54" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="580" width="270" height="26" as="geometry" /></mxCell>
+        <mxCell id="a22" value="FR33, FR46 – FR52, FR58" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="606" width="270" height="26" as="geometry" /></mxCell>
+        <mxCell id="a23" value="FR06, FR15–18, FR41–45, FR53, 55, 57" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapA"><mxGeometry y="632" width="270" height="26" as="geometry" /></mxCell>
 
         <mxCell id="mapB" value="Component" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=34;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="1510" y="140" width="140" height="658" as="geometry" />
@@ -248,10 +233,10 @@
         <mxCell id="b17" value="verification" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="476" width="140" height="26" as="geometry" /></mxCell>
         <mxCell id="b18" value="all" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="502" width="140" height="26" as="geometry" /></mxCell>
         <mxCell id="b19" value="products" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="528" width="140" height="26" as="geometry" /></mxCell>
-        <mxCell id="b20" value="" style="text;strokeColor=none;fillColor=#e1d5e7;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="554" width="140" height="26" as="geometry" /></mxCell>
-        <mxCell id="b21" value="products" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="580" width="140" height="26" as="geometry" /></mxCell>
-        <mxCell id="b22" value="verification" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="606" width="140" height="26" as="geometry" /></mxCell>
-        <mxCell id="b23" value="audit" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="632" width="140" height="26" as="geometry" /></mxCell>
+        <mxCell id="b20" value="" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="mapB"><mxGeometry y="554" width="140" height="26" as="geometry" /></mxCell>
+        <mxCell id="b21" value="products, verification" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="580" width="140" height="26" as="geometry" /></mxCell>
+        <mxCell id="b22" value="products, verification" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="606" width="140" height="26" as="geometry" /></mxCell>
+        <mxCell id="b23" value="all" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapB"><mxGeometry y="632" width="140" height="26" as="geometry" /></mxCell>
 
         <mxCell id="mapC" value="Function" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=34;horizontalStack=0;resizeParent=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="1650" y="140" width="260" height="658" as="geometry" />
@@ -276,17 +261,65 @@
         <mxCell id="c17" value="verify  (presentation)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="476" width="260" height="26" as="geometry" /></mxCell>
         <mxCell id="c18" value="Django translation, Spanish default" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=10;" vertex="1" parent="mapC"><mxGeometry y="502" width="260" height="26" as="geometry" /></mxCell>
         <mxCell id="c19" value="Product model, unique indexed code" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=10;" vertex="1" parent="mapC"><mxGeometry y="528" width="260" height="26" as="geometry" /></mxCell>
-        <mxCell id="c20" value="" style="text;strokeColor=none;fillColor=#e1d5e7;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="554" width="260" height="26" as="geometry" /></mxCell>
-        <mxCell id="c21" value="custody chain  (Sprint 3)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="580" width="260" height="26" as="geometry" /></mxCell>
-        <mxCell id="c22" value="scan analytics  (Sprint 3)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="606" width="260" height="26" as="geometry" /></mxCell>
-        <mxCell id="c23" value="record_entry, verify_integrity" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="632" width="260" height="26" as="geometry" /></mxCell>
+        <mxCell id="c20" value="" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="mapC"><mxGeometry y="554" width="260" height="26" as="geometry" /></mxCell>
+        <mxCell id="c21" value="custody, transfer_*, verify" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="580" width="260" height="26" as="geometry" /></mxCell>
+        <mxCell id="c22" value="company_analytics(_csv), admin_overview" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="606" width="260" height="26" as="geometry" /></mxCell>
+        <mxCell id="c23" value="password_reset, suspend, revoke, audit_log" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;overflow=hidden;rotatable=0;html=1;fontSize=11;" vertex="1" parent="mapC"><mxGeometry y="632" width="260" height="26" as="geometry" /></mxCell>
 
+        <mxCell id="accounts_s3_0" value="password_reset  —  FR06 (Django signed tokens)" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="accounts">
+          <mxGeometry y="136" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="accounts_s3_1" value="emails  —  FR53, FR54, FR55 notifications" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="accounts">
+          <mxGeometry y="164" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="companies_s3_0" value="suspend_company  —  FR15" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="companies">
+          <mxGeometry y="276" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="companies_s3_1" value="reactivate_company  —  FR16" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="companies">
+          <mxGeometry y="304" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="companies_s3_2" value="public_profile  —  FR18" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="companies">
+          <mxGeometry y="332" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="audit_s3_0" value="audit_log  —  FR44 filters, FR45 chain check" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="audit">
+          <mxGeometry y="136" width="340" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_0" value="custody  —  what an account holds, receives and offers" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="192" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_1" value="transfer_initiate  —  FR35, FR38, FR39, FR54" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="220" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_2" value="transfer_respond  —  FR36, FR37" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="248" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_3" value="transfer_claim  —  FR40 (passport code + transfer code)" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="276" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_4" value="company_analytics  —  FR46, FR47, FR48, FR49, FR52" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="304" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_5" value="company_analytics_csv  —  FR51" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="332" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_6" value="product_revoke  —  FR41, FR55" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="360" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_7" value="admin_revoke_product  —  FR42, FR55" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="388" width="400" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="products_s3_8" value="admin_overview  —  FR50" style="text;strokeColor=none;align=left;verticalAlign=middle;spacingLeft=14;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="products">
+          <mxGeometry y="416" width="400" height="28" as="geometry" />
+        </mxCell>
         <!-- ================= legend ================= -->
         <mxCell id="lg1" value="Sprint 1 — delivered" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1240" y="820" width="210" height="32" as="geometry" />
         </mxCell>
         <mxCell id="lg2" value="Sprint 2 — delivered" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1465" y="820" width="210" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="lg5" value="Sprint 3 — delivered (and Sprint 4 work done early)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="990" width="420" height="32" as="geometry" />
         </mxCell>
         <mxCell id="lg3" value="Later sprints" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1690" y="820" width="210" height="32" as="geometry" />
@@ -295,8 +328,8 @@
           <mxGeometry x="1240" y="866" width="660" height="110" as="geometry" />
         </mxCell>
 
-        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 2, section 1.2" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
-          <mxGeometry x="100" y="950" width="800" height="20" as="geometry" />
+        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 3, section 1.2" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1230" width="800" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

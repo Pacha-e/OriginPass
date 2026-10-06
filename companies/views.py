@@ -3,22 +3,20 @@
 The views orchestrate and check permission. What a status change means, and
 when it is allowed, is decided by the model.
 """
-from django import forms
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
-from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import admin_required
+from accounts.emails import notify_company_decision
 from accounts.models import Role
 from audit.models import Action, AuditEntry
 
-from .forms import CompanyApplicationForm, RejectionForm
+from .forms import CompanyApplicationForm, RejectionForm, SuspensionForm
 from .models import Company, CompanyStatus, TransitionNotAllowed
 
 # ---------------------------------------------------------------- owner side
@@ -133,7 +131,11 @@ def review_detail(request, pk):
     return render(
         request,
         "companies/review_detail.html",
-        {"company": company, "rejection_form": RejectionForm()},
+        {
+            "company": company,
+            "rejection_form": RejectionForm(),
+            "suspension_form": SuspensionForm(),
+        },
     )
 
 
@@ -153,7 +155,6 @@ def review_approve(request, pk):
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been approved.") % {"company": company})
-        from accounts.emails import notify_company_decision
         notify_company_decision(company)
 
     return redirect("companies:review_detail", pk=company.pk)
@@ -180,111 +181,60 @@ def review_reject(request, pk):
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been rejected.") % {"company": company})
-        from accounts.emails import notify_company_decision
         notify_company_decision(company)
 
     return redirect("companies:review_detail", pk=company.pk)
 
 
-# ---- Sprint 3-4 additions ----
-
-from test_support.factories import OWNER_PASSWORD
-from django.http import HttpResponseForbidden
-
-
-def public_profile(request, pk):
-    """FR18: a public page for each approved company, with the verification
-    track shown, no account needed.
-    """
-    company = get_object_or_404(
-        Company.objects.filter(status=CompanyStatus.APPROVED),
-        pk=pk,
-    )
-    return render(
-        request,
-        "companies/public_profile.html",
-        {"company": company},
-    )
-
-
 @admin_required
 @require_POST
 def suspend_company(request, pk):
-    """FR15: an approved company cannot register new passports while suspended.
-    """
-    company = get_object_or_404(Company, pk=pk)
+    """FR15: an approved company stops issuing passports, with the reason stored."""
+    company = get_object_or_404(Company.objects.select_related("owner"), pk=pk)
+    form = SuspensionForm(request.POST)
+    if not form.is_valid():
+        return render(
+            request,
+            "companies/review_detail.html",
+            {"company": company, "rejection_form": RejectionForm(), "suspension_form": form},
+            status=400,
+        )
     try:
-        company.suspend(actor=request.user, reason=request.POST.get("reason", ""))
+        company.suspend(actor=request.user, reason=form.cleaned_data["reason"])
     except TransitionNotAllowed as refusal:
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been suspended.") % {"company": company})
-        from accounts.emails import notify_company_decision
-        notify_company_decision(company)
     return redirect("companies:review_detail", pk=company.pk)
 
 
 @admin_required
 @require_POST
 def reactivate_company(request, pk):
-    """FR16: a suspended company regains its privileges, with the reason stored."""
+    """FR16: a suspended company is approved again and can issue passports."""
     company = get_object_or_404(Company, pk=pk)
     try:
-        company.reactivate(actor=request.user, reason=request.POST.get("reason", ""))
+        company.reactivate(actor=request.user)
     except TransitionNotAllowed as refusal:
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been reactivated.") % {"company": company})
-        from accounts.emails import notify_company_decision
-        notify_company_decision(company)
     return redirect("companies:review_detail", pk=company.pk)
 
 
-class PasswordResetRequestForm(forms.Form):
-    email = forms.EmailField(label=_("Email address"))
+# ------------------------------------------------------------- public side
 
 
-class PasswordResetConfirmForm(forms.Form):
-    password1 = forms.CharField(label=_("New password"), widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Confirm new password"), widget=forms.PasswordInput)
+def public_profile(request, pk):
+    """FR18: an approved company's public page, reachable without an account.
 
-    def clean(self):
-        cleaned = super().clean()
-        if cleaned.get("password1") != cleaned.get("password2"):
-            raise ValidationError(_("The two passwords do not match."))
-        return cleaned
-
-
-def password_reset_request(request):
-    """FR06: an email gets the token page regardless of whether the address is
-    registered, so a guessed email cannot be told from a live one.
+    Only approved companies have one: a pending or rejected application is not
+    something OriginPass vouches for, and a suspended company is not either.
     """
-    if request.method == "POST":
-        form = PasswordResetRequestForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data["email"]
-            messages.success(request, _("If that address is registered, its owner will receive a reset link shortly."))
-            return redirect("accounts:password_reset_request")
-    else:
-        form = PasswordResetRequestForm()
-    return render(request, "accounts/password_reset_request.html", {"form": form})
-
-
-def password_reset_confirm(request, token):
-    """FR06: the token identifies whose password is being changed; it dies
-    after one use.
-    """
-    user = User.objects.filter(password_reset_token=token).first()
-    if user is None:
-        return HttpResponseForbidden(_("This reset link is not valid or has already been used."))
-    if request.method == "POST":
-        form = PasswordResetConfirmForm(request.POST)
-        if form.is_valid():
-            user.set_password(form.cleaned_data["password1"])
-            user.password_reset_token = None
-            user.save(update_fields=["password", "password_reset_token"])
-            messages.success(request, _("Your password has been changed. You can now log in."))
-            return redirect("accounts:login")
-    else:
-        form = PasswordResetConfirmForm()
-    return render(request, "accounts/password_reset_confirm.html", {"form": form, "token": token})
+    company = get_object_or_404(Company.objects.filter(status=CompanyStatus.APPROVED), pk=pk)
+    products = company.products.filter(status="ACTIVE").order_by("name")
+    return render(
+        request,
+        "companies/public_profile.html",
+        {"company": company, "products": products},
+    )

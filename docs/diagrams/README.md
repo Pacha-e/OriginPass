@@ -9,7 +9,7 @@ with no export step needed to read it.
 |---|---|---|
 | `deployment-model.drawio` | 1.1 | The nodes the system runs on, the software installed on each one with its version, and the protocol between them |
 | `components-model.drawio` | 1.2 | One component per Django app, the functions each one provides, the dependencies between them, and the requirement each function implements |
-| `data-model.drawio` | 1.3 | The six tables, their columns and types, the foreign keys with their cardinality, and the check constraints |
+| `data-model.drawio` | 1.3 | The eight domain tables, their columns and types, the foreign keys with cardinality, and the check constraints |
 | `mockups.drawio` | 2 | The five views the Sprint 2 requirements are reflected in, each answering what the content groups are, where the information sits, and how the interface is used |
 
 `export/` holds a PNG of each diagram at twice its natural size, rebuilt with

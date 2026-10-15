@@ -154,8 +154,8 @@ El orden es el de la diapositiva 4 de la presentación y el del video del recorr
 
 - **Docker no responde:** ciérralo, ábrelo de nuevo y espera a *Running*; luego
   `Start-OriginPass.ps1`.
-- **El puerto 5432 o el 8000 está ocupado:** otro PostgreSQL o servidor está corriendo. Para
-  el 8000, arranca en otro puerto:
+- **Un puerto está ocupado** (55432 con el ZIP, 5432 con el clon, 8000 para la aplicación):
+  otro PostgreSQL o servidor está corriendo. Para el 8000, arranca en otro puerto:
   `.\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8001 --noreload`.
 - **Los datos se ven raros:** `.\.venv\Scripts\python.exe manage.py seed_demo` vuelve a crear
   lo que falte.

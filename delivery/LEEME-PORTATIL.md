@@ -8,9 +8,9 @@
 5. Prueba sin conexión **después** de instalar los paquetes e imagen Docker. Si falla, apunta el mensaje exacto. No borres `.env` ni el volumen Docker entre intentos; la clave local firma la evidencia y cambiarla invalida firmas antiguas.
 
 ## Qué hay / qué no hay
-- `app/`: árbol fuente local (incluye cambios aún sin commit ni push), migración y datos demo; **no contiene `.env`, base de datos, contraseñas personales ni entornos virtuales**.
-- `wiki/`: borradores locales de Deliverable 3 y bitácora diaria; **no están publicados**. Revisa y autoriza antes de cualquier push.
-- `video/OriginPass-Entrega-3.mp4`: copia sin edición del video académico existente. Dura aproximadamente **7:23** y **no** cumple el límite solicitado de **4–5 minutos** ni incorpora tu aparición a cámara. Quedó congelado por tu instrucción; **no lo presentes como video conforme**.
+- `app/`: snapshot de código Sprint 3 ya publicado en la rama `sprint-3-mvp`, migración y datos demo; **no contiene `.env`, base de datos, contraseñas personales ni entornos virtuales**.
+- `wiki/`: copia del Deliverable 3 y la bitácora diaria, también publicados en la [wiki oficial](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-3). Las fechas sin evidencia siguen pendientes de revisión personal por Emmanuel.
+- `video/OriginPass-Entrega-3.mp4`: copia sin edición del video académico existente. Dura aproximadamente **7:23** y **no** cumple el límite solicitado de **4–5 minutos** ni incorpora tu aparición a cámara. Quedó congelado por tu instrucción; **no lo presentes como video conforme**. El promocional de Andino está [publicado aparte como prerelease preliminar](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-promo-preliminar-2026-10-15), con QA FAIL y licencia CC BY-SA 4.0: no lo confundas con el académico.
 - `Setup-Portatil.ps1`: prepara PostgreSQL, instala dependencias, crea una clave **nueva local** sin mostrarla, migra la BD y genera ejemplos **ficticios**. Se puede repetir sin reiniciar la BD; no se debe usar en producción.
 - `Start-OriginPass.ps1`: reinicia la BD local y levanta Django solo en `127.0.0.1`. Requiere internet solo en el primer setup, salvo servicios externos voluntarios.
 

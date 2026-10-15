@@ -41,6 +41,8 @@ Two limits a buyer should keep in mind:
 
 The ready-to-transfer archive is [`delivery/OriginPass-Portatil.zip`](delivery/OriginPass-Portatil.zip). **Read [`delivery/LEEME-PORTATIL.md`](delivery/LEEME-PORTATIL.md) first** (also inside the ZIP); it gives prerequisites, exact PowerShell commands, local demo walkthrough and honest rubric limitations. The setup and launch scripts are separately available in `delivery/`, and `delivery/SHA256SUMS.txt` checks the ZIP. This archive contains the local Sprint 3 working-tree code and demo, **not** a live database, user uploads, a virtualenv or a personal signing key. A second laptop still needs a real first-run test; a desktop test is not proof of laptop readiness. If source changes after this snapshot, regenerate and verify the archive before presenting.
 
+**Separate promotional video:** the unchanged Andino Games 16:9 master is a [preliminary GitHub Release asset](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-promo-preliminar-2026-10-15) because its 121 MB size exceeds the normal Git object limit. See [`delivery/ANDINO-VIDEO.md`](delivery/ANDINO-VIDEO.md) and [`delivery/CREDITOS-Andino.md`](delivery/CREDITOS-Andino.md). It is **CC BY-SA 4.0, QA FAIL and not the academic video**; do not treat its older claims as implemented blockchain or proof of physical authenticity.
+
 Emmanuel reports no direct upload activity in Interactiva: the GitHub repository and wiki are the evidence to show in Thursday's 9:00 a.m. class presentation. The requested individual daily log replaces fictional meeting minutes; see the Wiki's `Daily-Log` page. Do not invent an LMS submission receipt.
 
 ## Documentation

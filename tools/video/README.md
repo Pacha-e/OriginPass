@@ -93,6 +93,6 @@ involved.
 pedagogical agreement requires deliverables and artefacts to be written in
 English; the video is presented in Spanish, which is the language of the class.
 
-**The interface in the walkthrough is still English.** Rendering it in Spanish is
-UR04, which belongs to Sprint 2. Once that ships, rebuilding picks up the
-translated interface without the narration or the slides being touched.
+**The Deliverable 3 feature walkthrough is in Spanish.** It is recorded by
+`record_features.py` from the translated application. The older Deliverable 1
+pipeline described above predates that translation.

@@ -12,7 +12,15 @@ with no export step needed to read it.
 | `data-model.drawio` | 1.3 | The eight domain tables, their columns and types, the foreign keys with cardinality, and the check constraints |
 | `mockups.drawio` | 2 | The five views the Sprint 2 requirements are reflected in, each answering what the content groups are, where the information sits, and how the interface is used |
 
-`export/` holds a PNG of each diagram at twice its natural size, rebuilt with
+`export/` holds each architecture model as a vector PDF, an SVG and a PNG at 2.5x.
+The PDF is the reliable option for reading small labels at high zoom. Rebuild all
+three architecture models through the official diagrams.net viewer:
+
+```bash
+python tools/presentation/render_diagrams.py
+```
+
+The mockup PNG can still be rebuilt with the draw.io desktop application or
 
 ```bash
 docker run --rm -v "$PWD/docs/diagrams:/data" rlespinasse/drawio-export -f png --scale 2
@@ -37,7 +45,8 @@ styling. The last frame draws the verification verdict at 360 pixels, because UR
 is a requirement about that width specifically and a desktop frame cannot show it.
 
 Colour carries the same meaning in all three: blue for what Sprint 1 delivered,
-green for what Sprint 2 is building, purple for what has a model but no views yet.
+green for Sprint 2, orange for additions in Sprint 3, and purple for models created
+in Sprint 1 whose views were delivered in Sprint 3.
 
 ## Exporting for the wiki
 

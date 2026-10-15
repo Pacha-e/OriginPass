@@ -112,14 +112,14 @@
         </mxCell>
 
         <!-- ================= provided interfaces ================= -->
-        <mxCell id="i_auth" value="Authentication" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=3;verticalLabelPosition=top;verticalAlign=bottom;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="i_auth" value="Authentication" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=3;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="520" y="198" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_auth_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#6c8ebf;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="accounts" target="i_auth">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="i_company" value="CompanyStatus" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=3;verticalLabelPosition=top;verticalAlign=bottom;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="i_company" value="CompanyStatus" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=3;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="520" y="509" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_company_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#6c8ebf;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="companies" target="i_company">
@@ -133,7 +133,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="i_passport" value="PassportLookup" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=3;verticalLabelPosition=middle;verticalAlign=middle;align=left;labelPosition=right;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="i_passport" value="PassportLookup" style="ellipse;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=3;verticalLabelPosition=middle;verticalAlign=middle;align=right;labelPosition=left;spacingRight=8;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="869" y="634" width="22" height="22" as="geometry" />
         </mxCell>
         <mxCell id="i_passport_line" style="endArrow=none;html=1;strokeWidth=3;strokeColor=#82b366;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="products" target="i_passport">
@@ -170,9 +170,10 @@
           </mxGeometry>
         </mxCell>
 
-        <mxCell id="d6" value="&amp;laquo;use&amp;raquo;  writes PRODUCT_REGISTERED" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="pr_create" target="i_audit">
-          <mxGeometry relative="1" as="geometry">
+        <mxCell id="d6" value="&amp;laquo;use&amp;raquo;  writes PRODUCT_REGISTERED" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;endSize=12;dashed=1;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="pr_create" target="i_audit">
+          <mxGeometry x="0.62" relative="1" as="geometry">
             <Array as="points"><mxPoint x="1180" y="236" /><mxPoint x="1180" y="1030" /><mxPoint x="531" y="1030" /></Array>
+            <mxPoint y="-12" as="offset" />
           </mxGeometry>
         </mxCell>
 
@@ -321,7 +322,7 @@
         <mxCell id="lg5" value="Sprint 3 — delivered (and Sprint 4 work done early)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1240" y="990" width="420" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="lg3" value="Later sprints" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="lg3" value="Model in Sprint 1, views in Sprint 3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1690" y="820" width="210" height="32" as="geometry" />
         </mxCell>
         <mxCell id="lg4" value="&lt;b&gt;Notation&lt;/b&gt;&amp;nbsp;&amp;nbsp; the circle on a stalk is a provided interface — a capability the component offers to the rest of the system. The dashed arrow is a dependency, and it points at the exact function that is needed rather than at the component as a whole.&lt;br&gt;&lt;br&gt;&lt;b&gt;Component &amp;#8594; Django app &amp;#8594; views.py.&lt;/b&gt;&amp;nbsp; Each function in a box is one view function in that app, and each one is reachable in the interface through a button, a link or a menu entry." style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#555555;" vertex="1" parent="1">

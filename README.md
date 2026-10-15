@@ -41,7 +41,25 @@ Two limits a buyer should keep in mind:
 
 The ready-to-transfer archive `OriginPass-Portatil.zip` and its `SHA256SUMS.txt` are assets of the [portable kit release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-kit-portatil-2026-10-15); `python delivery/build_portable.py` rebuilds them from the tracked source. **Read [`delivery/LEEME-PORTATIL.md`](delivery/LEEME-PORTATIL.md) first** (also inside the ZIP); it lists everything that has to be running and open for the presentation, the exact PowerShell commands and the order of the demonstration. The setup and launch scripts in `delivery/` run both from the extracted ZIP and from a clone of this repository. This archive contains the local Sprint 3 working-tree code and demo, **not** a live database, user uploads, a virtualenv or a personal signing key. A second laptop still needs a real first-run test; a desktop test is not proof of laptop readiness. If source changes after this snapshot, regenerate and verify the archive before presenting.
 
-The kit release also carries the Deliverable 3 presentation, built by `python tools/presentation/build_deck.py`, and a silent walkthrough of the new features with a caption per step, recorded by `python tools/video/record_features.py`. The five launch videos, narrated by Emmanuel, are assets of the [videos release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-videos-lanzamiento), published under CC BY-SA 4.0 with the credits in [`delivery/CREDITOS-VIDEOS.md`](delivery/CREDITOS-VIDEOS.md).
+Extract the full kit and open **`ABRIR-KIT.html`**. It links the vector PDF and HTML
+presentation, the three diagrams as individual vector PDFs/SVGs, seven original
+screenshots, the script, the feature walkthrough and all five launch videos. These presentation files work offline. Run `Verificar-Kit.ps1` to
+check every packaged source and media file against `KIT-MANIFEST.json`; setup creates
+`ABRIR-DEMO.html` with the passport links from that laptop's own database.
+
+The presentation is built by `python tools/presentation/build_deck.py`, after exporting
+the diagrams with `python tools/presentation/render_diagrams.py`. Authoring dependencies
+are in `tools/presentation/requirements.txt`. The silent walkthrough is recorded by
+`python tools/video/record_features.py`. The five launch videos, narrated by Emmanuel,
+remain available in the [videos release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-videos-lanzamiento)
+and are also included in the complete kit, under CC BY-SA 4.0 with the credits in
+[`delivery/CREDITOS-VIDEOS.md`](delivery/CREDITOS-VIDEOS.md).
+
+A versioned [wiki snapshot](docs/wiki/Deliverable-3.md) makes the kit reproducible from
+this repository alone. `python delivery/build_portable.py --fetch-videos` downloads any
+missing launch videos with GitHub CLI and checks their published SHA-256 values before
+packaging. Generated PDFs, videos and ZIPs are distributed through Releases; their
+sources, dependencies, media checksums, guides and wiki snapshot are versioned here.
 
 The individual daily log the professor asked for in place of meeting minutes is the Wiki's [Daily Log](https://github.com/Pacha-e/OriginPass/wiki/Daily-Log) page.
 

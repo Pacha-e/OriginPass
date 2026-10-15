@@ -12,6 +12,7 @@ lined up with what is on screen.
 """
 
 import json
+import os
 import re
 import sys
 from datetime import timedelta
@@ -103,6 +104,10 @@ def main():
 
     suffix = "-preview" if silent else ""
     out = BUILD / f"OriginPass-Entrega-{delivery}{suffix}.mp4"
+    # Render to process-unique files. Two interrupted/retried assemblers must
+    # never write the same MP4 or temporary audio concurrently.
+    render_out = BUILD / f".{out.stem}.{os.getpid()}.partial.mp4"
+    temp_audio = BUILD / f".temp-audio.{os.getpid()}.m4a"
     srt_out = BUILD / f"OriginPass-Entrega-{delivery}{suffix}.srt"
 
     clips, srt_blocks, index, offset = [], [], 1, 0.0
@@ -130,17 +135,22 @@ def main():
     video = concatenate_videoclips(clips, method="compose")
 
     print(f"\nwriting {out.name} — {video.duration:.1f} s ({video.duration / 60:.2f} min)")
-    video.write_videofile(
-        str(out),
-        fps=FPS,
-        codec="libx264",
-        audio_codec="aac" if not silent else None,
-        audio=not silent,
-        preset="medium",
-        threads=4,
-        temp_audiofile=str(BUILD / "temp-audio.m4a"),
-        logger=None,
-    )
+    try:
+        video.write_videofile(
+            str(render_out),
+            fps=FPS,
+            codec="libx264",
+            audio_codec="aac" if not silent else None,
+            audio=not silent,
+            preset="medium",
+            threads=4,
+            temp_audiofile=str(temp_audio),
+            logger=None,
+        )
+        os.replace(render_out, out)
+    finally:
+        render_out.unlink(missing_ok=True)
+        temp_audio.unlink(missing_ok=True)
 
     srt_out.write_text("\n\n".join(srt_blocks) + "\n", encoding="utf-8")
 

@@ -35,6 +35,15 @@ SECTIONS = [
             "sistema registra el viaje completo del producto. Esta entrega "
             "cierra el MVP."
         ),
+        # "MVP" read aloud would be spelled mid-word; speak it the way
+        # a presenter says it in Spanish while the subtitle keeps the acronym.
+        "tts_text": (
+            "Esta es la entrega tres de OriginPass, equipo uno, Proyecto "
+            "Integrador uno. El producto ya existe de punta a punta: la empresa "
+            "emite el pasaporte, el comprador lo verifica con un escaneo, y el "
+            "sistema registra el viaje completo del producto. Esta entrega "
+            "cierra el eme, uve, pe."
+        ),
     },
     {
         "id": "02-where-we-are",
@@ -67,8 +76,9 @@ SECTIONS = [
             "eyebrow": "Cadena de custodia",
             "title": "Cada mano por la que pasa el producto queda firmada",
             "body": (
-                "Una transferencia aceptada es un eslabón que no se puede editar "
-                "ni borrar: la base de datos lo exige."
+                "Una transferencia aceptada es un eslabón que la aplicación ya no "
+                "deja editar ni borrar, y la base de datos impide que la cadena "
+                "se bifurque."
             ),
         },
         "text": (
@@ -78,10 +88,21 @@ SECTIONS = [
             "rechaza, y solo si acepta, la transferencia se vuelve un eslabón de "
             "la cadena. "
             "Cada eslabón firma al anterior con un hash encadenado, así que "
-            "editar uno rompe todos los que siguen. La base de datos, no el "
-            "código de la vista, es la que se niega a tocar un eslabón ya "
-            "aceptado."
+            "editar uno invalida la firma de todos los que siguen. La aplicación "
+            "se niega a tocar un eslabón ya aceptado, y la base de datos impide "
+            "que la cadena se bifurque."
         ),
+        "tts_text": (
+            "La cadena de custodia es la pieza central del eme, uve, pe. "
+            "Cuando el tenedor actual ofrece el producto a otra persona, se crea "
+            "una transferencia en estado iniciada. La otra cuenta la acepta o la "
+            "rechaza, y solo si acepta, la transferencia se vuelve un eslabón de "
+            "la cadena. "
+            "Cada eslabón firma al anterior con un hash encadenado, así que "
+            "editar uno invalida la firma de todos los que siguen. La aplicación "
+            "se niega a tocar un eslabón ya aceptado, y la base de datos impide "
+            "que la cadena se bifurque."
+        ),  # "hash" pronounces fine in Spanish; kept as-is.
     },
     {
         "id": "04-demo",
@@ -89,16 +110,44 @@ SECTIONS = [
         "text": (
             "Vamos a verlo corriendo. "
             "El taller entra y registra un producto nuevo: un sombrero vueltiao "
-            "de veintiuna. El sistema le genera el pasaporte y el QR. "
-            "Descarga el QR y lo imprime para ponerlo en la pieza. "
+            "de veintiuna. Escribe el nombre, la categoría, el lugar de "
+            "fabricación y una descripción, y el sistema le genera el pasaporte "
+            "con su QR. "
+            "En la página del pasaporte aparecen el código, el QR para "
+            "descargar e imprimir, y las veces que el producto ha sido "
+            "verificado. "
             "Ahora, desde el teléfono del comprador: escanea el código, y la "
             "página pública responde Auténtico, con el sello de la marca, la "
-            "empresa que lo registró, y la cadena de custodia completa: del "
-            "taller, al distribuidor, al comprador. "
+            "empresa que lo registró, el lugar de fabricación, y la cadena de "
+            "custodia completa: del taller, al distribuidor, al comprador. "
             "El taller ofrece la transferencia al distribuidor escribiendo su "
             "correo y una nota que queda en la cadena. "
-            "El distribuidor la acepta, y el comprador que escanea el mismo código "
-            "después ve que la cadena creció: la pieza tiene una mano más. "
+            "El distribuidor abre sus entregas pendientes, la revisa y la "
+            "acepta. El comprador que escanea el mismo código después ve que "
+            "la cadena creció: la pieza tiene una mano más, con su nombre y "
+            "su fecha. "
+            "Si alguien intenta transferir un producto que no tiene, el sistema "
+            "se lo rechaza con la razón, no con un error genérico."
+        ),
+        "tts_text": (
+            "Vamos a verlo corriendo. "
+            "El taller entra y registra un producto nuevo: un sombrero vueltiao "
+            "de veintiuna. Escribe el nombre, la categoría, el lugar de "
+            "fabricación y una descripción, y el sistema le genera el pasaporte "
+            "con su cu erre. "
+            "En la página del pasaporte aparecen el código, el cu erre para "
+            "descargar e imprimir, y las veces que el producto ha sido "
+            "verificado. "
+            "Ahora, desde el teléfono del comprador: escanea el código, y la "
+            "página pública responde Auténtico, con el sello de la marca, la "
+            "empresa que lo registró, el lugar de fabricación, y la cadena de "
+            "custodia completa: del taller, al distribuidor, al comprador. "
+            "El taller ofrece la transferencia al distribuidor escribiendo su "
+            "correo y una nota que queda en la cadena. "
+            "El distribuidor abre sus entregas pendientes, la revisa y la "
+            "acepta. El comprador que escanea el mismo código después ve que "
+            "la cadena creció: la pieza tiene una mano más, con su nombre y "
+            "su fecha. "
             "Si alguien intenta transferir un producto que no tiene, el sistema "
             "se lo rechaza con la razón, no con un error genérico."
         ),
@@ -130,6 +179,18 @@ SECTIONS = [
             "La copia puede responder lo mismo que el original, pero no puede "
             "estar en dos países al mismo tiempo."
         ),
+        "tts_text": (
+            "Hay un ataque que un cu erre no puede evitar: fotografiarlo y "
+            "reimprimirlo. "
+            "OriginPass lo ve. "
+            "Cada verificación registra la región gruesa del escaneo. Si un mismo "
+            "pasaporte aparece en dos regiones distintas dentro de veinticuatro "
+            "horas, el sistema levanta una alerta de escaneo duplicado y la "
+            "empresa la ve en su panel de analítica, apuntando al escaneo "
+            "sospechoso. "
+            "La copia puede responder lo mismo que el original, pero no puede "
+            "estar en dos países al mismo tiempo."
+        ),  # "QR" spelled "cu erre" reads cleaner; kept consistent with 04.
     },
     {
         "id": "06-analytics",
@@ -157,6 +218,16 @@ SECTIONS = [
             "Todo se puede exportar en CSV, porque el que analiza no siempre "
             "trabaja en el navegador."
         ),
+        "tts_text": (
+            "La analítica le da a la empresa la otra mitad del valor. "
+            "Escaneos por día: cuánta gente está verificando y cuándo. "
+            "Distribución por región: dónde se está vendiendo de verdad. "
+            "Productos por número de escaneos: qué pieza está llamando la "
+            "atención. "
+            "Y la alerta de escaneo duplicado, que es la que delata el clon. "
+            "Todo se puede exportar en ce, ese, ve, porque el que analiza no "
+            "siempre trabaja en el navegador."
+        ),
     },
     {
         "id": "07-hardening",
@@ -182,6 +253,23 @@ SECTIONS = [
             "bloqueada de una que no existe. "
             "En la verificación pública, sesenta escaneos por hora desde una "
             "misma IP. Pasado el límite, el veredicto se sigue respondiendo, "
+            "porque un comprador con un producto real no puede recibir un "
+            "rechazo; solo deja de guardarse el registro. "
+            "Una sola oferta de transferencia abierta por producto, porque dos "
+            "a la vez era una carrera que la vista no podía cerrar. "
+            "Y el No encontrado es idéntico para todos los códigos muertos: "
+            "decir cuál existe y cuál no sería regalarle el mapa al atacante."
+        ),
+        "tts_text": (
+            "Estos requisitos no salieron de describir el sistema, sino de "
+            "atacarlo. "
+            "Cinco contraseñas erróneas en quince minutos desde una misma "
+            "dirección, y esa dirección queda bloqueada otros quince. Pero el "
+            "mensaje que recibe es el mismo que si la contraseña estuviera "
+            "mal, así que quien intenta adivinar no puede distinguir una cuenta "
+            "bloqueada de una que no existe. "
+            "En la verificación pública, sesenta escaneos por hora desde una "
+            "misma i pe. Pasado el límite, el veredicto se sigue respondiendo, "
             "porque un comprador con un producto real no puede recibir un "
             "rechazo; solo deja de guardarse el registro. "
             "Una sola oferta de transferencia abierta por producto, porque dos "
@@ -265,6 +353,16 @@ SECTIONS = [
             "El proyecto pasó de ochenta y cuatro pruebas en la entrega uno a "
             "trescientas seis hoy, todas contra PostgreSQL en integración "
             "continua. "
+            "Cada requisito del sprint tiene su prueba, la cadena firmada se "
+            "verifica en cada corrida, y la página pública se mide cargando en "
+            "menos de tres segundos sobre una conexión tres G, porque ese es el "
+            "requisito y la prueba lo afirma en lugar de asumirlo."
+        ),
+        "tts_text": (
+            "Nada de lo que se mostró en este video es una afirmación suelta. "
+            "El proyecto pasó de ochenta y cuatro pruebas en la entrega uno a "
+            "trescientas seis hoy, todas contra la base de datos "
+            "postgre es cu ele en integración continua. "
             "Cada requisito del sprint tiene su prueba, la cadena firmada se "
             "verifica en cada corrida, y la página pública se mide cargando en "
             "menos de tres segundos sobre una conexión tres G, porque ese es el "

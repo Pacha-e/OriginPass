@@ -46,6 +46,12 @@
       <dt>{% translate "Description" %}</dt>
       <dd>{{ company.description|linebreaksbr }}</dd>
 
+      <dt>{% translate "Evidence of the craft" %}</dt>
+      <dd>{% if company.evidence_notes %}{{ company.evidence_notes|linebreaksbr }}{% else %}<span class="faint">{% translate "Not provided" %}</span>{% endif %}</dd>
+
+      <dt>{% translate "Consent to publish" %}</dt>
+      <dd>{% if company.publish_consent %}{% translate "Given" %}{% else %}<span class="faint">{% translate "Not given" %}</span>{% endif %}</dd>
+
       <dt>{% translate "Submitted" %}</dt>
       <dd>{{ company.submitted_at|date:"j F Y, H:i" }}</dd>
 

@@ -65,7 +65,7 @@ def fresh_product():
     return Product.objects.filter(name=DEMO_NAME).order_by("-id").first()
 
 
-def beat(page, seconds=1.6):
+def beat(page, seconds=2.5):
     page.wait_for_timeout(int(seconds * 1000))
 
 
@@ -129,14 +129,23 @@ def main():
             "Tejido a mano en caña flecha por tres generaciones del taller.",
             delay=11,
         )
-        beat(page, 0.8)
+        # A real photo of the piece, so the passport and the public page
+        # carry the workshop's own image instead of the placeholder.
+        page.set_input_files(
+            "#id_image",
+            str(
+                Path(__file__).resolve().parent.parent.parent
+                / "companies/management/commands/demo_photos/sombrero-vueltiao-21.jpg"
+            ),
+        )
+        beat(page, 1.0)
         submit(page)
         page.wait_for_load_state("networkidle")
         beat(page, 2.2)
 
         # the fresh passport's detail page: code, QR and transfer code shown
         page.wait_for_selector("text=Descargar el código QR", timeout=8000)
-        beat(page, 2.6)
+        beat(page, 4.0)
 
         # The public page link carries the passport code; reading it from the
         # page keeps Django's ORM out of Playwright's async context.
@@ -148,9 +157,9 @@ def main():
 
         # --- the buyer's phone: the public verdict with the journey ----------
         page.goto(verify_url)
-        beat(page, 3.2)
+        beat(page, 4.5)
         page.locator("text=Recorrido de este producto").scroll_into_view_if_needed()
-        beat(page, 2.4)
+        beat(page, 3.5)
 
         # --- the workshop hands the piece to the distributor -----------------
         page.goto(f"{BASE}/products/")
@@ -189,9 +198,9 @@ def main():
 
         # --- the public page again: the journey grew --------------------------
         page.goto(verify_url)
-        beat(page, 2.2)
-        page.locator("text=Recorrido de este producto").scroll_into_view_if_needed()
         beat(page, 3.0)
+        page.locator("text=Recorrido de este producto").scroll_into_view_if_needed()
+        beat(page, 4.0)
 
         # --- the analytics close the loop --------------------------------------
         login(page, WORKSHOP_EMAIL)

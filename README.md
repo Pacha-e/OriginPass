@@ -12,11 +12,36 @@ Printed certificates can be photocopied. Brand-owned checkers only work for larg
 
 ## What OriginPass does
 
-- Verifies companies through two tracks: commercial companies with an official registry code, artisan workshops through manual review.
-- Issues one passport per product unit, identified by a code that cannot be guessed from other codes.
+- Verifies companies through two tracks: commercial companies with an official registry code, artisan workshops through manual review — an informal workshop without a NIT or chamber registration can apply with real evidence of the craft, and a person decides.
+- Issues one passport per product unit, identified by a code that cannot be guessed from other codes. The owner can upload or replace **one product image**, both at registration and when editing an already registered product; a gallery of several images is not implemented. Demo products use illustrative Commons photographs, not evidence that the depicted physical item came from the named fictitious company.
 - Publishes a verification page reachable by QR that any buyer can open without an account.
 - Records the chain of custody from the maker through distributors to the current owner.
 - Analyses verification scans to surface signs of QR cloning, such as one passport being scanned in distant places within a short window.
+
+## Scope: a working MVP today, Monad as the goal
+
+This repository holds a working MVP built on Django and PostgreSQL. It writes
+nothing to any blockchain. The product goal is to anchor the head of the
+integrity chain and the reviewer attestations directly on **Monad**, so that
+verification stops depending on trusting whoever runs this server. That step is
+architecture and roadmap, deliberately not implemented here — no simulated
+contract, no decorative testnet.
+
+Two limits a buyer should keep in mind:
+
+- The QR resolves a registry entry. A photocopied label resolves the same
+  passport, so the verdict certifies the state of the record, not by itself the
+  physical materiality of the piece — the piece still has to match its
+  photograph and description.
+- The passport is signed with a server-side key (HMAC over `SECRET_KEY`), not
+  with a key the workshop holds. "Signed" means tamper-evident, not a digital
+  signature controlled by the maker.
+
+## Portable presentation kit (Windows laptop)
+
+The ready-to-transfer archive is [`delivery/OriginPass-Portatil.zip`](delivery/OriginPass-Portatil.zip). **Read [`delivery/LEEME-PORTATIL.md`](delivery/LEEME-PORTATIL.md) first** (also inside the ZIP); it gives prerequisites, exact PowerShell commands, local demo walkthrough and honest rubric limitations. The setup and launch scripts are separately available in `delivery/`, and `delivery/SHA256SUMS.txt` checks the ZIP. This archive contains the local Sprint 3 working-tree code and demo, **not** a live database, user uploads, a virtualenv or a personal signing key. A second laptop still needs a real first-run test; a desktop test is not proof of laptop readiness. If source changes after this snapshot, regenerate and verify the archive before presenting.
+
+Emmanuel reports no direct upload activity in Interactiva: the GitHub repository and wiki are the evidence to show in Thursday's 9:00 a.m. class presentation. The requested individual daily log replaces fictional meeting minutes; see the Wiki's `Daily-Log` page. Do not invent an LMS submission receipt.
 
 ## Documentation
 
@@ -194,9 +219,9 @@ failure, so it can be run on a schedule.
 
 This makes tampering by anyone holding **only the database** detectable. It does not cover
 whoever runs the server, who holds the key too. Closing that needs the head of the chain
-published somewhere the operator does not control, which is a Sprint 4 option. The
-reasoning, including why the records are not on a blockchain, is on the
-[Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) page.
+published somewhere the operator does not control; anchoring it on Monad is the product's
+roadmap goal (see the scope section above). The reasoning for keeping this MVP off-chain is
+on the [Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) page.
 
 Documentation is kept in the Wiki rather than in the repository, so that a single copy
 stays authoritative.

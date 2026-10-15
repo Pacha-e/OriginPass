@@ -13,7 +13,8 @@
       {% else %}
         {% blocktranslate trimmed %}
           A commercial company is verified through an official registry. An artisan
-          workshop is reviewed by a person, and needs no registry code.
+          workshop — with or without a NIT or chamber registration — is reviewed by
+          a person from the evidence of the craft you describe.
         {% endblocktranslate %}
       {% endif %}
     </p>
@@ -33,6 +34,8 @@
     {% include "partials/field.html" with field=form.description %}
     {% include "partials/field.html" with field=form.location %}
     {% include "partials/field.html" with field=form.website %}
+    {% include "partials/field.html" with field=form.evidence_notes %}
+    {% include "partials/field.html" with field=form.publish_consent %}
 
     <div class="form-actions">
       <span class="tip tip--start">

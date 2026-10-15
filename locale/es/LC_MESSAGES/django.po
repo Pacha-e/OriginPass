@@ -264,10 +264,12 @@ msgstr "Al guardar los cambios, la solicitud vuelve a la fila de revisión."
 
 msgid ""
 "A commercial company is verified through an official registry. An artisan "
-"workshop is reviewed by a person, and needs no registry code."
+"workshop — with or without a NIT or chamber registration — is reviewed by "
+"a person from the evidence of the craft you describe."
 msgstr ""
 "Una empresa comercial se verifica con un registro oficial. Un taller "
-"artesanal lo revisa una persona y no necesita código de registro."
+"artesanal, tenga o no NIT o registro mercantil, lo revisa una persona a "
+"partir de la evidencia del oficio que describes."
 
 msgid "Save and resubmit"
 msgstr "Guardar y reenviar"
@@ -609,10 +611,15 @@ msgstr "Probar otro código"
 
 msgid ""
 "OriginPass shows what the registering company declared and who verified that "
-"company. No account is needed to check a product."
+"company. No account is needed to check a product. The verdict certifies the "
+"state of this registry entry: a photocopied QR resolves the same passport, so "
+"it is not, by itself, proof that the physical piece is the original."
 msgstr ""
 "OriginPass muestra lo que declaró la empresa que registró el producto y quién "
-"verificó a esa empresa. No hace falta cuenta para verificar un producto."
+"verificó a esa empresa. No hace falta cuenta para verificar un producto. El "
+"veredicto certifica el estado de este registro: un QR fotocopiado resuelve el "
+"mismo pasaporte, así que no prueba por sí solo que el producto físico sea el "
+"original."
 
 # --------------------------------------------------------- pages and errors
 
@@ -885,14 +892,14 @@ msgstr "Mi negocio"
 msgid "Product passport"
 msgstr "Pasaporte de producto"
 
-msgid "Four moments, each one recorded and signed, so none of them can be rewritten later."
-msgstr "Cuatro momentos, cada uno registrado y firmado, para que ninguno se pueda reescribir después."
+msgid "Four moments, each one recorded and signed, so that changing any of them later shows."
+msgstr "Cuatro momentos, cada uno registrado y firmado, de modo que cambiar cualquiera después deja evidencia."
 
 msgid "The workshop is verified"
 msgstr "Se verifica el taller"
 
-msgid "A company shows its chamber of commerce registry; an artisan workshop goes through a manual review."
-msgstr "Una empresa muestra su registro de Cámara de Comercio; un taller artesanal pasa por una revisión manual."
+msgid "A company shows its chamber of commerce registry; an artisan workshop, even an informal one without a NIT, goes through a manual review of real evidence of the craft."
+msgstr "Una empresa muestra su registro de Cámara de Comercio; un taller artesanal, incluso informal y sin NIT, pasa una revisión humana de evidencia real del oficio."
 
 msgid "Each piece gets a passport"
 msgstr "Cada producto recibe su pasaporte"
@@ -1588,3 +1595,66 @@ msgstr "El registro de tu taller o negocio, y si ya está aprobado."
 
 msgid "A product label: the QR code, and under it the passport code"
 msgstr "Una etiqueta de producto: el código QR y, debajo, el código del pasaporte"
+
+msgid "Evidence of your craft"
+msgstr "Evidencia de tu oficio"
+
+msgid "Consent to publish"
+msgstr "Consentimiento para publicar"
+
+msgid ""
+"Required for an artisan workshop without a registry: how you work, "
+"your materials, your workspace, and anyone who can vouch for you. "
+"Only the reviewer reads this; it is never published."
+msgstr ""
+"Obligatoria para un taller artesanal sin registro: cómo trabajas, tus "
+"materiales, tu espacio de trabajo y quién puede dar fe de ti. Solo la "
+"lee quien revisa; nunca se publica."
+
+msgid ""
+"Once approved, your name, town and description are shown on a public "
+"profile so buyers can find you. Tick to agree."
+msgstr ""
+"Una vez aprobado, tu nombre, tu municipio y tu descripción se muestran "
+"en un perfil público para que los compradores te encuentren. Márcalo "
+"para aceptar."
+
+msgid ""
+"Describe the evidence of your craft so a person can review "
+"your workshop without a registry code."
+msgstr ""
+"Describe la evidencia de tu oficio para que una persona pueda revisar "
+"tu taller sin código de registro."
+
+msgid "Your consent is needed to publish your profile once approved."
+msgstr "Necesitamos tu consentimiento para publicar tu perfil una vez aprobado."
+
+msgid ""
+"Evidence of the craft offered for a manual artisan review: process, "
+"materials, workspace, references (FR09)."
+msgstr ""
+"Evidencia del oficio ofrecida para la revisión artesanal manual: proceso, "
+"materiales, taller, referencias (FR09)."
+
+msgid ""
+"The applicant agrees to the approved company's name, location and "
+"description being shown on a public profile (FR18)."
+msgstr ""
+"La persona solicitante acepta que el nombre, la ubicación y la descripción "
+"de la empresa aprobada se muestren en un perfil público (FR18)."
+
+msgid "Evidence of the craft"
+msgstr "Evidencia del oficio"
+
+msgid "Given"
+msgstr "Otorgado"
+
+msgid "Not given"
+msgstr "No otorgado"
+
+msgid ""
+"What you told the reviewer about how you work. Only the review team reads "
+"this; it is never published."
+msgstr ""
+"Lo que le contaste a quien revisa sobre cómo trabajas. Solo lo lee el "
+"equipo de revisión; nunca se publica."

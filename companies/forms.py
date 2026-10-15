@@ -29,6 +29,8 @@ class CompanyApplicationForm(forms.ModelForm):
             "location",
             "website",
             "registry_code",
+            "evidence_notes",
+            "publish_consent",
         ]
         labels = {
             "legal_name": _("Legal name"),
@@ -38,6 +40,8 @@ class CompanyApplicationForm(forms.ModelForm):
             "location": _("Location"),
             "website": _("Contact website"),
             "registry_code": _("Official registry code"),
+            "evidence_notes": _("Evidence of your craft"),
+            "publish_consent": _("Consent to publish"),
         }
         help_texts = {
             "legal_name": _("The name of your workshop or business, as buyers know it."),
@@ -56,9 +60,19 @@ class CompanyApplicationForm(forms.ModelForm):
                 "Required for a commercial company, for example a NIT "
                 "or a Chamber of Commerce code."
             ),
+            "evidence_notes": _(
+                "Required for an artisan workshop without a registry: how you work, "
+                "your materials, your workspace, and anyone who can vouch for you. "
+                "Only the reviewer reads this; it is never published."
+            ),
+            "publish_consent": _(
+                "Once approved, your name, town and description are shown on a public "
+                "profile so buyers can find you. Tick to agree."
+            ),
         }
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
+            "evidence_notes": forms.Textarea(attrs={"rows": 4}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -103,6 +117,24 @@ class CompanyApplicationForm(forms.ModelForm):
                 )
             else:
                 cleaned["registry_code"] = ""
+            # FR09: a human decides from real evidence, so the application has to
+            # carry it; a blank note leaves the reviewer nothing to work with.
+            if not (cleaned.get("evidence_notes") or "").strip():
+                self.add_error(
+                    "evidence_notes",
+                    _(
+                        "Describe the evidence of your craft so a person can review "
+                        "your workshop without a registry code."
+                    ),
+                )
+
+        # FR18: an approved company gets a public profile, whoever it is, so
+        # applying without consenting to it cannot succeed.
+        if not cleaned.get("publish_consent"):
+            self.add_error(
+                "publish_consent",
+                _("Your consent is needed to publish your profile once approved."),
+            )
 
         return cleaned
 

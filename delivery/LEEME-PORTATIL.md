@@ -1,0 +1,25 @@
+# OriginPass — kit local para el portátil (Windows, presentación grupo jueves 9:00 a. m.)
+
+## Preparación, antes de salir
+1. Instala **Python 3.12 para Windows** y **Docker Desktop** (contenedores Linux) con internet; inicia Docker Desktop y espera a que indique *Running*. Revisa espacio disponible y carga del portátil. La primera instalación descarga paquetes Python e imagen PostgreSQL; **no la dejes para la sala de clase**.
+2. Copia `OriginPass-Portatil.zip` al portátil y **extráelo completo** (no ejecutes scripts dentro del ZIP). Por ejemplo, `C:\OriginPass-Portatil`. Conserva el ZIP como respaldo.
+3. Abre PowerShell dentro de la carpeta extraída. Ejecuta `powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup-Portatil.ps1`. La excepción de política aplica solo a ese proceso. No uses `Set-ExecutionPolicy` permanente ni abras el servidor a la red del salón.
+4. Si termina sin error, ejecuta `powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-OriginPass.ps1` y visita `http://127.0.0.1:8000/`. Deja PowerShell y Docker Desktop abiertos. Demuestra catálogo y QR/verificación; ingresa con los **usuarios de demostración documentados en `app\README.md`**, nunca con cuentas reales. Las imágenes de algunos productos seed vienen incluidas. En el panel de la empresa, entra a un producto → editar → sube una foto JPG/PNG → guarda → abre la página pública de verificación; la función admite **una imagen por producto** (no galería).
+5. Prueba sin conexión **después** de instalar los paquetes e imagen Docker. Si falla, apunta el mensaje exacto. No borres `.env` ni el volumen Docker entre intentos; la clave local firma la evidencia y cambiarla invalida firmas antiguas.
+
+## Qué hay / qué no hay
+- `app/`: árbol fuente local (incluye cambios aún sin commit ni push), migración y datos demo; **no contiene `.env`, base de datos, contraseñas personales ni entornos virtuales**.
+- `wiki/`: borradores locales de Deliverable 3 y bitácora diaria; **no están publicados**. Revisa y autoriza antes de cualquier push.
+- `video/OriginPass-Entrega-3.mp4`: copia sin edición del video académico existente. Dura aproximadamente **7:23** y **no** cumple el límite solicitado de **4–5 minutos** ni incorpora tu aparición a cámara. Quedó congelado por tu instrucción; **no lo presentes como video conforme**.
+- `Setup-Portatil.ps1`: prepara PostgreSQL, instala dependencias, crea una clave **nueva local** sin mostrarla, migra la BD y genera ejemplos **ficticios**. Se puede repetir sin reiniciar la BD; no se debe usar en producción.
+- `Start-OriginPass.ps1`: reinicia la BD local y levanta Django solo en `127.0.0.1`. Requiere internet solo en el primer setup, salvo servicios externos voluntarios.
+
+## Narrativa breve y honesta
+OriginPass es un **MVP Django/PostgreSQL** para registrar pasaportes de productos y trazabilidad. Atiende empresas formales con revisión documental y talleres artesanales informales con evidencia de oficio y revisión humana. Puede aceptar ambos tipos, pero el QR o el registro no garantizan autenticidad física absoluta. Los ejemplos locales son ficticios. La conexión directa a **Monad** es trabajo futuro; no hay transacciones blockchain reales en el MVP. Como Product Owner, Emmanuel pidió imágenes editables, variedad y ambas rutas; ahora hay carga de una imagen por producto y siete ejemplos de cinco o más categorías. La galería de fotos, validación externa robusta y evidencia de usuarios reales siguen pendientes.
+
+## Rebuild when code or wiki changes
+
+From the development PC repository root (where the sibling folder `OriginPass-wiki` exists), run `python delivery/build_portable.py` and check `delivery/SHA256SUMS.txt`. The builder selects tracked source plus the explicitly required migration/photos, current wiki Markdown and the **unchanged** academic MP4; it refuses missing sources and checks each ZIP member against the input bytes. Copy the resulting ZIP to the laptop **again**. Do not assume an older ZIP includes later edits. If the wiki is not cloned beside the repo, clone `https://github.com/Pacha-e/OriginPass.wiki.git` as `OriginPass-wiki` first.
+
+## Pendientes de entrega (no fingir que están cerrados)
+La wiki D3 y el repo deben verificarse publicados antes de presentarlos; el backlog y el PNG del modelo requieren alineación, y el video público conforme queda pendiente de tu grabación al final. La bitácora reemplaza las actas de reunión de equipo **por indicación del profesor** y marca fechas sin evidencia. Emmanuel confirmó que **Interactiva no tiene actividad de entrega directa**: presentar el repositorio y la wiki en clase; no inventar comprobante de LMS. Publicar el kit en GitHub no implica que la instalación ya haya funcionado en el portátil.

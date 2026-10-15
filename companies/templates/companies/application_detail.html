@@ -71,6 +71,11 @@
       <dt>{% translate "Description" %}</dt>
       <dd>{{ company.description|linebreaksbr }}</dd>
 
+      {% if company.evidence_notes %}
+        <dt>{% translate "Evidence of the craft" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "What you told the reviewer about how you work. Only the review team reads this; it is never published." %}</span></details></dt>
+        <dd>{{ company.evidence_notes|linebreaksbr }}</dd>
+      {% endif %}
+
       <dt>{% translate "Last status change" %}</dt>
       <dd>{{ company.status_changed_at|date:"j F Y, H:i" }}</dd>
     </dl>

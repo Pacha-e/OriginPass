@@ -21,6 +21,30 @@ def home(request):
 #: named here, on a page linked from every page.
 PHOTO_CREDITS = [
     {
+        "image": "img/demo/bolso-textil-demo.jpg",
+        "subject": "Bolso textil (imagen ilustrativa de demo; no prueba su origen)",
+        "author": "Daragang Nagueña",
+        "licence": "CC BY 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by/4.0",
+        "source": "https://commons.wikimedia.org/wiki/File:Cebu_Tote_Bag.jpg",
+    },
+    {
+        "image": "img/demo/estuche-demo.jpg",
+        "subject": "Estuche textil (imagen ilustrativa de demo)",
+        "author": "Xjaja~commonswiki (atribución atribuida por Commons)",
+        "licence": "Public domain",
+        "licence_url": "",
+        "source": "https://commons.wikimedia.org/wiki/File:Pencil_case.jpg",
+    },
+    {
+        "image": "img/demo/cesteria-demo.jpg",
+        "subject": "Cestería de Yemen (imagen ilustrativa de demo, no de Usiacurí)",
+        "author": "Davidbena",
+        "licence": "CC0",
+        "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "source": "https://commons.wikimedia.org/wiki/File:Woven_basket_-_rush_and_palm_fronds.jpg",
+    },
+    {
         "image": "img/crafts/sombrero.jpg",
         "subject": "Sombrero vueltiao",
         "author": "Hurluberlue",

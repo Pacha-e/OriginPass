@@ -18,9 +18,7 @@ with no export step needed to read it.
 docker run --rm -v "$PWD/docs/diagrams:/data" rlespinasse/drawio-export -f png --scale 2
 ```
 
-The wiki does not use them: it links the `.drawio` sources, so that what a reader opens is
-the file this repository versions rather than a picture of it that can fall behind. They
-exist for slides and for anywhere a link will not do.
+The wiki links the editable `.drawio` sources and, for the Sprint 3 data model, the matching PNG export so the added company fields are visible without draw.io. Reexport a PNG whenever its source changes.
 
 Every version and every column name in these diagrams was read from what is installed
 and running rather than from the plan: `pip list` and the image tags in

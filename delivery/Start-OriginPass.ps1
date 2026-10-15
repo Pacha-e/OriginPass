@@ -1,6 +1,9 @@
 $ErrorActionPreference = 'Stop'
+# The app sits in app\ beside this script inside the extracted ZIP, and one
+# folder up when the script runs from delivery\ in a clone of the repository.
 $root = Join-Path $PSScriptRoot 'app'
-if (-not (Test-Path (Join-Path $root '.venv\Scripts\python.exe')) -or -not (Test-Path (Join-Path $root '.env'))) { throw 'Primero ejecuta .\Setup-Portatil.ps1 en esta carpeta.' }
+if (-not (Test-Path (Join-Path $root 'manage.py'))) { $root = Split-Path $PSScriptRoot -Parent }
+if (-not (Test-Path (Join-Path $root '.venv\Scripts\python.exe')) -or -not (Test-Path (Join-Path $root '.env'))) { throw 'Primero ejecuta Setup-Portatil.ps1, en la misma carpeta que este script.' }
 Set-Location $root
 & docker compose up -d db
 if ($LASTEXITCODE -ne 0) { throw 'Abre Docker Desktop e inicia PostgreSQL.' }

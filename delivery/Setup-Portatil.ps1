@@ -1,6 +1,9 @@
 $ErrorActionPreference = 'Stop'
+# The app sits in app\ beside this script inside the extracted ZIP, and one
+# folder up when the script runs from delivery\ in a clone of the repository.
 $root = Join-Path $PSScriptRoot 'app'
-if (-not (Test-Path (Join-Path $root 'manage.py'))) { throw 'No se encontro app/manage.py; extrae TODO el ZIP primero.' }
+if (-not (Test-Path (Join-Path $root 'manage.py'))) { $root = Split-Path $PSScriptRoot -Parent }
+if (-not (Test-Path (Join-Path $root 'manage.py'))) { throw 'No se encontro manage.py: extrae TODO el ZIP, o ejecuta este script desde delivery\ dentro del repositorio clonado.' }
 Set-Location $root
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { throw 'Instala/inicia Docker Desktop, habilita Linux containers y repite este script.' }
 & docker info --format '{{.ServerVersion}}' | Out-Null
@@ -33,4 +36,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallo la carga de datos DEMO; NO la ejecutes e
 if ($LASTEXITCODE -ne 0) { throw 'Django check fallo.' }
 & $python manage.py verify_integrity
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las cadenas de integridad.' }
-Write-Host 'Preparacion local terminada. Para presentar: .\Start-OriginPass.ps1 desde la carpeta extraida.'
+Write-Host 'Preparacion local terminada. Para presentar: Start-OriginPass.ps1, en la misma carpeta que este script.'

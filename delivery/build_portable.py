@@ -11,13 +11,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DELIVERY = ROOT / "delivery"
 WIKI = ROOT.parent / "OriginPass-wiki"
-VIDEO = ROOT / "tools/video/build/OriginPass-Entrega-3.mp4"
+#: What is presented besides the application: the deck, its script and the
+#: silent walkthrough of the new features. All three are built, not committed.
+PRESENTATION = {
+    "OriginPass-Entrega-3-presentacion.pdf": ROOT / "tools/presentation/build",
+    "OriginPass-Entrega-3-guion.md": ROOT / "tools/presentation/build",
+    "OriginPass-Entrega-3-recorrido.mp4": ROOT / "tools/video/build",
+}
 ZIP = DELIVERY / "OriginPass-Portatil.zip"
 DEMO_PHOTOS = ("bolso-textil-demo", "estuche-demo", "cesteria-demo")
 
 
 def main() -> int:
-    for required in (WIKI / "Deliverable-3.md", WIKI / "Daily-Log.md", VIDEO):
+    presentation = [folder / name for name, folder in PRESENTATION.items()]
+    for required in (WIKI / "Deliverable-3.md", WIKI / "Daily-Log.md", *presentation):
         if not required.is_file():
             print(f"Missing required source: {required}", file=sys.stderr)
             return 1
@@ -48,7 +55,8 @@ def main() -> int:
         sources[name] = DELIVERY / name
     for page in WIKI.glob("*.md"):
         sources[f"wiki/{page.name}"] = page
-    sources["video/OriginPass-Entrega-3.mp4"] = VIDEO
+    for name, folder in PRESENTATION.items():
+        sources[f"presentacion/{name}"] = folder / name
     with zipfile.ZipFile(ZIP, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as bundle:
         for target, source in sorted(sources.items()):
             bundle.write(source, target)

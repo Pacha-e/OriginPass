@@ -73,7 +73,8 @@ def main():
             print(f"\n{label} failed")
             return code
 
-    name = f"OriginPass-Entrega-{'1' if edition == 'd1' else '3'}{'-preview' if preview else ''}.mp4"
+    number = "1" if edition == "d1" else "3"
+    name = f"OriginPass-Entrega-{number}{'-preview' if preview else ''}.mp4"
     print(f"\nDone. tools/video/build/{name}")
     return 0
 

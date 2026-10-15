@@ -19,6 +19,8 @@ select = [
 # lines are Spanish prose, and breaking a sentence to satisfy a column limit
 # makes the text harder to read and to edit than leaving it whole.
 "tools/video/script.py" = ["E501"]
+"tools/video/script_d1.py" = ["E501"]
+"tools/video/script_d3.py" = ["E501"]
 
 [tool.ruff.lint.isort]
 known-first-party = [

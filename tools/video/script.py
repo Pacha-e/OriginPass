@@ -19,6 +19,4 @@ if _edition == "d1":
 elif _edition == "d3":
     from script_d3 import GAP, RATE, SECTIONS, VOICE  # noqa: F401
 else:
-    raise SystemExit(
-        f"VIDEO_SCRIPT={_edition!r} is not an edition. Use 'd1' or 'd3'."
-    )
+    raise SystemExit(f"VIDEO_SCRIPT={_edition!r} is not an edition. Use 'd1' or 'd3'.")

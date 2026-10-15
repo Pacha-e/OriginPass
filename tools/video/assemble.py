@@ -94,8 +94,6 @@ def load_timing(silent):
 
 
 def main():
-    import os
-
     silent = "--silent" in sys.argv
     timing = load_timing(silent)
 

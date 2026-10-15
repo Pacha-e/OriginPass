@@ -13,6 +13,7 @@ DELIVERY = ROOT / "delivery"
 WIKI = ROOT.parent / "OriginPass-wiki"
 VIDEO = ROOT / "tools/video/build/OriginPass-Entrega-3.mp4"
 ZIP = DELIVERY / "OriginPass-Portatil.zip"
+DEMO_PHOTOS = ("bolso-textil-demo", "estuche-demo", "cesteria-demo")
 
 
 def main() -> int:
@@ -27,7 +28,7 @@ def main() -> int:
     # Files selected explicitly before their first commit; never sweep all untracked files.
     extra = [Path("companies/migrations/0002_company_evidence_notes_company_publish_consent.py")]
     for prefix in ("companies/management/commands/demo_photos", "static/img/demo"):
-        extra.extend(Path(prefix) / f"{name}.jpg" for name in ("bolso-textil-demo", "estuche-demo", "cesteria-demo"))
+        extra.extend(Path(prefix) / f"{name}.jpg" for name in DEMO_PHOTOS)
     sources: dict[str, Path] = {}
     for relative in tracked + extra:
         parts = relative.parts

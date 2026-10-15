@@ -51,7 +51,10 @@ APPLICATIONS = [
         "description": "Taller informal de demostración que teje cestas en palma de iraca.",
         "location": "Usiacurí, Atlántico",
         "website": "",
-        "evidence_notes": "Demo: proceso documentado de tejido, materiales y referencia local; no es una verificación real.",
+        "evidence_notes": (
+            "Demo: proceso documentado de tejido, materiales y referencia local; "
+            "no es una verificación real."
+        ),
         "outcome": "approve",
     },
     {
@@ -141,7 +144,10 @@ PASSPORTS = [
     {
         "owner_email": "contacto@textilesmedellin.example",
         "name": "Bolso textil demostrativo",
-        "description": "Ejemplo ficticio de empresa formal. Foto ilustrativa de otra bolsa; no acredita fabricación ni procedencia.",
+        "description": (
+            "Ejemplo ficticio de empresa formal. Foto ilustrativa de otra bolsa; "
+            "no acredita fabricación ni procedencia."
+        ),
         "category": "Accesorios",
         "origin": "Medellín, Antioquia",
         "scans": 3,
@@ -150,7 +156,10 @@ PASSPORTS = [
     {
         "owner_email": "contacto@textilesmedellin.example",
         "name": "Estuche textil demostrativo",
-        "description": "Ejemplo ficticio de estuche de tela. Foto ilustrativa, no prueba materiales reciclados ni origen.",
+        "description": (
+            "Ejemplo ficticio de estuche de tela. Foto ilustrativa, "
+            "no prueba materiales reciclados ni origen."
+        ),
         "category": "Estuches",
         "origin": "Medellín, Antioquia",
         "scans": 2,
@@ -159,7 +168,10 @@ PASSPORTS = [
     {
         "owner_email": "taller@cesteriausiacuri.example",
         "name": "Bandeja tejida demostrativa",
-        "description": "Cestería ilustrativa; la foto muestra otra pieza de Yemen, no acredita origen Usiacurí ni autenticidad física.",
+        "description": (
+            "Cestería ilustrativa; la foto muestra otra pieza de Yemen, "
+            "no acredita origen Usiacurí ni autenticidad física."
+        ),
         "category": "Cestería",
         "origin": "Usiacurí, Atlántico (ejemplo ficticio)",
         "scans": 2,

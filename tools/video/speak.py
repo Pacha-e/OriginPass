@@ -1,4 +1,3 @@
-
 """Generate the Spanish narration for the Deliverable 3 video with edge-tts.
 
 A stopgap so the video can be assembled and reviewed end to end today:

@@ -149,9 +149,7 @@ def main():
 
         # The public page link carries the passport code; reading it from the
         # page keeps Django's ORM out of Playwright's async context.
-        verify_url = (
-            page.locator("a", has_text="Ver la página pública").first.get_attribute("href")
-        )
+        verify_url = page.locator("a", has_text="Ver la página pública").first.get_attribute("href")
         if verify_url and verify_url.startswith("/"):
             verify_url = f"{BASE}{verify_url}"
 

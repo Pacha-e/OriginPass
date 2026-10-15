@@ -10,7 +10,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 
-from companies.models import Company, CompanyStatus
+from companies.models import Company, CompanyStatus, CompanyType
 from products.models import PRODUCT_TYPE_BY_COMPANY_TYPE, Product, ProductStatus
 from verification.models import ScanEvent
 
@@ -48,6 +48,15 @@ class SeedDemoPassportsTests(TestCase):
 
     def setUp(self):
         call_command("seed_demo", stdout=StringIO())
+
+    def test_demonstrates_formal_and_informal_issuers_with_varied_products(self):
+        issuers = Company.objects.filter(products__isnull=False).distinct()
+        self.assertEqual(
+            set(issuers.values_list("company_type", flat=True)),
+            {CompanyType.COMMERCIAL, CompanyType.ARTISAN},
+        )
+        self.assertGreaterEqual(Product.objects.values("category").distinct().count(), 5)
+        self.assertGreaterEqual(Product.objects.count(), 7)
 
     def test_it_issues_passports(self):
         self.assertGreater(Product.objects.count(), 0)

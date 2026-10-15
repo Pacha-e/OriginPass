@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Custody" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Custody" %}</h1>
+    <p>{% translate "The pieces in your hands, the ones offered to you and the ones you are handing over." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <span class="tip">
+      <a class="btn btn--primary" href="{% url 'products:transfer_claim' %}" aria-describedby="tip-claim">{% translate "Claim a piece with its codes" %}</a>
+      <span class="tip__text" id="tip-claim" role="tooltip">{% translate "If you bought a product and the seller gave you a transfer code, put it in your name here." %}</span>
+    </span>
+  </div>
+</div>
+
+{% if incoming %}
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Waiting for your answer" %}</h2>
+      <p>{% translate "Accepting adds you to the public journey of the piece." %}</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate "Product" %}</th>
+            <th>{% translate "Offered by" %}</th>
+            <th>{% translate "Offered on" %}</th>
+            <th><span class="visually-hidden">{% translate "Answer" %}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in incoming %}
+            <tr>
+              <td>{{ transfer.product.name }}</td>
+              <td>{{ transfer.from_holder.email }}</td>
+              <td class="muted">{{ transfer.created_at|date:"j M Y, H:i" }}</td>
+              <td>
+                <span class="tip">
+                  <a class="btn btn--primary" href="{% url 'products:transfer_respond' transfer.pk %}" aria-describedby="tip-answer-{{ forloop.counter }}">{% translate "Answer" %}</a>
+                  <span class="tip__text" id="tip-answer-{{ forloop.counter }}" role="tooltip">{% translate "See the product and choose whether to receive it." %}</span>
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "In your hands" %}</h2>
+    <p>{% translate "The pieces whose current holder is your account." %}</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{% translate "Product" %}</th>
+          <th>{% translate "Made by" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th><span class="visually-hidden">{% translate "Actions" %}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in held %}
+          <tr>
+            <td>
+              <a class="cell-product" href="{% url 'verification:verify' product.passport_code %}">
+                {% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="" width="56" height="56" loading="lazy">{% else %}<span class="thumb" aria-hidden="true"></span>{% endif %}
+                {{ product.name }}
+              </a>
+            </td>
+            <td class="muted">{{ product.company.legal_name }}</td>
+            <td><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></td>
+            <td>
+              {% if product.status == "ACTIVE" %}
+                <span class="tip">
+                  <a class="btn" href="{% url 'products:transfer_initiate' product.pk %}" aria-describedby="tip-give-{{ forloop.counter }}">{% translate "Transfer" %}</a>
+                  <span class="tip__text" id="tip-give-{{ forloop.counter }}" role="tooltip">{% translate "Hand this product to another person or business: a distributor, a shop or the buyer." %}</span>
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="table-empty">{% translate "You hold no pieces yet. When someone transfers one to you, it appears here." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "You are offering" %}</h2>
+    <p>{% translate "Give the transfer code to the buyer in person. Nobody else sees it." %}</p>
+  </div>
+  {% if outgoing %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate "Product" %}</th>
+            <th>{% translate "To" %}</th>
+            <th>{% translate "Transfer code" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "A secret code for this handover only. Whoever receives the product types it with the passport code, and the product goes to their name." %}</span></details></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in outgoing %}
+            <tr>
+              <td>{{ transfer.product.name }}</td>
+              <td>{{ transfer.to_holder.email }}</td>
+              <td><span class="code-chip">{{ transfer.transfer_code }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">{% translate "You have no open offers." %}</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% load i18n %}{% translate "Hello," %}
+
+{% blocktranslate trimmed %}The application for {{ company_name }} is now: {{ status }}.{% endblocktranslate %}
+{% if reason %}
+{% blocktranslate trimmed %}Reason recorded: {{ reason }}{% endblocktranslate %}
+{% endif %}
+{% translate "Log in to OriginPass to see your application." %}

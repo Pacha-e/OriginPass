@@ -99,6 +99,20 @@ class Company(models.Model):
         blank=True,
         help_text=_("Why the application was rejected or the company suspended (DBR12)."),
     )
+    evidence_notes = models.TextField(
+        blank=True,
+        help_text=_(
+            "Evidence of the craft offered for a manual artisan review: process, "
+            "materials, workspace, references (FR09)."
+        ),
+    )
+    publish_consent = models.BooleanField(
+        default=False,
+        help_text=_(
+            "The applicant agrees to the approved company's name, location and "
+            "description being shown on a public profile (FR18)."
+        ),
+    )
     submitted_at = models.DateTimeField(auto_now_add=True)
     status_changed_at = models.DateTimeField(default=timezone.now)
 

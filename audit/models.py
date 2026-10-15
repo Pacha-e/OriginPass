@@ -14,21 +14,22 @@ See `audit/integrity.py`.
 from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from .integrity import GENESIS, sign, verify_chain
 
 
 class Action(models.TextChoices):
-    COMPANY_SUBMITTED = "COMPANY_SUBMITTED", "Company application submitted"
-    COMPANY_RESUBMITTED = "COMPANY_RESUBMITTED", "Company application resubmitted"
-    COMPANY_APPROVED = "COMPANY_APPROVED", "Company approved"
-    COMPANY_REJECTED = "COMPANY_REJECTED", "Company rejected"
-    COMPANY_SUSPENDED = "COMPANY_SUSPENDED", "Company suspended"
-    COMPANY_REACTIVATED = "COMPANY_REACTIVATED", "Company reactivated"
-    PRODUCT_REGISTERED = "PRODUCT_REGISTERED", "Product registered"
-    PRODUCT_REVOKED = "PRODUCT_REVOKED", "Product revoked"
-    CUSTODY_ACCEPTED = "CUSTODY_ACCEPTED", "Custody transfer accepted"
-    CUSTODY_DECLINED = "CUSTODY_DECLINED", "Custody transfer declined"
+    COMPANY_SUBMITTED = "COMPANY_SUBMITTED", _("Company application submitted")
+    COMPANY_RESUBMITTED = "COMPANY_RESUBMITTED", _("Company application resubmitted")
+    COMPANY_APPROVED = "COMPANY_APPROVED", _("Company approved")
+    COMPANY_REJECTED = "COMPANY_REJECTED", _("Company rejected")
+    COMPANY_SUSPENDED = "COMPANY_SUSPENDED", _("Company suspended")
+    COMPANY_REACTIVATED = "COMPANY_REACTIVATED", _("Company reactivated")
+    PRODUCT_REGISTERED = "PRODUCT_REGISTERED", _("Product registered")
+    PRODUCT_REVOKED = "PRODUCT_REVOKED", _("Product revoked")
+    CUSTODY_ACCEPTED = "CUSTODY_ACCEPTED", _("Custody transfer accepted")
+    CUSTODY_DECLINED = "CUSTODY_DECLINED", _("Custody transfer declined")
 
 
 class AuditEntry(models.Model):

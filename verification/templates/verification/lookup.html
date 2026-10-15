@@ -4,8 +4,8 @@
 {% block title %}{% translate "Verify a product" %} — OriginPass{% endblock %}
 
 {% block content %}
-<div class="card card--narrow">
-  <div class="card__head">
+<div class="page-head">
+  <div>
     <h1>{% translate "Verify a product" %}</h1>
     <p>
       {% blocktranslate trimmed %}
@@ -14,15 +14,18 @@
       {% endblocktranslate %}
     </p>
   </div>
+</div>
 
-  <form method="get" action="{% url 'verification:lookup' %}">
-    <div class="field-row">
-      <label for="code">{% translate "Passport code" %}</label>
-      <input type="text" id="code" name="code" autocomplete="off" required>
-    </div>
-    <div class="form-actions">
+<div class="lookup">
+  <div>
+    <form class="verify-box" method="get" action="{% url 'verification:lookup' %}" role="search">
+      <label class="visually-hidden" for="code">{% translate "Passport code" %}</label>
+      <input type="text" id="code" name="code" autocomplete="off" spellcheck="false" maxlength="64" required placeholder="{% translate 'Type the code under the QR' %}">
       <button type="submit" class="btn btn--primary">{% translate "Check this code" %}</button>
-    </div>
-  </form>
+    </form>
+    <p class="faint">{% translate "The code is the line of letters and digits printed under the QR on the label." %}</p>
+    <p class="muted">{% translate "You will see one of three answers: Genuine, Revoked or Not found, with what each one means." %}</p>
+  </div>
+  {% include "partials/label_hint.html" %}
 </div>
 {% endblock %}

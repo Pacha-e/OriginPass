@@ -3,8 +3,13 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
-from django.test import TestCase
+import io
+import tempfile
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from products.models import ProductStatus
 from test_support.factories import OWNER_PASSWORD, make_admin, make_approved_company, make_product
@@ -87,6 +92,32 @@ class ProductEditTests(TestCase):
         self.company = make_approved_company(email="weaver@tuchin.co")
         self.product = make_product(self.company, **VALID_PRODUCT)
         self.client.login(email="weaver@tuchin.co", password=OWNER_PASSWORD)
+
+    def test_owner_can_add_a_photo_after_registration_and_public_sees_it(self):
+        original_code = self.product.passport_code
+        picture = io.BytesIO()
+        Image.new("RGB", (16, 16), "#b98052").save(picture, format="PNG")
+        picture.seek(0)
+
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(
+                reverse("products:product_edit", args=[self.product.pk]),
+                {
+                    **VALID_PRODUCT,
+                    "image": SimpleUploadedFile(
+                        "woven-piece.png", picture.read(), content_type="image/png"
+                    ),
+                },
+            )
+            self.assertEqual(response.status_code, 302)
+            self.product.refresh_from_db()
+            self.assertEqual(self.product.passport_code, original_code)
+            self.assertTrue(self.product.image.name.startswith("product-images/"))
+            self.assertTrue(self.product.image.storage.exists(self.product.image.name))
+            public = self.client.get(
+                reverse("verification:verify", args=[self.product.passport_code])
+            )
+            self.assertContains(public, self.product.image.url)
 
     def test_editing_changes_the_description_and_keeps_the_code(self):
         original_code = self.product.passport_code

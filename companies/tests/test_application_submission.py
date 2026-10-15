@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from accounts.models import Role
 from companies.models import Company, CompanyStatus, VerificationTrack
-from test_support.factories import make_company, make_user
+from test_support.factories import make_admin, make_company, make_user
 from test_support.timing import measure
 
 from .payloads import ARTISAN_APPLICATION, COMMERCIAL_APPLICATION
@@ -131,3 +131,62 @@ class ArtisanApplicationTests(TestCase):
 
         self.assertIn("registry_code", response.context["form"].errors)
         self.assertFalse(Company.objects.exists())
+
+
+class ArtisanEvidenceTests(TestCase):
+    """FR09 - a manual review needs something to review, and a public profile
+    needs the applicant's consent."""
+
+    def setUp(self):
+        self.owner = make_user()
+        self.client.force_login(self.owner)
+
+    def test_the_form_captures_evidence_and_consent(self):
+        response = self.client.get(reverse("companies:application_create"))
+
+        for field in ["evidence_notes", "publish_consent"]:
+            self.assertIn(field, response.context["form"].fields)
+
+    def test_an_artisan_application_without_evidence_is_refused(self):
+        payload = ARTISAN_APPLICATION | {"evidence_notes": "   "}
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("evidence_notes", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_an_artisan_application_without_consent_is_refused(self):
+        payload = {
+            key: value for key, value in ARTISAN_APPLICATION.items() if key != "publish_consent"
+        }
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("publish_consent", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_a_commercial_application_without_consent_is_refused(self):
+        payload = {
+            key: value for key, value in COMMERCIAL_APPLICATION.items() if key != "publish_consent"
+        }
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("publish_consent", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_evidence_and_consent_are_stored(self):
+        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
+
+        company = Company.objects.get(owner=self.owner)
+        self.assertEqual(company.evidence_notes, ARTISAN_APPLICATION["evidence_notes"])
+        self.assertTrue(company.publish_consent)
+
+    def test_the_reviewer_sees_the_evidence(self):
+        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
+        company = Company.objects.get(owner=self.owner)
+
+        self.client.force_login(make_admin())
+        response = self.client.get(reverse("companies:review_detail", args=[company.pk]))
+
+        self.assertContains(response, ARTISAN_APPLICATION["evidence_notes"])

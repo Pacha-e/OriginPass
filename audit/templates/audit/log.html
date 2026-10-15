@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Audit log" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Audit log" %}</h1>
+    <p>{% translate "Every change of status of a company or a passport, signed and linked to the one before it." %}</p>
+  </div>
+</div>
+
+{# FR45: whether the trail is still as it was written, over all entries, not only these. #}
+{% if chain_intact %}
+  <div class="notice notice--ok">
+    <p class="notice__title">{% blocktranslate trimmed count total=total %}The signed chain is intact: {{ total }} entry checked.{% plural %}The signed chain is intact: {{ total }} entries checked.{% endblocktranslate %}</p>
+    <p>{% translate "No entry was edited or removed since it was written." %}</p>
+  </div>
+{% else %}
+  <div class="notice notice--danger">
+    <p class="notice__title">{% translate "The signed chain is broken" %}</p>
+    <p>{{ chain_problem }}</p>
+  </div>
+{% endif %}
+
+{# FR44: filter by actor, action and date range. #}
+<form class="card spaced" method="get">
+  {% for error in form.non_field_errors %}
+    <div class="form-error" role="alert">{{ error }}</div>
+  {% endfor %}
+  <div class="filter-grid">
+    {% include "partials/field.html" with field=form.actor %}
+    {% include "partials/field.html" with field=form.action %}
+    {% include "partials/field.html" with field=form.since %}
+    {% include "partials/field.html" with field=form.until %}
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn--primary">{% translate "Filter" %}</button>
+    <a class="btn btn--link" href="{% url 'audit:log' %}">{% translate "Clear" %}</a>
+  </div>
+</form>
+
+<div class="table-wrap spaced">
+  <table>
+    <thead>
+      <tr>
+        <th>{% translate "When" %}</th>
+        <th>{% translate "Actor" %}</th>
+        <th>{% translate "Action" %}</th>
+        <th>{% translate "Record" %}</th>
+        <th>{% translate "Reason" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in page %}
+        <tr>
+          <td class="muted">{{ entry.created_at|date:"j M Y, H:i" }}</td>
+          <td>{{ entry.actor.email }}</td>
+          <td>{{ entry.get_action_display }}</td>
+          <td class="mono">{{ entry.target_type }} #{{ entry.target_id }}</td>
+          <td>{{ entry.reason|default:"—" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="table-empty">{% translate "No entries match these filters." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if page.has_other_pages %}
+  <nav class="action-bar" aria-label="{% translate 'Pages' %}">
+    {% if page.has_previous %}<a class="btn" href="?{{ query }}{% if query %}&amp;{% endif %}page={{ page.previous_page_number }}">{% translate "Newer" %}</a>{% endif %}
+    <span class="muted">{% blocktranslate trimmed with number=page.number pages=page.paginator.num_pages %}Page {{ number }} of {{ pages }}{% endblocktranslate %}</span>
+    {% if page.has_next %}<a class="btn" href="?{{ query }}{% if query %}&amp;{% endif %}page={{ page.next_page_number }}">{% translate "Older" %}</a>{% endif %}
+  </nav>
+{% endif %}
+{% endblock %}

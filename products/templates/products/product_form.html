@@ -22,11 +22,19 @@
     </p>
   </div>
 
+  {% if not product %}
+    <ol class="mini-steps">
+      <li>{% translate "Write what the product is and where it was made." %}</li>
+      <li>{% translate "Add a photo, if you have one." %}</li>
+      <li>{% translate "Press Issue the passport: you get its code and its QR to print." %}</li>
+    </ol>
+  {% endif %}
+
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
 
     {% for error in form.non_field_errors %}
-      <div class="form-error">{{ error }}</div>
+      <div class="form-error" role="alert">{{ error }}</div>
     {% endfor %}
 
     {% include "partials/field.html" with field=form.name %}
@@ -36,9 +44,14 @@
     {% include "partials/field.html" with field=form.image %}
 
     <div class="form-actions">
-      <button type="submit" class="btn btn--primary">
-        {% if product %}{% translate "Save changes" %}{% else %}{% translate "Issue the passport" %}{% endif %}
-      </button>
+      <span class="tip tip--start">
+        <button type="submit" class="btn btn--primary" aria-describedby="tip-save">
+          {% if product %}{% translate "Save changes" %}{% else %}{% translate "Issue the passport" %}{% endif %}
+        </button>
+        <span class="tip__text" id="tip-save" role="tooltip">
+          {% if product %}{% translate "Saves the new name, description or photo. The code stays the same." %}{% else %}{% translate "Creates the passport with its own code and QR. You can download the QR right after." %}{% endif %}
+        </span>
+      </span>
       <a class="btn" href="{% if product %}{% url 'products:product_detail' product.pk %}{% else %}{% url 'products:product_list' %}{% endif %}">{% translate "Cancel" %}</a>
     </div>
   </form>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% translate "Photo credits" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Photo credits" %}</h1>
+    <p>{% translate "The photographs on this site come from Wikimedia Commons, under licences that allow showing them as long as their author is named." %}</p>
+  </div>
+</div>
+
+<div class="card">
+  <ul class="credits">
+    {% for credit in credits %}
+      <li>
+        <img src="{% static credit.image %}" alt="{{ credit.subject }}" width="96" height="96" loading="lazy">
+        <div>
+          <strong>{{ credit.subject }}</strong><br>
+          {% translate "Photo by" %} {{ credit.author }} ·
+          {% if credit.licence_url %}<a href="{{ credit.licence_url }}" rel="license noopener">{{ credit.licence }}</a>{% else %}{{ credit.licence }}{% endif %} ·
+          <a href="{{ credit.source }}" rel="noopener">{% translate "Original on Wikimedia Commons" %}</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

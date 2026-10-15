@@ -12,11 +12,38 @@ Printed certificates can be photocopied. Brand-owned checkers only work for larg
 
 ## What OriginPass does
 
-- Verifies companies through two tracks: commercial companies with an official registry code, artisan workshops through manual review.
-- Issues one passport per product unit, identified by a code that cannot be guessed from other codes.
+- Verifies companies through two tracks: commercial companies with an official registry code, artisan workshops through manual review — an informal workshop without a NIT or chamber registration can apply with real evidence of the craft, and a person decides.
+- Issues one passport per product unit, identified by a code that cannot be guessed from other codes. The owner can upload or replace **one product image**, both at registration and when editing an already registered product; a gallery of several images is not implemented. Demo products use illustrative Commons photographs, not evidence that the depicted physical item came from the named fictitious company.
 - Publishes a verification page reachable by QR that any buyer can open without an account.
 - Records the chain of custody from the maker through distributors to the current owner.
 - Analyses verification scans to surface signs of QR cloning, such as one passport being scanned in distant places within a short window.
+
+## Scope: a working MVP today, Monad as the goal
+
+This repository holds a working MVP built on Django and PostgreSQL. It writes
+nothing to any blockchain. The product goal is to anchor the head of the
+integrity chain and the reviewer attestations directly on **Monad**, so that
+verification stops depending on trusting whoever runs this server. That step is
+architecture and roadmap, deliberately not implemented here — no simulated
+contract, no decorative testnet.
+
+Two limits a buyer should keep in mind:
+
+- The QR resolves a registry entry. A photocopied label resolves the same
+  passport, so the verdict certifies the state of the record, not by itself the
+  physical materiality of the piece — the piece still has to match its
+  photograph and description.
+- The passport is signed with a server-side key (HMAC over `SECRET_KEY`), not
+  with a key the workshop holds. "Signed" means tamper-evident, not a digital
+  signature controlled by the maker.
+
+## Portable presentation kit (Windows laptop)
+
+The ready-to-transfer archive `OriginPass-Portatil.zip` and its `SHA256SUMS.txt` are assets of the [portable kit release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-kit-portatil-2026-10-15); `python delivery/build_portable.py` rebuilds them from the tracked source. **Read [`delivery/LEEME-PORTATIL.md`](delivery/LEEME-PORTATIL.md) first** (also inside the ZIP); it gives prerequisites, exact PowerShell commands, local demo walkthrough and honest rubric limitations. The setup and launch scripts in `delivery/` run both from the extracted ZIP and from a clone of this repository. This archive contains the local Sprint 3 working-tree code and demo, **not** a live database, user uploads, a virtualenv or a personal signing key. A second laptop still needs a real first-run test; a desktop test is not proof of laptop readiness. If source changes after this snapshot, regenerate and verify the archive before presenting.
+
+**Separate promotional video:** the unchanged Andino Games 16:9 master is a [preliminary GitHub Release asset](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-promo-preliminar-2026-10-15) because its 121 MB size exceeds the normal Git object limit. See [`delivery/ANDINO-VIDEO.md`](delivery/ANDINO-VIDEO.md) and [`delivery/CREDITOS-Andino.md`](delivery/CREDITOS-Andino.md). It is **CC BY-SA 4.0, QA FAIL and not the academic video**; do not treat its older claims as implemented blockchain or proof of physical authenticity.
+
+Emmanuel reports no direct upload activity in Interactiva: the GitHub repository and wiki are the evidence to show in Thursday's 9:00 a.m. class presentation. The requested individual daily log replaces fictional meeting minutes; see the Wiki's `Daily-Log` page. Do not invent an LMS submission receipt.
 
 ## Documentation
 
@@ -57,8 +84,8 @@ python manage.py makemessages -l es    # collect the strings into the .po
 python manage.py compilemessages       # build the .mo Django serves
 ```
 
-Both need GNU gettext installed. The compiled `.mo` is a build artefact and is not
-committed; the `.po` is.
+Both need GNU gettext installed. The compiled `.mo` is committed beside the `.po`, so a
+fresh clone is served in Spanish without gettext; recompile it whenever the `.po` changes.
 
 ## Running the project locally
 
@@ -93,9 +120,22 @@ python manage.py seed_demo
 ```
 
 Five company applications, one in each status, and four passports issued by the two
-approved ones, with one revoked so that verdict can be shown and a history of scans
-behind them. It prints each passport's verification path, so the walkthrough does not
-need the codes to be looked up first.
+approved ones, with one revoked so that verdict can be shown and a month of scans from
+several regions behind them. One passport travels the whole chain of custody, from the
+workshop to a distributor to a private buyer, and carries a duplicate-scan alert; another
+has an open offer, so its transfer code can be shown. It prints each passport's
+verification path and the transfer code, so the walkthrough does not need them looked up.
+
+| Account | Role in the demo |
+|---|---|
+| `admin@originpass.co` | Platform administrator: overview, applications, audit log |
+| `taller@tuchin.co` | Approved artisan workshop: passports, analytics, custody |
+| `contacto@labonga.co` | Approved distributor: receives and passes on pieces |
+| `comprador@correo.co` | Private buyer with no company: holds a piece |
+| `info@mochilaswayuu.co` | Application still pending review |
+
+Running it again adds nothing that is already there, and brings the text of an older
+dataset up to date.
 
 The data goes through the same model rules the application does, so it cannot create a
 row the application would refuse: the product type is derived from the company rather
@@ -103,6 +143,14 @@ than written down, exactly as the registration view derives it.
 
 Every account it creates shares one known password, which it prints, so it refuses
 to run unless `DEBUG` is on.
+
+Two settings matter for a demo and default to what development needs:
+
+- Notification emails (FR53 to FR55, the password reset of FR06) are printed in the
+  console running the server. A deployment sets `EMAIL_BACKEND` to its SMTP service.
+- The region of a scan is read from the geolocation headers of a CDN only when
+  `TRUST_GEO_HEADERS` is on, which it is whenever `DEBUG` is. Behind no such proxy a
+  client writes those headers itself, so a deployment turns it on only behind one.
 
 Generate a secret key with:
 
@@ -140,7 +188,8 @@ OriginPass/
 ├── templates/        base template, shared partials and the error pages
 ├── test_support/     factories and helpers shared by the apps' test suites
 ├── locale/es/        the Spanish the interface is served in
-├── static/           the stylesheet and the favicon, written for this project
+├── static/           the stylesheet, the favicon and the brand marks
+├── docs/brand/       logo, slogan, palette and screenshots of the identity
 ├── docs/diagrams/    deployment, component and data models
 ├── tools/video/      builds the deliverable presentation video from a script
 ├── .github/workflows/ci.yml
@@ -172,9 +221,9 @@ failure, so it can be run on a schedule.
 
 This makes tampering by anyone holding **only the database** detectable. It does not cover
 whoever runs the server, who holds the key too. Closing that needs the head of the chain
-published somewhere the operator does not control, which is a Sprint 4 option. The
-reasoning, including why the records are not on a blockchain, is on the
-[Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) page.
+published somewhere the operator does not control; anchoring it on Monad is the product's
+roadmap goal (see the scope section above). The reasoning for keeping this MVP off-chain is
+on the [Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) page.
 
 Documentation is kept in the Wiki rather than in the repository, so that a single copy
 stays authoritative.
@@ -187,7 +236,19 @@ Sprint 2 delivers what the product exists to do: an approved company registers a
 gets a QR code for it, and any buyer scans that code and reads a verdict without an
 account. It also serves the whole interface in Spanish.
 
-Custody transfers and the analytics follow in later sprints; their tables already exist.
+Sprint 3 delivers the chain of custody and what the scans say. The current holder of a
+piece offers it to another account, which accepts or declines; a buyer can claim it at the
+point of sale with the passport code and a transfer code only the seller sees. The public
+page shows the journey of each piece without naming anyone by their email. A company sees
+its scans by day, region and product, compared with the period before, exports them as CSV
+and is alerted when one passport is scanned from two regions within a day. Logins lock
+after five failures in fifteen minutes, and scans are capped per address per hour.
+
+Sprint 4 work already in place: revocation by the company and by the administrator with
+a stored reason and an email to the holder, suspension and reactivation of a company, a
+public profile per approved company, password reset by email and the audit log filtered
+by actor, action and date. Bulk registration from CSV, the language switch and publishing
+the head of the integrity chain externally remain open.
 
 ## Licence
 

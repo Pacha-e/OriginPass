@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" role="img" aria-labelledby="t">
+  <title id="t">OriginPass</title>
+  <g transform="translate(8 8) scale(1.6667)" color="#1E2B58">
+    <rect x="5" y="5" width="8" height="38" rx="1.5" fill="#1E2B58"/>
+    <circle cx="26.5" cy="19" r="12" fill="none" stroke="#1E2B58" stroke-width="4.5"/>
+    <circle cx="26.5" cy="19" r="6.4" fill="none" stroke="#D9C28A" stroke-width="3" stroke-dasharray="3.1 1.6"/>
+    <circle cx="26.5" cy="19" r="2.4" fill="#1E2B58"/>
+  </g>
+  <text x="100" y="56" font-family="Bahnschrift, 'DIN Alternate', 'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="42" font-weight="600" letter-spacing="0.5" fill="#1E2B58">OriginPass</text>
+  <text x="101" y="80" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" fill="#565C6B">El origen no se imita.</text>
+</svg>

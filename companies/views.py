@@ -12,10 +12,11 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import admin_required
+from accounts.emails import notify_company_decision
 from accounts.models import Role
 from audit.models import Action, AuditEntry
 
-from .forms import CompanyApplicationForm, RejectionForm
+from .forms import CompanyApplicationForm, RejectionForm, SuspensionForm
 from .models import Company, CompanyStatus, TransitionNotAllowed
 
 # ---------------------------------------------------------------- owner side
@@ -130,7 +131,11 @@ def review_detail(request, pk):
     return render(
         request,
         "companies/review_detail.html",
-        {"company": company, "rejection_form": RejectionForm()},
+        {
+            "company": company,
+            "rejection_form": RejectionForm(),
+            "suspension_form": SuspensionForm(),
+        },
     )
 
 
@@ -150,6 +155,7 @@ def review_approve(request, pk):
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been approved.") % {"company": company})
+        notify_company_decision(company)
 
     return redirect("companies:review_detail", pk=company.pk)
 
@@ -175,5 +181,60 @@ def review_reject(request, pk):
         messages.error(request, str(refusal))
     else:
         messages.success(request, _("%(company)s has been rejected.") % {"company": company})
+        notify_company_decision(company)
 
     return redirect("companies:review_detail", pk=company.pk)
+
+
+@admin_required
+@require_POST
+def suspend_company(request, pk):
+    """FR15: an approved company stops issuing passports, with the reason stored."""
+    company = get_object_or_404(Company.objects.select_related("owner"), pk=pk)
+    form = SuspensionForm(request.POST)
+    if not form.is_valid():
+        return render(
+            request,
+            "companies/review_detail.html",
+            {"company": company, "rejection_form": RejectionForm(), "suspension_form": form},
+            status=400,
+        )
+    try:
+        company.suspend(actor=request.user, reason=form.cleaned_data["reason"])
+    except TransitionNotAllowed as refusal:
+        messages.error(request, str(refusal))
+    else:
+        messages.success(request, _("%(company)s has been suspended.") % {"company": company})
+    return redirect("companies:review_detail", pk=company.pk)
+
+
+@admin_required
+@require_POST
+def reactivate_company(request, pk):
+    """FR16: a suspended company is approved again and can issue passports."""
+    company = get_object_or_404(Company, pk=pk)
+    try:
+        company.reactivate(actor=request.user)
+    except TransitionNotAllowed as refusal:
+        messages.error(request, str(refusal))
+    else:
+        messages.success(request, _("%(company)s has been reactivated.") % {"company": company})
+    return redirect("companies:review_detail", pk=company.pk)
+
+
+# ------------------------------------------------------------- public side
+
+
+def public_profile(request, pk):
+    """FR18: an approved company's public page, reachable without an account.
+
+    Only approved companies have one: a pending or rejected application is not
+    something OriginPass vouches for, and a suspended company is not either.
+    """
+    company = get_object_or_404(Company.objects.filter(status=CompanyStatus.APPROVED), pk=pk)
+    products = company.products.filter(status="ACTIVE").order_by("name")
+    return render(
+        request,
+        "companies/public_profile.html",
+        {"company": company, "products": products},
+    )

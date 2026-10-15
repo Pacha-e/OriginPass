@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="OriginPass" version="24.7.17">
   <diagram name="Deployment model" id="originpass-deployment-model">
-    <mxGraphModel dx="1960" dy="1060" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1960" pageHeight="1060" math="0" shadow="0">
+    <mxGraphModel dx="1960" dy="1060" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1960" pageHeight="1200" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -89,10 +89,10 @@
 
         <!-- ================= database server ================= -->
         <mxCell id="dbserver" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;Database server&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;PostgreSQL 17&lt;/font&gt;" style="swimlane;html=1;startSize=64;align=center;verticalAlign=middle;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;collapsible=0;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="160" width="440" height="430" as="geometry" />
+          <mxGeometry x="1400" y="160" width="440" height="494" as="geometry" />
         </mxCell>
         <mxCell id="db" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;originpass&lt;/b&gt;&amp;nbsp; (database schema)" style="swimlane;html=1;startSize=42;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#d79b00;fontSize=13;collapsible=0;" vertex="1" parent="dbserver">
-          <mxGeometry x="24" y="76" width="392" height="336" as="geometry" />
+          <mxGeometry x="24" y="76" width="392" height="400" as="geometry" />
         </mxCell>
         <mxCell id="t1" value="accounts_user" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
           <mxGeometry x="16" y="52" width="360" height="28" as="geometry" />
@@ -112,13 +112,19 @@
         <mxCell id="t6" value="audit_auditentry" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="db">
           <mxGeometry x="16" y="212" width="360" height="28" as="geometry" />
         </mxCell>
+        <mxCell id="t7" value="accounts_loginattempt  —  FR57 lockout (Sprint 3)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="db">
+          <mxGeometry x="16" y="244" width="360" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t8" value="products_alert  —  FR49 duplicate scans (Sprint 3)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;align=left;spacingLeft=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="db">
+          <mxGeometry x="16" y="276" width="360" height="28" as="geometry" />
+        </mxCell>
         <mxCell id="dbnote" value="Five CHECK constraints hold the business rules in the database as well as in the application, so a rule survives a view that forgets it. Two UNIQUE constraints keep each chain of signed records linear, so no record can be the predecessor of two others. The data model draws all seven." style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=11;fontColor=#555555;" vertex="1" parent="db">
-          <mxGeometry x="16" y="252" width="360" height="70" as="geometry" />
+          <mxGeometry x="16" y="316" width="360" height="70" as="geometry" />
         </mxCell>
 
         <!-- ================= github ================= -->
         <mxCell id="github" value="&lt;i&gt;&amp;laquo;device&amp;raquo;&lt;/i&gt;&lt;br&gt;&lt;b&gt;GitHub&lt;/b&gt;&amp;nbsp; &lt;font style=&quot;font-size: 11px;&quot;&gt;(external service)&lt;/font&gt;" style="swimlane;html=1;startSize=52;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;collapsible=0;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="640" width="440" height="220" as="geometry" />
+          <mxGeometry x="1400" y="690" width="440" height="220" as="geometry" />
         </mxCell>
         <mxCell id="gh_repo" value="&lt;i&gt;&amp;laquo;artifact&amp;raquo;&lt;/i&gt;&amp;nbsp; &lt;b&gt;Pacha-e/OriginPass&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;source code, wiki and backlog&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;dashed=1;" vertex="1" parent="github">
           <mxGeometry x="24" y="66" width="392" height="48" as="geometry" />
@@ -128,7 +134,13 @@
         </mxCell>
 
         <!-- ================= connections ================= -->
-        <mxCell id="conn1" value="&amp;laquo;HTTPS&amp;raquo;&amp;nbsp; TLS 1.3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="phone" target="appserver">
+        <mxCell id="mail" value="&amp;laquo;device&amp;raquo;&lt;br&gt;&lt;b&gt;Mail service&lt;/b&gt;&amp;nbsp; &lt;font style=&quot;font-size: 11px;&quot;&gt;(external, Sprint 3)&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;any SMTP provider in a deployment&lt;br&gt;Django console backend in development&lt;br&gt;FR06 reset links · FR53 decisions · FR54 offers · FR55 revocations&lt;/font&gt;" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=12;align=center;verticalAlign=middle;fontSize=13;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="100" y="780" width="340" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="conn5" value="&amp;laquo;SMTP&amp;raquo;&amp;nbsp; STARTTLS, port 587" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;strokeColor=#d79b00;exitX=0;exitY=0.9;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="appserver" target="mail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn1" value="&amp;laquo;HTTPS&amp;raquo;&amp;nbsp; TLS 1.3&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;through an optional CDN that adds&lt;br&gt;CF-IPCountry / CF-Region (FR33, Sprint 3)&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="phone" target="appserver">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="conn2" value="&amp;laquo;HTTPS&amp;raquo;&amp;nbsp; TLS 1.3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;strokeWidth=3;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.72;entryDx=0;entryDy=0;" edge="1" parent="1" source="pc" target="appserver">
@@ -146,12 +158,12 @@
           <mxGeometry x="700" y="880" width="520" height="210" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend" value="&lt;b&gt;Colour of the components&lt;/b&gt;&lt;br&gt;&lt;br&gt;blue&amp;nbsp; —&amp;nbsp; delivered in Sprint 1&lt;br&gt;green&amp;nbsp; —&amp;nbsp; being built in Sprint 2&lt;br&gt;purple&amp;nbsp; —&amp;nbsp; model exists, views in Sprint 4" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=14;fillColor=none;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="890" width="440" height="120" as="geometry" />
+        <mxCell id="legend" value="&lt;b&gt;Colour of the components&lt;/b&gt;&lt;br&gt;&lt;br&gt;blue&amp;nbsp; —&amp;nbsp; delivered in Sprint 1&lt;br&gt;green&amp;nbsp; —&amp;nbsp; being built in Sprint 2&lt;br&gt;orange&amp;nbsp; —&amp;nbsp; added in Sprint 3: the mail service, two tables, the CDN headers&lt;br&gt;purple&amp;nbsp; —&amp;nbsp; model exists, views in Sprint 4" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=14;fillColor=none;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="940" width="440" height="140" as="geometry" />
         </mxCell>
 
-        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 2, section 1.1" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
-          <mxGeometry x="100" y="1120" width="800" height="20" as="geometry" />
+        <mxCell id="footer" value="ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel Hernández Melo · Deliverable 3, section 1.1" style="text;html=1;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1160" width="800" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

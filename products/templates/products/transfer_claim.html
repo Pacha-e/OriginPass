@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Claim a piece" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Claim a piece with its codes" %}</h1>
+    <p>
+      {% blocktranslate trimmed %}
+        At the sale, the seller gives you a transfer code. Together with the passport
+        code printed on the label, it proves the piece was handed to you.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  <div class="claim-hint">
+    {% include "partials/label_hint.html" %}
+    <p class="muted">{% translate "The passport code is printed under the QR, on the label. The transfer code is the one the seller gave you." %}</p>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+      <div class="form-error" role="alert">{{ error }}</div>
+    {% endfor %}
+    {% include "partials/field.html" with field=form.passport_code %}
+    {% include "partials/field.html" with field=form.transfer_code %}
+    <div class="form-actions">
+      <span class="tip tip--start">
+        <button type="submit" class="btn btn--primary" aria-describedby="tip-claim-send">{% translate "Claim the piece" %}</button>
+        <span class="tip__text" id="tip-claim-send" role="tooltip">{% translate "If both codes match, the product goes to your name right away." %}</span>
+      </span>
+      <a class="btn" href="{% url 'products:custody' %}">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

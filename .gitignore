@@ -57,7 +57,15 @@ course-material/
 # the slides and the rendered file are not, because they are large binaries
 # that can be rebuilt with `python tools/video/build.py`.
 tools/video/build/
+tools/video/hf-launch/
+tools/video/videos/
 *TEMP_MPY_*
+
+# The presentation kit is built from the tracked source by
+# `python delivery/build_portable.py` and carries the rendered video, so it is
+# published as a GitHub Release asset, like the video, rather than committed.
+delivery/OriginPass-Portatil.zip
+delivery/SHA256SUMS.txt
 
 # The narration recordings themselves. Audio files do not belong in a code
 # repository; the finished video is published elsewhere.

@@ -1,6 +1,7 @@
 # Diagrams
 
-The diagrams required by Deliverable 2. Each one is a draw.io file, editable at
+The diagrams required by Deliverables 2 and 3. What Sprint 3 changed is drawn in orange in
+each one, with its own legend entry, as Deliverable 3 asks the changes to be marked. Each one is a draw.io file, editable at
 [app.diagrams.net](https://app.diagrams.net) or in the draw.io desktop application,
 with no export step needed to read it.
 
@@ -8,7 +9,7 @@ with no export step needed to read it.
 |---|---|---|
 | `deployment-model.drawio` | 1.1 | The nodes the system runs on, the software installed on each one with its version, and the protocol between them |
 | `components-model.drawio` | 1.2 | One component per Django app, the functions each one provides, the dependencies between them, and the requirement each function implements |
-| `data-model.drawio` | 1.3 | The six tables, their columns and types, the foreign keys with their cardinality, and the check constraints |
+| `data-model.drawio` | 1.3 | The eight domain tables, their columns and types, the foreign keys with cardinality, and the check constraints |
 | `mockups.drawio` | 2 | The five views the Sprint 2 requirements are reflected in, each answering what the content groups are, where the information sits, and how the interface is used |
 
 `export/` holds a PNG of each diagram at twice its natural size, rebuilt with
@@ -17,9 +18,7 @@ with no export step needed to read it.
 docker run --rm -v "$PWD/docs/diagrams:/data" rlespinasse/drawio-export -f png --scale 2
 ```
 
-The wiki does not use them: it links the `.drawio` sources, so that what a reader opens is
-the file this repository versions rather than a picture of it that can fall behind. They
-exist for slides and for anywhere a link will not do.
+The wiki links the editable `.drawio` sources and, for the Sprint 3 data model, the matching PNG export so the added company fields are visible without draw.io. Reexport a PNG whenever its source changes.
 
 Every version and every column name in these diagrams was read from what is installed
 and running rather than from the plan: `pip list` and the image tags in

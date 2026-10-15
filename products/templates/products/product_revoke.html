@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Revoke a passport" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Revoke this passport" %}</h1>
+    <p>
+      {% blocktranslate trimmed with name=product.name code=product.passport_code %}
+        You are about to revoke {{ name }} ({{ code }}). Anyone who scans it from now on
+        reads Revoked, with the reason you write. This cannot be undone.
+      {% endblocktranslate %}
+    </p>
+    {% if by_admin %}
+      <p class="muted">
+        {% blocktranslate trimmed with company=product.company.legal_name %}
+          As administrator, on behalf of OriginPass. It was registered by {{ company }}.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="notice notice--warning">
+    <p>{% translate "Do this when the product was lost, stolen, damaged or copied. If you only want to give it to someone, use Transfer instead." %}</p>
+  </div>
+
+  <form method="post" class="spaced" novalidate>
+    {% csrf_token %}
+    {% include "partials/field.html" with field=form.reason %}
+    <div class="form-actions">
+      <span class="tip tip--start">
+        <button type="submit" class="btn btn--danger" aria-describedby="tip-confirm-revoke">{% translate "Revoke the passport" %}</button>
+        <span class="tip__text" id="tip-confirm-revoke" role="tooltip">{% translate "From now on its QR says Revoked. It cannot be undone." %}</span>
+      </span>
+      <a class="btn" href="{{ cancel_url }}">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

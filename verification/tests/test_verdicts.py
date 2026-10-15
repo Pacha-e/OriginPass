@@ -99,7 +99,7 @@ class RevokedVerdictTests(TestCase):
     def test_the_verdict_is_revoked(self):
         response = self.client.get(self.url)
 
-        self.assertContains(response, "Revocado")
+        self.assertContains(response, "Anulado")
         self.assertEqual(response.context["verdict"], Verdict.REVOKED)
 
     def test_the_date_of_the_revocation_is_shown(self):

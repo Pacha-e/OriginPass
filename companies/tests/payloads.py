@@ -15,6 +15,8 @@ COMMERCIAL_APPLICATION = {
     "description": "Distributor of certified crafts from Cordoba.",
     "location": "Monteria, Cordoba",
     "website": "https://labonga.co",
+    "evidence_notes": "",
+    "publish_consent": "on",
 }
 
 ARTISAN_APPLICATION = {
@@ -26,4 +28,9 @@ ARTISAN_APPLICATION = {
     "description": "Family workshop weaving sombrero vueltiao.",
     "location": "Tuchin, Cordoba",
     "website": "",
+    "evidence_notes": (
+        "Three generations weaving cana flecha; photos of the workshop and "
+        "the process, and the Asotuchin association can vouch for us."
+    ),
+    "publish_consent": "on",
 }

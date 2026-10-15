@@ -1,0 +1,5 @@
+{% load i18n %}{% translate "Hello," %}
+
+{% blocktranslate trimmed %}{{ sender }} is offering you custody of {{ product_name }}.{% endblocktranslate %}
+
+{% translate "Log in to OriginPass and open Custody to accept or decline it." %}

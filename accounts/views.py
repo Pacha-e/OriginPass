@@ -8,7 +8,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from .forms import LoginForm, RegistrationForm
+from .forms import AUTHENTICATION_ERROR, LoginForm, RegistrationForm
+from .models import LoginAttempt
 
 
 def _destination_after_login(request):
@@ -31,6 +32,17 @@ def _destination_after_login(request):
     return resolve_url(settings.LOGIN_REDIRECT_URL)
 
 
+def _client_ip(request):
+    """The address the request came from.
+
+    Django gives the last peer in REMOTE_ADDR. The X-Forwarded-For the
+    reverse proxy adds is not trusted here because nothing in the
+    development setup guarantees it came from a proxy we control; an
+    attacker who can set it can rotate past the per-IP streak.
+    """
+    return request.META.get("REMOTE_ADDR") or "0.0.0.0"
+
+
 def register(request):
     """FR01: a visitor creates an account with an email address and a password."""
     if request.user.is_authenticated:
@@ -49,15 +61,40 @@ def register(request):
 
 
 def log_in(request):
-    """FR03: a registered user logs in. FR04: one message for any bad credential."""
+    """FR03: a registered user logs in. FR04: one message for any bad credential.
+    FR57: after five failures in fifteen minutes from one IP for one email the
+    streak is locked for fifteen minutes, and the locked address still gets the
+    same message as a wrong password (FR04), so a crawler cannot tell a locked
+    account from one that does not exist.
+    """
     if request.user.is_authenticated:
         return redirect("pages:home")
 
     if request.method == "POST":
+        # Normalised and bounded here, before it reaches the table: the streak
+        # must not be dodged by changing the case of the address, and an address
+        # longer than the column would fail the insert instead of the login.
+        email = request.POST.get("email", "").strip().lower()[:254]
+        ip = _client_ip(request)
+
+        if email and LoginAttempt.is_locked_out(email, ip):
+            form = LoginForm(request, data=request.POST)
+            # The lock is not announced: the same error a wrong password would
+            # return is shown, so probing cannot enumerate accounts.
+            form.add_error(None, AUTHENTICATION_ERROR)
+            return render(
+                request,
+                "accounts/login.html",
+                {"form": form, "next": request.GET.get("next", "")},
+            )
+
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
+            LoginAttempt.clear(email, ip)
             login(request, form.get_user())
             return redirect(_destination_after_login(request))
+        if email:
+            LoginAttempt.record_failure(email, ip)
     else:
         form = LoginForm(request)
 

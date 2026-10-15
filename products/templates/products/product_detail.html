@@ -5,54 +5,120 @@
 
 {% block content %}
 <div class="page-head">
-  <h1>{{ product.name }}</h1>
-  <p><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></p>
-</div>
-
-<div class="card">
-  <div class="card__head">
-    <h2>{% translate "Passport" %}</h2>
-    <p>
-      {% blocktranslate trimmed %}
-        This code identifies one physical unit. It was generated from a
-        cryptographically secure source, so it cannot be worked out from another code.
-      {% endblocktranslate %}
-    </p>
+  <div>
+    <h1>{{ product.name }}</h1>
+    <p><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></p>
   </div>
-
-  <dl class="detail-list">
-    <dt>{% translate "Passport code" %}</dt><dd class="mono">{{ product.passport_code }}</dd>
-    <dt>{% translate "Type" %}</dt><dd>{{ product.get_product_type_display }}</dd>
-    <dt>{% translate "Category" %}</dt><dd>{{ product.category }}</dd>
-    <dt>{% translate "Place of manufacture" %}</dt><dd>{{ product.origin }}</dd>
-    <dt>{% translate "Registered" %}</dt><dd>{{ product.registered_at|date:"j F Y, H:i" }}</dd>
-    <dt>{% translate "Verification address" %}</dt>
-    <dd><a href="{{ verification_url }}">{{ verification_url }}</a></dd>
-  </dl>
-
-  <div class="form-actions">
-    {# FR22: the QR encodes the address above, downloadable as PNG. #}
-    <a class="btn btn--primary" href="{% url 'products:qr_download' product.pk %}">{% translate "Download the QR code" %}</a>
+  <div class="page-head__actions">
+    <span class="tip">
+      <a class="btn" href="{{ verification_url }}" aria-describedby="tip-public">{% translate "See the public page" %}</a>
+      <span class="tip__text" id="tip-public" role="tooltip">{% translate "What a buyer sees after scanning the QR of this product." %}</span>
+    </span>
     {% if product.status == "ACTIVE" %}
-      <a class="btn" href="{% url 'products:product_edit' product.pk %}">{% translate "Edit" %}</a>
+      <span class="tip">
+        <a class="btn" href="{% url 'products:product_edit' product.pk %}" aria-describedby="tip-edit">{% translate "Edit" %}</a>
+        <span class="tip__text" id="tip-edit" role="tooltip">{% translate "Correct the name, the description or the photo. The code does not change." %}</span>
+      </span>
     {% endif %}
-    <a class="btn btn--link" href="{% url 'products:product_list' %}">{% translate "Back to my products" %}</a>
   </div>
-</div>
-
-<div class="card">
-  <div class="card__head">
-    <h2>{% translate "Description" %}</h2>
-  </div>
-  <p>{{ product.description|linebreaksbr }}</p>
-  {% if product.image %}
-    <p><img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}"></p>
-  {% endif %}
 </div>
 
 {% if product.status == "REVOKED" %}
   <div class="notice notice--danger">
-    <p><strong>{% translate "This passport was revoked." %}</strong> {{ product.revocation_reason }}</p>
+    <p class="notice__title">{% translate "This passport was revoked." %}</p>
+    <p>{{ product.revocation_reason }}</p>
   </div>
 {% endif %}
+
+<div class="grid-2 spaced">
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Passport" %}</h2>
+      <p>
+        {% blocktranslate trimmed %}
+          This code identifies one physical unit. It was generated from a
+          cryptographically secure source, so it cannot be worked out from another code.
+        {% endblocktranslate %}
+      </p>
+    </div>
+
+    {% if product.image %}
+      <img class="product-image" src="{{ product.image.url }}" alt="{% blocktranslate with name=product.name %}Photograph of {{ name }}{% endblocktranslate %}" width="220" height="220">
+    {% endif %}
+
+    <dl class="detail-list spaced">
+      <dt>{% translate "Passport code" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "The letters and digits printed under the QR on the label. Every product has a different one, and nobody can guess it from another." %}</span></details></dt>
+      <dd class="mono">{{ product.passport_code }}</dd>
+      <dt>{% translate "Type" %}</dt><dd>{{ product.get_product_type_display }}</dd>
+      <dt>{% translate "Category" %}</dt><dd>{{ product.category }}</dd>
+      <dt>{% translate "Place of manufacture" %}</dt><dd>{{ product.origin }}</dd>
+      <dt>{% translate "Registered" %}</dt><dd>{{ product.registered_at|date:"j F Y, H:i" }}</dd>
+      <dt>{% translate "Times verified" %}<details class="info"><summary aria-label="{% translate 'What does this mean?' %}">?</summary><span class="info__body">{% translate "How many times someone opened this passport by scanning the QR or typing the code." %}</span></details></dt>
+      <dd>{{ scan_count }}</dd>
+    </dl>
+  </div>
+
+  <div class="card qr-panel">
+    <div class="card__head">
+      <h2>{% translate "QR code for the label" %}</h2>
+      <p>{% translate "It opens the public verification page of this piece. Print it with the code below it." %}</p>
+    </div>
+    {# FR22: the QR encodes the public address, downloadable as PNG. #}
+    <img src="{% url 'products:qr_download' product.pk %}" width="180" height="180" alt="{% translate 'QR code of this passport' %}">
+    <p class="mono">{{ verification_url }}</p>
+    <div class="form-actions">
+      <span class="tip tip--start">
+        <a class="btn btn--primary" href="{% url 'products:qr_download' product.pk %}" aria-describedby="tip-qr">{% translate "Download the QR code" %}</a>
+        <span class="tip__text" id="tip-qr" role="tooltip">{% translate "Saves the QR as an image, to print and stick on the product label." %}</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card__head">
+    <h2>{% translate "Custody" %}</h2>
+    <p>{% translate "Who holds this piece now, and whether it is being handed over." %}</p>
+  </div>
+  <dl class="detail-list">
+    <dt>{% translate "Current holder" %}</dt>
+    <dd>{% if is_holder %}{% translate "Your company" %}{% elif holder.company.status == "APPROVED" %}{{ holder.company.legal_name }}{% else %}{% translate "Private holder" %}{% endif %}</dd>
+  </dl>
+
+  {% if open_offer %}
+    <div class="notice notice--warning spaced">
+      <p class="notice__title">
+        {% blocktranslate trimmed with who=open_offer.to_holder.email %}Offered to {{ who }}, waiting for an answer.{% endblocktranslate %}
+      </p>
+      <p>{% translate "Give this transfer code to the buyer at the moment of the sale. With it and the passport code they claim the piece." %}</p>
+      <p><span class="code-chip">{{ open_offer.transfer_code }}</span></p>
+    </div>
+  {% elif product.status == "ACTIVE" and is_holder %}
+    <div class="action-bar">
+      <span class="tip tip--start">
+        <a class="btn btn--primary" href="{% url 'products:transfer_initiate' product.pk %}" aria-describedby="tip-transfer">{% translate "Transfer this piece" %}</a>
+        <span class="tip__text" id="tip-transfer" role="tooltip">{% translate "Hand this product to another person or business: a distributor, a shop or the buyer." %}</span>
+      </span>
+    </div>
+  {% endif %}
+</div>
+
+{% if product.description %}
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Description" %}</h2>
+    </div>
+    <p>{{ product.description|linebreaksbr }}</p>
+  </div>
+{% endif %}
+
+<div class="action-bar">
+  <a class="btn btn--link" href="{% url 'products:product_list' %}">{% translate "Back to my products" %}</a>
+  {% if product.status == "ACTIVE" %}
+    <span class="tip">
+      <a class="btn btn--danger" href="{% url 'products:product_revoke' product.pk %}" aria-describedby="tip-revoke">{% translate "Revoke this passport" %}</a>
+      <span class="tip__text" id="tip-revoke" role="tooltip">{% translate "Cancel the passport if the product was lost, damaged or copied. Whoever scans it will read Revoked and your reason." %}</span>
+    </span>
+  {% endif %}
+</div>
 {% endblock %}

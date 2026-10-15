@@ -2,7 +2,7 @@
 
 Each slide is written as HTML in the project's own identity (the añil and caña
 palette, Bahnschrift headings, the ringed P), rendered at 1920x1080 in a
-headless browser, and the pages are joined into a PDF. The script that goes
+headless browser, and printed directly to a vector PDF. The script that goes
 with each slide is written beside it and saved as Markdown, so the deck and
 what is said over it change together.
 
@@ -12,10 +12,9 @@ Writes to tools/presentation/build/.
 
 import base64
 import html
-import io
+import shutil
 from pathlib import Path
 
-from PIL import Image
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -23,6 +22,7 @@ BUILD = Path(__file__).resolve().parent / "build"
 SLIDES = BUILD / "slides"
 PDF = BUILD / "OriginPass-Entrega-3-presentacion.pdf"
 SCRIPT = BUILD / "OriginPass-Entrega-3-guion.md"
+HTML = BUILD / "OriginPass-Entrega-3-presentacion.html"
 
 SHOTS = ROOT / "docs/brand/screenshots"
 DIAGRAMS = ROOT / "docs/diagrams/export"
@@ -55,22 +55,8 @@ def image_uri(path):
 
 
 def diagram_uri(path):
-    """The diagram cropped to its drawing: the draw.io export carries a wide empty page."""
-    picture = Image.open(path).convert("RGB")
-    ink = picture.convert("L").point(lambda level: 255 if level < 225 else 0)
-    left, top, right, bottom = ink.getbbox()
-    pad = 24
-    picture = picture.crop(
-        (
-            max(left - pad, 0),
-            max(top - pad, 0),
-            min(right + pad, picture.width),
-            min(bottom + pad, picture.height),
-        )
-    )
-    buffer = io.BytesIO()
-    picture.save(buffer, format="PNG")
-    return "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
+    """Inline SVG keeps shapes and diagram labels vectorial in Chromium's PDF."""
+    return path.with_suffix(".svg").read_text(encoding="utf-8")
 
 
 def head(slide):
@@ -123,13 +109,17 @@ def render(slide):
         header = "".join(f"<th>{esc(h)}</th>" for h in slide["columns"])
         return head(slide) + f"<table><tr>{header}</tr>{rows}</table>"
     if kind == "diagram":
-        changes = "".join(f"<li>{tagged(c)}</li>" for c in slide["changes"])
+        stem = Path(slide["image"]).stem
         return (
             head(slide)
             + '<div class="diagram"><div class="img">'
-            + f'<img src="{diagram_uri(DIAGRAMS / slide["image"])}" alt=""></div>'
-            + '<aside><h2><span class="legend"></span>Nuevo en el Sprint 3</h2>'
-            f"<ul>{changes}</ul></aside></div>"
+            + diagram_uri(DIAGRAMS / slide["image"])
+            + '</div></div><p class="diagram-link"><span class="screen-only">'
+            + "Ampliar por separado: "
+            + f'<a href="diagramas/{stem}.pdf">PDF</a> · '
+            + f'<a href="diagramas/{stem}.svg">SVG</a> · '
+            + '<a href="diagramas/index.html">Todos los diagramas</a></span>'
+            + f'<span class="print-only">Ampliar: diagramas/{stem}.pdf</span></p>'
         )
     if kind == "stats":
         stats = "".join(
@@ -162,7 +152,7 @@ def render(slide):
     raise ValueError(kind)
 
 
-def page(slide, number, total):
+def slide_html(slide, number, total):
     dark = slide["kind"] in ("cover", "close", "statement")
     foot = (
         ""
@@ -170,10 +160,84 @@ def page(slide, number, total):
         else f'<div class="foot"><span class="brand">{MARK}OriginPass · Entrega 3</span>'
         f"<span>{number} / {total}</span></div>"
     )
+    capture = ""
+    if slide.get("shot"):
+        name = slide["shot"]
+        capture = (
+            '<p class="capture-link"><span class="screen-only">'
+            f'<a href="capturas/{name}">Abrir captura a tamaño original</a></span>'
+            f'<span class="print-only">Captura completa: capturas/{name}</span></p>'
+        )
     return (
-        f'<!doctype html><html lang="es"><head><meta charset="utf-8"><style>{CSS}</style></head>'
-        f'<body class="{"dark" if dark else ""}">'
-        f"{'' if dark else '<div class=pinta></div>'}{render(slide)}{foot}</body></html>"
+        f'<section class="slide {"dark" if dark else ""}" id="slide-{number}">'
+        f"{'' if dark else '<div class=pinta></div>'}{render(slide)}{capture}{foot}</section>"
+    )
+
+
+def document(slides):
+    return (
+        '<!doctype html><html lang="es"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        f"<title>OriginPass · Entrega 3</title><style>{CSS}</style></head><body>"
+        + "".join(slide_html(slide, n, len(slides)) for n, slide in enumerate(slides, 1))
+        + "</body></html>"
+    )
+
+
+def copy_diagrams(deck):
+    folder = BUILD / "diagramas"
+    folder.mkdir(exist_ok=True)
+    links = []
+    for slide in deck:
+        if slide["kind"] != "diagram":
+            continue
+        stem = Path(slide["image"]).stem
+        formats = []
+        for extension in ("pdf", "svg", "png"):
+            name = f"{stem}.{extension}"
+            shutil.copy2(DIAGRAMS / name, folder / name)
+            formats.append(f'<a href="{name}">{extension.upper()}</a>')
+        source = stem.split("-", 2)[:2]
+        source_name = "-".join(source) + ".drawio"
+        shutil.copy2(ROOT / "docs/diagrams" / source_name, folder / source_name)
+        links.append(f"<li><h2>{esc(slide['title'])}</h2>{' · '.join(formats)}</li>")
+    (folder / "index.html").write_text(
+        '<!doctype html><html lang="es"><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        "<title>OriginPass · Diagramas</title><style>"
+        'body{font:20px/1.5 "Segoe UI",sans-serif;max-width:900px;margin:40px auto;'
+        "padding:0 24px;color:#1e2b58;background:#f3f4ee}"
+        "li{margin-bottom:32px}a{display:inline-block;padding:8px;color:#1e2b58}"
+        "</style><h1>Diagramas de OriginPass</h1>"
+        "<p>Abre el PDF para ampliar con texto nítido. El SVG se abre en el navegador. "
+        "El PNG de alta resolución sirve como respaldo. Los archivos .drawio son editables.</p>"
+        "<ul>" + "".join(links) + "</ul></html>",
+        encoding="utf-8",
+    )
+
+
+def copy_captures(deck):
+    folder = BUILD / "capturas"
+    folder.mkdir(exist_ok=True)
+    links = []
+    for slide in deck:
+        if not slide.get("shot"):
+            continue
+        name = slide["shot"]
+        shutil.copy2(SHOTS / name, folder / name)
+        links.append(f'<li><a href="{name}">{esc(slide["title"])}</a></li>')
+    (folder / "index.html").write_text(
+        '<!doctype html><html lang="es"><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        "<title>OriginPass · Capturas completas</title><style>"
+        'body{font:20px/1.5 "Segoe UI",sans-serif;max-width:900px;margin:40px auto;'
+        "padding:0 24px;color:#1e2b58;background:#f3f4ee}"
+        "a{display:inline-block;padding:10px;color:#1e2b58}"
+        "</style><h1>Capturas completas de la aplicación</h1>"
+        "<p>Abre una captura y pulsa sobre ella para verla a tamaño original.</p><ul>"
+        + "".join(links)
+        + "</ul></html>",
+        encoding="utf-8",
     )
 
 
@@ -183,21 +247,27 @@ def build():
     SLIDES.mkdir(parents=True, exist_ok=True)
     for old in SLIDES.glob("*.png"):
         old.unlink()
-    images = []
+    copy_diagrams(DECK)
+    copy_captures(DECK)
+    HTML.write_text(document(DECK), encoding="utf-8")
     with sync_playwright() as p:
         browser = p.chromium.launch()
         context = browser.new_context(viewport={"width": 1920, "height": 1080})
         tab = context.new_page()
-        for number, slide in enumerate(DECK, 1):
-            tab.set_content(page(slide, number, len(DECK)))
-            tab.wait_for_timeout(150)
+        tab.goto(HTML.as_uri(), wait_until="networkidle")
+        tab.evaluate("document.fonts.ready")
+        tab.pdf(
+            path=str(PDF),
+            width="1920px",
+            height="1080px",
+            print_background=True,
+            prefer_css_page_size=True,
+            margin={"top": "0", "bottom": "0", "left": "0", "right": "0"},
+        )
+        for number, _slide in enumerate(DECK, 1):
             target = SLIDES / f"{number:02d}.png"
-            tab.screenshot(path=str(target))
-            images.append(target)
+            tab.locator(f"#slide-{number}").screenshot(path=str(target))
         browser.close()
-
-    pages = [Image.open(path).convert("RGB") for path in images]
-    pages[0].save(PDF, save_all=True, append_images=pages[1:], resolution=144)
 
     lines = [
         "# OriginPass — Entrega 3: guion de la presentación",
@@ -208,6 +278,10 @@ def build():
     for number, slide in enumerate(DECK, 1):
         title = slide.get("title", "").replace("\n", " ")
         lines += [f"## {number}. {title}", "", slide["say"], ""]
+        if slide["kind"] == "diagram":
+            lines += ["Nuevo en el Sprint 3:", ""]
+            lines += [f"- {change}" for change in slide["changes"]]
+            lines += ["", f"Ampliar: `diagramas/{Path(slide['image']).stem}.pdf`.", ""]
     SCRIPT.write_bytes("\n".join(lines).encode("utf-8"))
     print(f"{PDF} ({len(DECK)} slides)")
     print(SCRIPT)

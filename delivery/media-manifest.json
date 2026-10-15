@@ -1,0 +1,46 @@
+{
+    "release": "originpass-videos-lanzamiento",
+    "license": "CC BY-SA 4.0",
+    "assets": [
+        {
+            "name": "OriginPass-lanzamiento-16x9.mp4",
+            "size": 121318641,
+            "sha256": "be83441f696ee97dceca1d361bfa9d6d7f86901e2403de5e8c577fd80028fdfd",
+            "url": "https://github.com/Pacha-e/OriginPass/releases/download/originpass-videos-lanzamiento/OriginPass-lanzamiento-16x9.mp4"
+        },
+        {
+            "name": "OriginPass-lanzamiento-9x16.mp4",
+            "size": 117521748,
+            "sha256": "f54c8eb2e0717c191565f227593db025c53d126bd7f2c6973d644d6262384892",
+            "url": "https://github.com/Pacha-e/OriginPass/releases/download/originpass-videos-lanzamiento/OriginPass-lanzamiento-9x16.mp4"
+        },
+        {
+            "name": "OriginPass-reel-como-funciona-9x16.mp4",
+            "size": 36338741,
+            "sha256": "8edb46ce4c937c82b36749baac5e7b58d68ffe09cec3e1bec22b449d9280b84b",
+            "url": "https://github.com/Pacha-e/OriginPass/releases/download/originpass-videos-lanzamiento/OriginPass-reel-como-funciona-9x16.mp4"
+        },
+        {
+            "name": "OriginPass-reel-cual-es-el-original-9x16.mp4",
+            "size": 43307671,
+            "sha256": "cb96ce1595a00ba4858ef771726e8500816128483d90a2d5a60aa6d8d88b7926",
+            "url": "https://github.com/Pacha-e/OriginPass/releases/download/originpass-videos-lanzamiento/OriginPass-reel-cual-es-el-original-9x16.mp4"
+        },
+        {
+            "name": "OriginPass-reel-manifiesto-9x16.mp4",
+            "size": 23405183,
+            "sha256": "5ba44c582d65324bcffb8e440bf4d23240b5dbe609af320d099be3339f07494a",
+            "url": "https://github.com/Pacha-e/OriginPass/releases/download/originpass-videos-lanzamiento/OriginPass-reel-manifiesto-9x16.mp4"
+        }
+    ],
+    "support_assets": [
+        {
+            "name": "OriginPass-Entrega-3-recorrido.mp4",
+            "directory": "tools/video/build",
+            "release": "originpass-kit-portatil-2026-10-15",
+            "size": 18947252,
+            "sha256": "3fc9563ff415d33ce3f68dc52b2fb8cc68f56c408136101483c758ab8dae55ed",
+            "url": "https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/OriginPass-Entrega-3-recorrido.mp4"
+        }
+    ]
+}

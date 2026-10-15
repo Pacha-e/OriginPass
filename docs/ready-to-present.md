@@ -3,6 +3,11 @@
 One file, start to finish. Follow it in order. Every step says what you should see, so a
 step that went wrong is caught here rather than in front of the room.
 
+For the Windows Deliverable 3 kit, use [the current portable guide](../delivery/LEEME-PORTATIL.md).
+Extract the release ZIP, open `ABRIR-KIT.html`, run `Setup-Portatil.ps1` once with internet,
+then `Start-OriginPass.ps1` on presentation day. The instructions below describe the
+manual developer setup on `main`.
+
 It is written to be handed to an agent as much as read by a person. An agent working from
 this file should run each step, compare the real output against the **Expect** line, and
 stop at the first mismatch rather than continuing and hoping.
@@ -42,7 +47,7 @@ If the repository is already there, take the branch being presented and update i
 ```bash
 cd OriginPass
 git fetch origin
-git checkout sprint-2-completion
+git checkout main
 git pull
 ```
 

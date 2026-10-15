@@ -5,6 +5,14 @@ los datos de demostración, todas las vistas abiertas, los diagramas, la present
 videos. La preparación se hace **antes de clase y con internet**; el día de la presentación
 solo se arranca y se abre lo de la lista.
 
+**Empieza por `ABRIR-KIT.html`**, en la raíz del ZIP extraído: reúne todos los archivos
+de exposición, incluidos los cinco videos de lanzamiento. Funcionan sin internet.
+`Verificar-Kit.ps1` comprueba que ningún archivo del kit falte o haya cambiado.
+`Setup-Portatil.ps1` genera `ABRIR-DEMO.html` con los pasaportes reales de ese equipo.
+El ZIP usa PostgreSQL aislado en `127.0.0.1:55432`, proyecto Docker `originpass-kit` y
+volumen propio. El clon conserva su PostgreSQL de desarrollo en el puerto 5432.
+Guarda la carpeta preparada completa: su `.env` contiene la clave que firma esa base.
+
 ## Lo que tiene que estar listo, corriendo y abierto
 
 Marca cada punto antes de empezar.
@@ -38,7 +46,15 @@ aplicación:
 **3. La presentación.**
 
 - [ ] `presentacion\OriginPass-Entrega-3-presentacion.pdf`, abierta y lista para pantalla
-  completa.
+  completa. El texto y los diagramas son vectoriales: se pueden ampliar sin pixelarse.
+- [ ] `presentacion\OriginPass-Entrega-3-presentacion.html`, alternativa en el navegador,
+  con enlaces para abrir cada diagrama por separado. Conserva la carpeta `diagramas` a su lado.
+- [ ] `presentacion\capturas\index.html`, las capturas de la aplicación a su tamaño
+  original, para leer los detalles pequeños que aparecen en las diapositivas.
+
+Los enlaces para abrir archivos funcionan en la versión HTML. El PDF muestra la ruta
+del archivo junto a cada diagrama o captura, para abrirlo desde la carpeta del kit.
+
 - [ ] `presentacion\OriginPass-Entrega-3-guion.md`, lo que se dice en cada diapositiva, en el
   teléfono o impreso.
 
@@ -48,17 +64,22 @@ aplicación:
   funciones nuevas con un rótulo por paso, sin narración. Es el respaldo si algo falla en la
   demostración en vivo.
 
-**5. Los diagramas** (en el ZIP están en `app\docs\diagrams\export\`, y en la presentación).
+**5. Los diagramas** (abre `presentacion\diagramas\index.html` para elegir uno).
 
-- [ ] `deployment-model-Deployment-model.png` — despliegue
-- [ ] `components-model-Component-model.png` — componentes
-- [ ] `data-model-Data-model.png` — datos
+- [ ] `deployment-model-Deployment-model.pdf` — despliegue
+- [ ] `components-model-Component-model.pdf` — componentes
+- [ ] `data-model-Data-model.pdf` — datos
+
+En `presentacion\diagramas\` cada modelo tiene PDF vectorial para ampliar, SVG para
+el navegador, PNG de alta resolución de respaldo y fuente `.drawio` editable. Para
+leer las tablas completas durante la exposición, abre el PDF individual y amplía.
 
 Los cambios del Sprint 3 van en naranja en los tres. Los `.drawio` editables están en
 `app\docs\diagrams\`.
 
-**6. Los videos de lanzamiento**, con la voz de Emmanuel, descargados de la
-[release de videos](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-videos-lanzamiento):
+**6. Los videos de lanzamiento**, con la voz de Emmanuel, incluidos en `videos\` y
+enlazados desde `ABRIR-KIT.html` (también disponibles en la
+[release de videos](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-videos-lanzamiento)):
 
 - [ ] `OriginPass-lanzamiento-16x9.mp4` — lanzamiento, horizontal
 - [ ] `OriginPass-lanzamiento-9x16.mp4` — lanzamiento, vertical
@@ -84,7 +105,9 @@ Los cambios del Sprint 3 van en naranja en los tres. Los `.drawio` editables est
      comprueba el hash con `Get-FileHash .\OriginPass-Portatil.zip` y extrae **todo** el ZIP,
      por ejemplo en `C:\OriginPass-Portatil`.
    - **Clon:** `git clone https://github.com/Pacha-e/OriginPass.git C:\OriginPass`. La
-     presentación y el video del recorrido se descargan de la release del kit.
+     aplicación se prepara con los scripts de `delivery\`. Para el índice, el manifiesto
+     y todos los materiales, descarga y extrae también el ZIP completo. `ABRIR-KIT.html`
+     y `Verificar-Kit.ps1` se usan desde esa extracción, no desde la carpeta fuente `delivery\`.
 3. Abre PowerShell en esa carpeta y ejecuta la preparación. Con el ZIP, el script está en la
    raíz; con el clon, en `delivery\`:
 
@@ -92,11 +115,16 @@ Los cambios del Sprint 3 van en naranja en los tres. Los `.drawio` editables est
    powershell -NoProfile -ExecutionPolicy Bypass -File .\Setup-Portatil.ps1
    ```
 
+   Con un clon, entra primero en `delivery\` (`cd C:\OriginPass\delivery`).
+
    Levanta PostgreSQL, crea el entorno de Python, instala las dependencias, crea una clave
    local nueva sin mostrarla, migra la base, carga los datos de demostración y verifica las
    cadenas firmadas. Termina con `Preparacion local terminada`.
-4. Descarga los cinco videos de lanzamiento (punto 6 de la lista).
-5. Haz un ensayo completo: arranca, abre todo lo de la lista y recorre la demostración.
+4. Desde la raíz del ZIP extraído, ejecuta
+   `powershell -NoProfile -ExecutionPolicy Bypass -File .\Verificar-Kit.ps1`.
+   Debe terminar con `Kit OK`. No modifica datos ni instala dependencias.
+5. Abre `ABRIR-KIT.html` y haz un ensayo completo: arranca la aplicación, abre
+   `ABRIR-DEMO.html` y recorre la demostración con cuentas en ventanas separadas.
 
 ## El día de la presentación
 
@@ -107,7 +135,7 @@ Los cambios del Sprint 3 van en naranja en los tres. Los `.drawio` editables est
    powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-OriginPass.ps1
    ```
 
-3. Abre todo lo de la lista, en su orden.
+3. Abre `ABRIR-KIT.html` y luego todo lo de la lista, en su orden.
 
 ## La demostración en vivo
 
@@ -126,8 +154,8 @@ El orden es el de la diapositiva 4 de la presentación y el del video del recorr
 
 - **Docker no responde:** ciérralo, ábrelo de nuevo y espera a *Running*; luego
   `Start-OriginPass.ps1`.
-- **El puerto 5432 o el 8000 está ocupado:** otro PostgreSQL o servidor está corriendo. Para
-  el 8000, arranca en otro puerto:
+- **Un puerto está ocupado** (55432 con el ZIP, 5432 con el clon, 8000 para la aplicación):
+  otro PostgreSQL o servidor está corriendo. Para el 8000, arranca en otro puerto:
   `.\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8001 --noreload`.
 - **Los datos se ven raros:** `.\.venv\Scripts\python.exe manage.py seed_demo` vuelve a crear
   lo que falte.
@@ -141,21 +169,46 @@ integridad. El servidor solo escucha en `127.0.0.1`, no en la red del salón.
 
 - `app\`: el código de `main`, las migraciones, las fotos de demostración y los diagramas. Sin
   `.env`, sin base de datos y sin entorno virtual.
-- `presentacion\`: la presentación en PDF, su guion y el video del recorrido.
+- `presentacion\`: la presentación en PDF y HTML, su guion, los diagramas individuales
+  en `diagramas\`, las capturas originales en `capturas\` y el video del recorrido.
 - `wiki\`: las páginas de la wiki.
+  Es una copia local de su texto Markdown; algunos enlaces e imágenes de la wiki
+  siguen apuntando a GitHub. Los diagramas y capturas para exponer están incluidos aparte.
+- `videos\`: los cinco videos de lanzamiento; atribuciones en `CREDITOS-VIDEOS.md`.
+- `ABRIR-KIT.html`: índice local de todo el material.
+- `KIT-MANIFEST.json`, `verify_kit.py` y `Verificar-Kit.ps1`: identificación del commit
+  fuente y comprobación de cada archivo del kit por tamaño y SHA-256.
+- `ABRIR-DEMO.html`: página regenerada por la preparación y el arranque, con los
+  pasaportes de la base de datos local. Por eso no se incluye en el hash del manifiesto.
 - `Setup-Portatil.ps1` y `Start-OriginPass.ps1`: preparar y arrancar. Funcionan igual desde
   el ZIP y desde `delivery\` en un clon.
 
 ## Reconstruir el kit, desde el PC de desarrollo
 
-Con la carpeta `OriginPass-wiki` clonada junto al repositorio:
+Desde un clon actualizado de `main`. Instala las herramientas de autoría una vez
+(el portátil que presenta no las necesita):
 
 ```powershell
-python tools/presentation/build_deck.py
-python manage.py runserver 127.0.0.1:8765     # en otra ventana
-python tools/video/record_features.py
-python delivery/build_portable.py
+python -m pip install -r tools/presentation/requirements.txt
+python -m playwright install chromium
 ```
+
+GitHub CLI (`gh`) permite recuperar los videos publicados. El empaquetador descarga
+los que falten, incluido el recorrido, y valida su SHA-256:
+
+```powershell
+python tools/presentation/render_diagrams.py
+python tools/presentation/build_deck.py
+python delivery/build_portable.py --fetch-videos
+```
+
+Para volver a grabar el recorrido tras cambiar funciones: prepara la demo, arranca
+`python manage.py runserver 127.0.0.1:8765` en otra ventana y ejecuta
+`python tools/video/record_features.py`. Al cambiar un video publicado, actualiza
+también su tamaño y hash en `media-manifest.json` antes de empaquetar.
 
 `build_portable.py` escribe `delivery\OriginPass-Portatil.zip` y `delivery\SHA256SUMS.txt`.
 Ninguno se versiona: se suben a la release del kit.
+Las páginas necesarias de la wiki están versionadas en `docs/wiki/`; no hace falta
+otro clon para empaquetar. Los videos de lanzamiento se descargan solo si faltan y
+se comprueban contra `delivery/media-manifest.json`.

@@ -22,9 +22,9 @@ The [presentation of the Sprint Review](https://github.com/Pacha-e/OriginPass/re
 explains each feature slide by slide; both are in the
 [kit release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-kit-portatil-2026-10-15).
 
-The complete kit now includes all five launch videos, their credits and the feature
-walkthrough. Extract the whole archive
-and open `ABRIR-KIT.html` to select a local file. No network is needed to play these files.
+The portable kit carries the five launch videos, their credits and the feature
+walkthrough, so they play without a network: extract the whole archive and open
+`ABRIR-KIT.html`.
 
 ## Launch videos
 

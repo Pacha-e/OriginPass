@@ -17,12 +17,12 @@ once continuous integration passed.
 **Presentation and video:** the [Sprint Review presentation](https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/OriginPass-Entrega-3-presentacion.pdf)
 and the [walkthrough of the new features](https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/OriginPass-Entrega-3-recorrido.mp4); see section 4.
 
-The presentation now preserves its text and diagrams as vectors, so labels stay sharp
-when zooming. Each architecture model also opens independently:
+Text and diagrams in the presentation are vectors, so every label stays sharp at any
+zoom. Each architecture model also opens on its own:
 [deployment PDF](https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/deployment-model-Deployment-model.pdf),
 [components PDF](https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/components-model-Component-model.pdf),
 [data PDF](https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/data-model-Data-model.pdf).
-The complete kit includes SVGs, high-resolution PNGs and the original screenshots too.
+The kit adds each model as SVG and high-resolution PNG, and the original screenshots.
 
 > **Scope.** OriginPass is an MVP built on Django and PostgreSQL. Its records are signed
 > and chained in the application; anchoring the head of that chain on Monad, so that
@@ -190,13 +190,14 @@ states what changed and why.
   [`tools/video/record_features.py`](https://github.com/Pacha-e/OriginPass/blob/main/tools/video/record_features.py),
   so both can be rebuilt whenever the product changes.
 
-Extract the entire kit and open `ABRIR-KIT.html`. The presentation, independent diagrams,
-original screenshots, script, feature walkthrough, five launch videos and wiki snapshot are available locally without internet. `Verificar-Kit.ps1`
-checks the packaged files against `KIT-MANIFEST.json`, which identifies the source commit.
-`Setup-Portatil.ps1` waits for PostgreSQL, prepares the demonstration and creates
-`ABRIR-DEMO.html` with that machine's actual passport links. Python 3.12 and Docker Desktop
-must be prepared before class. A first-run rehearsal on the actual presentation laptop
-is still required; validation on the development PC does not replace it.
+The [portable kit](https://github.com/Pacha-e/OriginPass/releases/download/originpass-kit-portatil-2026-10-15/OriginPass-Portatil.zip)
+works without internet: extract it whole and open `ABRIR-KIT.html`, which links the
+presentation, each diagram, the original screenshots, the script, the feature
+walkthrough, the five launch videos and a snapshot of this wiki. `Verificar-Kit.ps1`
+checks every packaged file against `KIT-MANIFEST.json`, which records the source commit.
+`Setup-Portatil.ps1` waits for PostgreSQL, prepares the demonstration data and writes
+`ABRIR-DEMO.html` with the passport links of that machine. It needs Python 3.12 and
+Docker Desktop installed beforehand.
 
 **Verified.** Continuous integration runs the migration check, the 314 tests against
 PostgreSQL 17, the linter and the formatter on every pull request and every push to

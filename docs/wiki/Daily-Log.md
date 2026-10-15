@@ -21,15 +21,7 @@ the same work week by week, with what came next and what was in the way.
 | Wed 30 September | Built the Sprint 3 features: the duplicate-scan alert, the login lockout, the custody transfers and the claim with two codes, the region and journey on the public page, the scan cap, the analytics, the administrator's overview, revocation and the notification emails. | `c92207c`, `721fdb0`, `f04d52c`, `3cb91a5`, `bdb920a`, `f00eff7`, `185a35d` |
 | Thu 1 October | Audited the Sprint 3 work against the requirements and fixed every defect found, each with a regression test. Gave the product its corporate image. In the follow-up with the professor, the rural artisan was named as one of the users; the interface was rewritten in plain language the same day, with an explanation on every action. | `20b9bb3`, `1d7118e`, `1b41862`; the audited work was committed on 6 October |
 | Tue 6 October | Committed the audited Sprint 3 work and the plain-language interface, with 306 tests, and closed the Sprint 3 issues in the backlog. Prepared the Deliverable 3 edition of the video pipeline. | `cca4dbb`, `6f8396d` |
-| Thu 15 October | Answered the Product Owner's feedback: private evidence of the craft and consent to publish in every application, a product photo editable after registration, and seven demonstration products from formal and informal producers (314 tests). Fixed the lint failures that kept continuous integration red, made the presentation kit run from a plain clone, and merged Sprint 3 into `main` through pull request #82. Reopened FR34, which had been closed without being built. Built the Sprint Review presentation and recorded the walkthrough of the new features; published the launch videos and updated this wiki. | `c60f7ff`, `1d6aa5e`, `ac2da6d`, `823b016`; [PR #82](https://github.com/Pacha-e/OriginPass/pull/82) |
-
-## Presentation preparation, 15 October
-
-The 15 October presentation preparation also replaced the raster slide PDF with vector
-text and diagrams, exported each architecture model separately, and packaged the original
-screenshots and all five launch videos for offline use. The kit gained `ABRIR-KIT.html`,
-file checksums and database-specific demo links. The local 314-test suite, migration check,
-lint and formatting passed before publication.
+| Thu 15 October | Answered the Product Owner's feedback: private evidence of the craft and consent to publish in every application, a product photo editable after registration, and seven demonstration products from formal and informal producers (314 tests). Fixed the lint failures that kept continuous integration red, made the presentation kit run from a plain clone, and merged Sprint 3 into `main` through pull request #82. Reopened FR34, which had been closed without being built. Built the Sprint Review presentation and recorded the walkthrough of the new features; published the launch videos and updated this wiki. Rebuilt the presentation with vector text and diagrams, exported each architecture model on its own, and packaged the screenshots and the five launch videos into an offline kit with checksums. | `c60f7ff`, `1d6aa5e`, `ac2da6d`, `823b016`; [PR #82](https://github.com/Pacha-e/OriginPass/pull/82), [PR #85](https://github.com/Pacha-e/OriginPass/pull/85) |
 
 ## Days without a record
 

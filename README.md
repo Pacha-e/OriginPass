@@ -59,7 +59,15 @@ All project documentation lives in the [Wiki](https://github.com/Pacha-e/OriginP
 | [Requirements Prioritisation](https://github.com/Pacha-e/OriginPass/wiki/Requirements-Prioritisation) | MoSCoW prioritisation and sprint assignment |
 | [Domain Model](https://github.com/Pacha-e/OriginPass/wiki/Domain-Model) | Entities, relationships and state machines |
 | [Deliverable 1](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-1) | Project definition and software requirements specification |
+| [Deliverable 2](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-2) | Solution design and functionality preview |
+| [Deliverable 3](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-3) | The MVP: architecture, corporate image, repository, video and project management |
+| [Videos](https://github.com/Pacha-e/OriginPass/wiki/Videos) | The Deliverable 3 walkthrough and the launch videos |
 | [Sprint 1 Review](https://github.com/Pacha-e/OriginPass/wiki/Sprint-1-Review) | What was committed, delivered and how it was verified |
+| [Sprint 2 Review](https://github.com/Pacha-e/OriginPass/wiki/Sprint-2-Review) | What was committed, delivered and how it was verified |
+| [Sprint 3 Review](https://github.com/Pacha-e/OriginPass/wiki/Sprint-3-Review) | What was committed, delivered and how it was verified |
+| [Daily Log](https://github.com/Pacha-e/OriginPass/wiki/Daily-Log) | The individual day-by-day log |
+| [Development Log](https://github.com/Pacha-e/OriginPass/wiki/Development-Log) | What was built each week, what came next, what stood in the way |
+| [Retrospectives](https://github.com/Pacha-e/OriginPass/wiki/Retrospectives) | What to continue, start and stop doing |
 
 Requirements are tracked as issues in the [Backlog](https://github.com/users/Pacha-e/projects/1).
 

@@ -67,6 +67,9 @@ tools/video/videos/
 delivery/OriginPass-Portatil.zip
 delivery/SHA256SUMS.txt
 
+# The presentation is built from tools/presentation/deck_content.py.
+tools/presentation/build/
+
 # The narration recordings themselves. Audio files do not belong in a code
 # repository; the finished video is published elsewhere.
 tools/video/voice/*

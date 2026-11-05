@@ -104,12 +104,12 @@ sudo bash -c 'set -a; . /etc/originpass.env; set +a; cd /opt/originpass/app && /
 
 ## HTTPS
 
-Instalado el 5 de noviembre de 2026 con Let's Encrypt, en `https://13-220-96-49.sslip.io`.
+Instalado el 5 de noviembre de 2026 con Let's Encrypt, en `https://44-206-186-9.sslip.io`.
 
 1. En el security group, agrega **HTTPS (443)** con origen **Anywhere-IPv4**.
 2. `sudo apt-get install -y certbot python3-certbot-nginx`
-3. `sudo certbot --nginx -d 13-220-96-49.sslip.io --redirect -m TU_CORREO --agree-tos --no-eff-email`. El `--redirect` manda el HTTP a HTTPS. El certificado vence el 3 de febrero de 2027; la renovación es automática.
-4. En `/etc/originpass.env`, `ALLOWED_HOSTS` incluye el nombre, `CSRF_TRUSTED_ORIGINS=https://13-220-96-49.sslip.io`, y se añaden `BEHIND_TLS_PROXY=1`, `SESSION_COOKIE_SECURE=1` y `CSRF_COOKIE_SECURE=1`.
+3. `sudo certbot --nginx -d 44-206-186-9.sslip.io --redirect -m TU_CORREO --agree-tos --no-eff-email`. El `--redirect` manda el HTTP a HTTPS. El certificado vence el 3 de febrero de 2027; la renovación es automática.
+4. En `/etc/originpass.env`, `ALLOWED_HOSTS` incluye el nombre, `CSRF_TRUSTED_ORIGINS=https://44-206-186-9.sslip.io`, y se añaden `BEHIND_TLS_PROXY=1`, `SESSION_COOKIE_SECURE=1` y `CSRF_COOKIE_SECURE=1`.
 5. `sudo systemctl restart originpass`
 
 Los QR impresos deben apuntar a la dirección HTTPS. Los QR antiguos con la IP siguen funcionando por redirección, pero el certificado no cubre la IP y el navegador mostraría una advertencia.
@@ -125,7 +125,7 @@ sudo -u originpass git -C /opt/originpass/app pull --ff-only
 Después, en cada actualización:
 
 ```bash
-sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 13-220-96-49.sslip.io
+sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 44-206-186-9.sslip.io
 ```
 
 El script instala dependencias, aplica migraciones, copia los archivos estáticos, reinicia el servicio y comprueba `/healthz/` por HTTPS con el certificado validado. Si un paso falla, se detiene.
@@ -136,7 +136,7 @@ Se cargaron una vez con `seed_demo`, con `DEBUG=1` solo para ese comando. Las cu
 
 ## Limitaciones conocidas
 
-- **La IP cambia** si paras y arrancas la instancia (no hay Elastic IP). Con ella cambia el nombre sslip.io: hay que emitir el certificado para el nombre nuevo (sección HTTPS, paso 3), poner el nombre nuevo en `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS` de `/etc/originpass.env` y ejecutar `sudo systemctl restart originpass`. Una Elastic IP, si el Learner Lab la permite, evita todo esto.
+- **Elastic IP.** Desde el 5 de noviembre de 2026 la instancia tiene la Elastic IP `44.206.186.9`, así que la dirección no cambia al parar y arrancar la instancia. Consume algo del presupuesto del lab, también con la instancia detenida. Si alguna vez cambia la IP, cambia con ella el nombre sslip.io: hay que emitir el certificado para el nombre nuevo (sección HTTPS, paso 3), poner el nombre nuevo en `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS` de `/etc/originpass.env`, ejecutar `actualizar-ec2.sh` con el nombre nuevo y volver a exportar los QR, que llevan la dirección dentro.
 - **Sin copia de seguridad.** La base de datos y `media/` viven en el disco de la instancia; terminarla los borra.
 - **Correo sin SMTP.** Las notificaciones y el enlace de restablecimiento de contraseña no salen de la instancia mientras no se configure `EMAIL_BACKEND` con un servicio SMTP.
 - **Región de los escaneos.** Sin un CDN delante, `TRUST_GEO_HEADERS` queda apagado: los escaneos nuevos no registran región y la alerta de copia no se dispara. La alerta que se ve en el panel viene de los datos de demostración.

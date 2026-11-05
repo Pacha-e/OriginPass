@@ -1,13 +1,13 @@
 # Ready to present: OriginPass demonstration
 
-Status: 5 November 2026. The demonstration runs on the AWS EC2 deployment at `https://13-220-96-49.sslip.io`. The local server is the fallback. Check this page before the class.
+Status: 5 November 2026. The demonstration runs on the AWS EC2 deployment at `https://44-206-186-9.sslip.io`. The local server is the fallback. Check this page before the class.
 
 ## 1. Thirty minutes before the class
 
 1. Start the AWS Academy Learner Lab and the instance `originpass-d4`. Note the public IPv4 address.
-2. If the address is not `13.220.96.49`, the public name, the certificate and the settings change too. Do not improvise on the day: use the local fallback in section 4 and fix the deployment afterwards (`deploy/aws/README-AWS.md`).
-3. Open `https://13-220-96-49.sslip.io/healthz/`. Expect a padlock and `{"status": "ok"}`.
-4. Open the verification page of "Bolso textil demostrativo" (code from the printed sheet, under `https://13-220-96-49.sslip.io/v/<code>/`). Expect its photo to load; the nginx `/media/` route serves it.
+2. If the address is not `44.206.186.9`, the public name, the certificate and the settings change too. Do not improvise on the day: use the local fallback in section 4 and fix the deployment afterwards (`deploy/aws/README-AWS.md`).
+3. Open `https://44-206-186-9.sslip.io/healthz/`. Expect a padlock and `{"status": "ok"}`.
+4. Open the verification page of "Bolso textil demostrativo" (code from the printed sheet, under `https://44-206-186-9.sslip.io/v/<code>/`). Expect its photo to load; the nginx `/media/` route serves it.
 5. Print `hoja-qr-1.png` from `04-Datos\entrega-4-qr\qr-https-definitivo` at 100% on US Letter paper. Check the logo on each code and the status text on the revoked passport.
 6. Scan one printed code with a phone. It must open the HTTPS verification page.
 
@@ -45,5 +45,5 @@ The administrator account is not part of the demonstration.
 
 ## Reference
 
-- Update the server: `sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 13-220-96-49.sslip.io`
+- Update the server: `sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 44-206-186-9.sslip.io`
 - Deployment guide: `deploy/aws/README-AWS.md`

@@ -3,10 +3,10 @@
 # Order matters: code, dependencies, migrations, static files, restart, then a check
 # over HTTPS through the local nginx. A failed step stops the script.
 # Usage (on the instance):
-#   sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 13-220-96-49.sslip.io
+#   sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 44-206-186-9.sslip.io
 set -euo pipefail
 
-HOST_PUBLICO="${1:?Falta el nombre publico, por ejemplo 13-220-96-49.sslip.io}"
+HOST_PUBLICO="${1:?Falta el nombre publico, por ejemplo 44-206-186-9.sslip.io}"
 APP_DIR=/opt/originpass/app
 VENV=/opt/originpass/venv
 LOCK=/run/originpass-update.lock

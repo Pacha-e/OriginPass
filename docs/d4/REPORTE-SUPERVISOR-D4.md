@@ -6,7 +6,7 @@ This section is the current status. Sections 1 onward are the record of 29 Octob
 
 | Item | Status |
 |---|---|
-| Deployment | Deployed on AWS EC2 (AWS Academy Learner Lab), Ubuntu 26.04.1 LTS. Public URL: `https://13-220-96-49.sslip.io`, HTTPS with Let's Encrypt. `/healthz/` answered `{"status": "ok"}` on 5 November 2026 |
+| Deployment | Deployed on AWS EC2 (AWS Academy Learner Lab), Ubuntu 26.04.1 LTS. Public URL: `https://44-206-186-9.sslip.io`, HTTPS with Let's Encrypt. `/healthz/` answered `{"status": "ok"}` on 5 November 2026 |
 | Availability | At the time of this update the instance did not answer from outside. Check the Learner Lab session and `/healthz/` before the demonstration |
 | Code | Branch `main`, pushed to `origin`. Latest commits include `64990f9` (CI expression fixed, update script, deployment record) |
 | Automated tests | 349 tests passed on PostgreSQL 17 in the last full run (commit `047089f`) |

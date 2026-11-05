@@ -8,7 +8,7 @@ Estado a 29-oct-2026. Cada pregunta indica su fuente y la decisión por defecto 
 |---|---|---|---|
 | A1 | ¿Es válido el despliegue en AWS EC2 (Learner Lab)? | `referencia/aviso-profesor.md:3` pide "desplegada en AWS". | Sí. Se usa AWS EC2 (Learner Lab), como pide el profesor. Azure se retiró. |
 | A2 | El enunciado pide **reuniones semanales registradas** (3 respuestas por estudiante y semana). ¿Aplica a D4 la **bitácora** que se aceptó en D3? | Enunciado §7.2. La bitácora no aparece en ningún archivo fuente. | Se presenta bitácora y se pide confirmación. |
-| A3 | ¿Se necesita una demo local con capturas si no hay URL pública? | Enunciado §1.4 permite "motivos y evidencia alternativa". | No aplica: hay URL pública (https://13-220-96-49.sslip.io). La demo local queda como respaldo. |
+| A3 | ¿Se necesita una demo local con capturas si no hay URL pública? | Enunciado §1.4 permite "motivos y evidencia alternativa". | No aplica: hay URL pública (https://44-206-186-9.sslip.io). La demo local queda como respaldo. |
 | A4 | ¿La **Wiki de D4** debe estar en **inglés**? | `config/settings.py:114-118` dice que el curso pide artefactos en inglés. D3 se reescribió en inglés. | Inglés. Los documentos en español de `docs/d4/` se traducirán antes de publicar. |
 | A5 | ¿Cuáles son los **criterios de evaluación**, los pesos y la fecha de entrega final? | No aparecen en el enunciado ni en el aviso. | No hay criterios: se entrega según el enunciado. |
 | A6 | ¿Cuántos **participantes** mínimos y qué perfil se aceptan para la prueba de usabilidad (§3)? | Enunciado §3: actividades y tabla de severidad High/Medium/Low. | No se ha hecho ninguna sesión. No se inventan resultados. |

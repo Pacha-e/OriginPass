@@ -5,7 +5,7 @@
 **Sprint covered:** Sprint 4, 14 October to 10 November 2026. Status recorded on 5 November 2026.
 
 **Repository:** https://github.com/Pacha-e/OriginPass, branch `main`.
-**Deployed application:** https://13-220-96-49.sslip.io (AWS EC2, HTTPS). The address is tied to the public IP of the Learner Lab instance; if the instance is restarted it changes, and it is updated here and in the [README](https://github.com/Pacha-e/OriginPass#entregable-4-setup-and-status) before the review. See 1.4.
+**Deployed application:** https://44-206-186-9.sslip.io (AWS EC2, HTTPS). The instance holds an Elastic IP, so the address survives a restart of the instance; it answers while the Learner Lab instance is running. See 1.4.
 
 OriginPass gives every physical product its own passport. A workshop or a company registers each unit and prints its QR; the piece passes from hand to hand along a signed chain of custody; any buyer scans the code and reads, with no account, whether the piece is genuine, who made it and where it has been. The vueltiao hat of Tuchín is the case the product was built around.
 
@@ -129,9 +129,9 @@ FR39 was built in Sprint 3 and corrected in Sprint 4: an offer opened before a p
 
 ### 1.4. Deployment Validation
 
-**Deployment URL:** https://13-220-96-49.sslip.io
+**Deployment URL:** https://44-206-186-9.sslip.io
 
-**Health check:** `https://13-220-96-49.sslip.io/healthz/` answers `{"status": "ok"}` when the application reaches its database. It answered so over HTTPS on 5 November 2026.
+**Health check:** `https://44-206-186-9.sslip.io/healthz/` answers `{"status": "ok"}` when the application reaches its database. It answered so over HTTPS on 5 November 2026.
 
 The application runs on one AWS EC2 instance of the AWS Academy Learner Lab: Ubuntu 26.04.1 LTS, nginx in front with a Let's Encrypt certificate, gunicorn and Django behind it, and PostgreSQL on the same instance. The steps to install and update it are in [`deploy/aws/README-AWS.md`](https://github.com/Pacha-e/OriginPass/blob/main/deploy/aws/README-AWS.md). The screenshots below were taken from the running instance on 5 November 2026.
 
@@ -144,7 +144,7 @@ The application runs on one AWS EC2 instance of the AWS Academy Learner Lab: Ubu
 
 **Deployment limitations**
 
-- **The address depends on the Learner Lab.** The instance runs only while the lab session is open, and without an Elastic IP its public IP changes each time it is started again. The sslip.io name is derived from the IP, so a new IP needs a new certificate and a new entry in the allowed hosts; the procedure is in the guide.
+- **The address depends on the Learner Lab.** The instance runs only while the lab session is open. Until 5 November its public IP changed each time it was started again, which forced a new certificate and new allowed hosts; it now holds an Elastic IP, so the address stays fixed while the lab exists. The sslip.io name is derived from that IP; a domain of its own is not registered.
 - **One instance, no backup.** The database and the uploaded photos live on the disk of the instance. Terminating it deletes them.
 - **No outgoing email.** No SMTP service is configured, so the notifications (FR53–FR55) and the password reset link (FR06) are written to the server's log instead of being sent.
 - **No region on new scans** (see FR33 and FR49 in 1.3).
@@ -271,7 +271,7 @@ One US Letter page, also as a [printable PDF](https://github.com/Pacha-e/OriginP
 
 - **Trust in the operator.** Records are signed with a key derived from the server's secret, so a change made by someone who holds only the database is detected, but the operator of the server could rebuild the chain. FR56 closes that and is not built.
 - **Custody and concurrency.** The external audit of 5 November found that the state of a custody transfer and the time it was resolved are not part of its signature, that an offer validated against an earlier holder can still be accepted, and that some writes are not serialised against each other under concurrent requests. They are listed in the project's audit notes, to be fixed with a test each.
-- **Single instance.** One machine, no backup, no Elastic IP, no outgoing email (see 1.4). The installer is not safe to run again on an instance with data, because it would generate a new secret key and every existing signature would stop validating.
+- **Single instance.** One machine, no automatic backup, no outgoing email (see 1.4). The installer is not safe to run again on an instance with data, because it would generate a new secret key and every existing signature would stop validating.
 - **Scan region.** It depends on a CDN in front of the application; without one, scans carry no region and the copy alert does not fire.
 
 ### Functional limitations
@@ -295,7 +295,7 @@ One US Letter page, also as a [printable PDF](https://github.com/Pacha-e/OriginP
 - **Validate with users.** Run the producer interviews, the buyer survey and the usability protocol before building anything else; it is the largest open item of the project.
 - **Anchor the chain on Monad (FR56),** so that verification stops depending on whoever runs the server.
 - **Tamper-evident labels.** A label that breaks when removed, or an NFC tag, would tie the passport to the piece itself.
-- **A production deployment:** an Elastic IP or a domain, a managed database with backups, an SMTP service and a CDN, which also gives the scans their region back.
+- **A production deployment:** a domain of its own, a managed database with backups, an SMTP service and a CDN, which also gives the scans their region back.
 - **A gallery and a richer public profile** for each workshop.
 
 ---

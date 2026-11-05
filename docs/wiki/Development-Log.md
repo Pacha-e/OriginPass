@@ -33,7 +33,7 @@ No commit reached `main` between 16 October and 3 November, so this entry starts
 
 **What is blocking**
 
-- The EC2 instance depends on the Learner Lab session. Its public address changes when the instance is restarted, and the certificate and the allowed hosts must be changed with it.
+- The EC2 instance depends on the Learner Lab session. Its public address changed each time the instance was restarted, which forced a new certificate, new allowed hosts and new printed QR codes; on 5 November it was given an Elastic IP, so the address is now fixed.
 - Photo reading has been checked against generated images in node, not against photographs taken with the final phones.
 
 ---

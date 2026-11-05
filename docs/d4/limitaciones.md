@@ -42,7 +42,7 @@ Verified on 2026-10-29 on `d4/integracion-20261029`. Each limitation cites the f
 
 | ID | Limitation | Evidence |
 |---|---|---|
-| D1 | Public URL: deployed at https://13-220-96-49.sslip.io (5 November 2026). It depends on the Learner Lab instance: while the instance is stopped, the URL does not answer | `deploy/aws/README-AWS.md`; `docs/d4/seguimiento.md` |
+| D1 | Public URL: deployed at https://44-206-186-9.sslip.io (5 November 2026). It depends on the Learner Lab instance: while the instance is stopped, the URL does not answer | `deploy/aws/README-AWS.md`; `docs/d4/seguimiento.md` |
 | D2 | No first-run test on a second laptop | `README.md:42` |
 | D3 | Tests have not been re-run on this date | `docs/GUIA-DEMO.md:91-94` ("Estado verificado", 1 October) |
 | D4 | The portable kit contains Sprint 3 code and demo; no live database, no user uploads, no personal signing key | `README.md:42` |

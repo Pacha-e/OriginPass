@@ -26,11 +26,11 @@ flowchart LR
     APP -->|"MEDIA_ROOT"| MED
 ```
 
-- Public address: `https://13-220-96-49.sslip.io`. `/healthz/` answers `{"status": "ok"}`.
+- Public address: `https://44-206-186-9.sslip.io`. `/healthz/` answers `{"status": "ok"}`.
 - Install and update: `deploy/aws/instalar-ec2.sh` (first install) and `deploy/aws/actualizar-ec2.sh` (updates: dependencies, migrations, static files, restart, HTTPS check). Guide: `deploy/aws/README-AWS.md`.
 - Media: nginx serves `/media/` from `/opt/originpass/app/media` because Django serves media only with `DEBUG=True`.
 - Limitation: media and the database live on the instance disk. There is no backup yet, and terminating the instance deletes them.
-- Limitation: the IP changes when the instance is stopped and started (no Elastic IP). The certificate covers the sslip.io name only.
+- The instance holds the Elastic IP `44.206.186.9` since 5 November 2026, so the address survives a stop and start. The certificate covers the sslip.io name only.
 ### 1.2 Scenario B: project laptop (local)
 
 ```mermaid

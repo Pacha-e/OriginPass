@@ -281,7 +281,7 @@ Universidad EAFIT, Medellín, Colombia
 
 ## Entregable 4: setup and status
 
-**Deployed on AWS EC2:** https://13-220-96-49.sslip.io (HTTPS, Let's Encrypt). `https://13-220-96-49.sslip.io/healthz/` answers `{"status": "ok"}`. The application also runs locally at `http://127.0.0.1:8000/`.
+**Deployed on AWS EC2:** https://44-206-186-9.sslip.io (HTTPS, Let's Encrypt). `https://44-206-186-9.sslip.io/healthz/` answers `{"status": "ok"}`. The application also runs locally at `http://127.0.0.1:8000/`.
 
 Requirements: Python 3.12 (see Technology) and Docker Compose for PostgreSQL (see Running the project locally). `requirements.txt` lists the runtime dependencies; `requirements-dev.txt` adds the linter.
 

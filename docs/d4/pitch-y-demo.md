@@ -1,6 +1,6 @@
 # Pitch and demo: Entregable 4
 
-> **The demo runs on the public deployment.** It is served at `https://13-220-96-49.sslip.io` (AWS EC2, HTTPS; `docs/d4/backlog.md`, D4-01), with the local server at `http://127.0.0.1:8000/` (`README.md`) as the fallback. Neither the pitch nor the demo claims user results or a validated usability study.
+> **The demo runs on the public deployment.** It is served at `https://44-206-186-9.sslip.io` (AWS EC2, HTTPS; `docs/d4/backlog.md`, D4-01), with the local server at `http://127.0.0.1:8000/` (`README.md`) as the fallback. Neither the pitch nor the demo claims user results or a validated usability study.
 
 ## Preparation
 

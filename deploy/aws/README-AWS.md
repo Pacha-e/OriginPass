@@ -1,0 +1,120 @@
+# Despliegue en AWS EC2 (AWS Academy Learner Lab)
+
+Despliegue del entregable 4. Sustituye al despliegue de Azure, que se retiró.
+Estado: **pendiente de ejecución**. Ninguna URL existe hasta completar estos pasos.
+
+## Arquitectura
+
+- Una instancia EC2 con Ubuntu Server 24.04 LTS.
+- nginx escucha en el puerto 80 y reenvía a gunicorn en `127.0.0.1:8000` (Django).
+- PostgreSQL 16 local, escuchando solo en `127.0.0.1`. No queda expuesto a Internet.
+- Código: clon público de este repositorio (rama `main`).
+- Sin HTTPS. Los datos viajan sin cifrar; es una limitación declarada.
+- Archivos subidos (`media/`) en disco local de la instancia.
+
+## 1. Especificaciones de la instancia
+
+Consola EC2 → **Launch instance**.
+
+| Campo | Valor |
+|---|---|
+| Name | `originpass-d4` |
+| AMI | **Ubuntu Server 24.04 LTS**, 64-bit (x86) |
+| Instance type | **t3.small** (2 GiB de RAM). Si no aparece, `t3.micro` (1 GiB) con swap (ver paso 4) |
+| Key pair | **Proceed without a key pair.** El acceso se hace con EC2 Instance Connect desde la consola (paso 2) |
+| Network / VPC | VPC por defecto |
+| Subnet | Cualquier subred pública de la región |
+| Auto-assign public IP | **Enable** |
+| Security group | Nuevo, con las reglas de la tabla siguiente |
+| Storage | **16 GiB gp3**, volumen raíz (mínimo 12) |
+| IAM instance profile | No hace falta |
+| User data | Vacío (la instalación se hace a mano, paso 3) |
+
+Reglas de entrada del security group:
+
+| Tipo | Protocolo | Puerto | Origen |
+|---|---|---|---|
+| SSH | TCP | 22 | **My IP** |
+| HTTP | TCP | 80 | **Anywhere** (0.0.0.0/0) |
+
+No abras 5432 ni 8000. No se usa 443 porque no hay HTTPS.
+
+Región: la del lab (menú superior derecho de la consola). Anótala; debe coincidir en todo.
+
+Cuando la instancia esté en `running`, anota su **Public IPv4 address** (por ejemplo `54.12.34.56`). Esa es `IP_PUBLICA` en los pasos siguientes.
+
+## 2. Entrar por SSH
+
+La instancia no tiene key pair, así que no hay SSH desde PowerShell. Usa la consola:
+
+1. En EC2 → **Instances**, selecciona `originpass-d4`.
+2. Pulsa **Connect → EC2 Instance Connect → Connect**. Se abre una terminal en el navegador, como usuario `ubuntu`.
+
+Si la conexión falla con timeout, el security group no deja entrar el puerto 22 desde el servicio de la consola. Añade temporalmente una regla SSH 22 desde `0.0.0.0/0`, y **quítala** al terminar la instalación.
+
+## 3. Instalar
+
+Dentro de la instancia (sustituye `IP_PUBLICA`):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Pacha-e/OriginPass/main/deploy/aws/instalar-ec2.sh -o instalar-ec2.sh
+sudo bash instalar-ec2.sh IP_PUBLICA main
+```
+
+El script instala git, PostgreSQL, nginx y Python; clona el repositorio en `/opt/originpass/app`; crea la base y el usuario de PostgreSQL con contraseñas aleatorias; aplica migraciones; y arranca gunicorn y nginx. Termina con una comprobación local de `/healthz/`.
+
+Las credenciales de la base quedan solo en `/etc/originpass.env` (permisos 600).
+
+Si el script falla, el mensaje indica el paso. Corrige la causa y vuelve a ejecutarlo: es repetible.
+
+## 4. Swap (solo si usas t3.micro)
+
+Con 1 GiB de RAM la instalación puede agotar la memoria. Antes del paso 3:
+
+```bash
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile
+sudo mkswap /swapfile && sudo swapon /swapfile
+```
+
+## 5. Verificar
+
+Desde tu PC, PowerShell:
+
+```powershell
+curl.exe -i http://IP_PUBLICA/healthz/
+```
+
+Debe responder `HTTP/1.1 200 OK` y contener `"status": "ok"`. Después, abre `http://IP_PUBLICA/` en el navegador.
+
+Si falla, dentro de la instancia:
+
+```bash
+sudo systemctl status originpass --no-pager
+sudo journalctl -u originpass -n 50 --no-pager
+sudo tail -n 30 /var/log/nginx/error.log
+```
+
+## 6. Cuenta de administración
+
+El sitio arranca sin usuarios. Crea un administrador desde la instancia:
+
+```bash
+sudo bash -c 'set -a; . /etc/originpass.env; set +a; cd /opt/originpass/app && /opt/originpass/venv/bin/python manage.py createsuperuser'
+```
+
+## Datos de demostración: pendiente de decisión
+
+`seed_demo` no puede ejecutarse con `DEBUG=0`, y así debe ser: crea cuentas con una contraseña conocida. Por eso el sitio de EC2 arranca **sin productos de demostración**.
+
+Los códigos de pasaporte y las firmas de integridad dependen de la base de datos y de `SECRET_KEY` de cada instancia. Un QR generado en otra instalación no funciona aquí. Los QR para la clase deben generarse **contra la base de esta instancia**.
+
+## Limitaciones conocidas
+
+- **La IP cambia** si paras y arrancas la instancia (no hay Elastic IP). Si cambia, edita `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS` en `/etc/originpass.env` y ejecuta `sudo systemctl restart originpass`.
+- **Sin HTTPS.** Pendiente: dominio y certificado (Let's Encrypt), y `BEHIND_TLS_PROXY=1`.
+- **Sin ensayo previo** de este procedimiento en EC2. Lo que se verifica es lo que devuelve el comando.
+
+## Coste y limpieza
+
+- El Learner Lab tiene presupuesto limitado. Al terminar la demostración, **termina la instancia** (Instance state → Terminate). Terminar borra el disco.
+- Al cerrar el lab, las instancias se detienen. Al volver a abrirlo, la IP puede cambiar.

@@ -37,30 +37,6 @@ Two limits a buyer should keep in mind:
   with a key the workshop holds. "Signed" means tamper-evident, not a digital
   signature controlled by the maker.
 
-## Portable presentation kit (Windows laptop)
-
-The ready-to-transfer archive `OriginPass-Portatil.zip` and its `SHA256SUMS.txt` are assets of the [portable kit release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-kit-portatil-2026-10-15); `python delivery/build_portable.py` rebuilds them from the tracked source. **Read [`delivery/LEEME-PORTATIL.md`](delivery/LEEME-PORTATIL.md) first** (also inside the ZIP); it lists everything that has to be running and open for the presentation, the exact PowerShell commands and the order of the demonstration. The setup and launch scripts in `delivery/` run both from the extracted ZIP and from a clone of this repository. This archive contains the local Sprint 3 working-tree code and demo, **not** a live database, user uploads, a virtualenv or a personal signing key. A second laptop still needs a real first-run test; a desktop test is not proof of laptop readiness. If source changes after this snapshot, regenerate and verify the archive before presenting.
-
-Extract the full kit and open **`ABRIR-KIT.html`**. It links the vector PDF and HTML
-presentation, the three diagrams as individual vector PDFs/SVGs, seven original
-screenshots, the script, the feature walkthrough and all five launch videos. These presentation files work offline. Run `Verificar-Kit.ps1` to
-check every packaged source and media file against `KIT-MANIFEST.json`; setup creates
-`ABRIR-DEMO.html` with the passport links from that laptop's own database.
-
-The presentation is built by `python tools/presentation/build_deck.py`, after exporting
-the diagrams with `python tools/presentation/render_diagrams.py`. Authoring dependencies
-are in `tools/presentation/requirements.txt`. The silent walkthrough is recorded by
-`python tools/video/record_features.py`. The five launch videos, narrated by Emmanuel,
-remain available in the [videos release](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-videos-lanzamiento)
-and are also included in the complete kit, under CC BY-SA 4.0 with the credits in
-[`delivery/CREDITOS-VIDEOS.md`](delivery/CREDITOS-VIDEOS.md).
-
-A versioned [wiki snapshot](docs/wiki/Deliverable-3.md) makes the kit reproducible from
-this repository alone. `python delivery/build_portable.py --fetch-videos` downloads any
-missing launch videos with GitHub CLI and checks their published SHA-256 values before
-packaging. Generated PDFs, videos and ZIPs are distributed through Releases; their
-sources, dependencies, media checksums, guides and wiki snapshot are versioned here.
-
 The individual daily log the professor asked for in place of meeting minutes is the Wiki's [Daily Log](https://github.com/Pacha-e/OriginPass/wiki/Daily-Log) page.
 
 ## Documentation
@@ -297,3 +273,34 @@ so this choice does not close any door.
 
 Emmanuel Hernández Melo — ehernandem@eafit.edu.co
 Universidad EAFIT, Medellín, Colombia
+
+## Entregable 4: setup and status
+
+**Public URL pending: AWS EC2 deployment not executed yet.** The application runs locally at `http://127.0.0.1:8000/`. No production URL is verified.
+
+Requirements: Python 3.12 (see Technology) and Docker Compose for PostgreSQL (see Running the project locally). `requirements.txt` lists the runtime dependencies; `requirements-dev.txt` adds the linter.
+
+Minimum commands to start locally. They are the same steps as [Running the project locally](#running-the-project-locally), without the step-by-step guide:
+
+```bash
+docker compose up -d                  # PostgreSQL 17 on localhost:5432
+python -m venv .venv
+source .venv/Scripts/activate         # Linux and macOS: source .venv/bin/activate
+pip install -r requirements-dev.txt
+cp .env.example .env                  # fill in SECRET_KEY
+python manage.py migrate
+python manage.py compilemessages
+python manage.py createsuperuser
+python manage.py runserver            # http://127.0.0.1:8000/
+python manage.py seed_demo            # demo data; requires DEBUG on
+```
+
+Entregable 4 documentation, draft: [docs/d4/](docs/d4/)
+
+- [Pending backlog](docs/d4/backlog.md)
+- [Limitations and future work](docs/d4/limitaciones.md)
+- [Follow-up and real status](docs/d4/seguimiento.md)
+- [Retrospective (draft)](docs/d4/retrospectiva.md)
+- [Pitch and demo script](docs/d4/pitch-y-demo.md)
+
+AWS deployment (EC2, AWS Academy Learner Lab): guide at [deploy/aws/README-AWS.md](deploy/aws/README-AWS.md). The deployment is prepared but not executed, and there is no verified URL.

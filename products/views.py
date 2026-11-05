@@ -41,7 +41,7 @@ from .models import (
     ProductStatus,
     TransferState,
 )
-from .qr import passport_qr_image
+from .qr import PRINT_DPI, passport_qr_image
 
 # ---- Constants ----
 
@@ -454,7 +454,7 @@ def qr_download(request, pk):
     image = passport_qr_image(address)
 
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
+    image.save(buffer, format="PNG", dpi=(PRINT_DPI, PRINT_DPI))
 
     response = HttpResponse(buffer.getvalue(), content_type="image/png")
     response["Content-Disposition"] = (

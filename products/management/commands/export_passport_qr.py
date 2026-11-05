@@ -7,7 +7,6 @@ does not verify here.
 """
 
 # ---- External imports ----
-import math
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -17,25 +16,24 @@ from PIL import Image, ImageDraw, ImageFont
 
 # ---- Internal imports ----
 from products.models import Product, ProductStatus
-from products.qr import QR_SIZE, passport_qr_image
+from products.qr import PRINT_DPI, QR_SIZE, passport_qr_image
 
 # ---- Constants ----
 
-#: Three columns fit an A4 page at QR_SIZE.
+#: US Letter at PRINT_DPI: the sheets are printed at 100% on Letter paper.
+PAGE_SIZE = (2550, 3300)
+
 COLUMNS = 3
+ROWS = 4
+PER_PAGE = COLUMNS * ROWS
 
-MARGIN = 40
-
-#: Room under each code for the product name.
-LABEL_HEIGHT = 60
-
-SHEET_FILE = "hoja-qr.png"
+LABEL_FONT_SIZE = 36
 
 # ---- Public API ----
 
 
 class Command(BaseCommand):
-    help = "Write one PNG per passport and a printable sheet with every code."
+    help = "Write one PNG per passport and Letter-size sheets with every code."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -63,11 +61,13 @@ class Command(BaseCommand):
         for product in products:
             address = base + reverse("verification:verify", args=[product.passport_code])
             code = passport_qr_image(address)
-            code.save(output / f"qr-{product.passport_code}.png")
+            code.save(output / f"qr-{product.passport_code}.png", dpi=(PRINT_DPI, PRINT_DPI))
             tiles.append((_label(product), code))
 
-        _sheet(tiles).save(output / SHEET_FILE)
-        self.stdout.write(f"{len(tiles)} QR codes written to {output}")
+        pages = [tiles[start : start + PER_PAGE] for start in range(0, len(tiles), PER_PAGE)]
+        for number, page in enumerate(pages, start=1):
+            _page(page).save(output / f"hoja-qr-{number}.png", dpi=(PRINT_DPI, PRINT_DPI))
+        self.stdout.write(f"{len(tiles)} QR codes on {len(pages)} page(s) written to {output}")
 
 
 # ---- Private helpers ----
@@ -87,19 +87,26 @@ def _validated_base(url):
     return url.rstrip("/")
 
 
-def _sheet(tiles):
-    rows = math.ceil(len(tiles) / COLUMNS)
-    cell_height = QR_SIZE + LABEL_HEIGHT + MARGIN
-    width = COLUMNS * (QR_SIZE + MARGIN) + MARGIN
-    height = rows * cell_height + MARGIN
-    sheet = Image.new("RGB", (width, height), "white")
+def _page(tiles):
+    width, height = PAGE_SIZE
+    cell_width = width // COLUMNS
+    cell_height = height // ROWS
+    sheet = Image.new("RGB", PAGE_SIZE, "white")
     draw = ImageDraw.Draw(sheet)
-    font = ImageFont.load_default(size=20)
+    font = ImageFont.load_default(size=LABEL_FONT_SIZE)
 
     for index, (name, code) in enumerate(tiles):
-        x = MARGIN + (index % COLUMNS) * (QR_SIZE + MARGIN)
-        y = MARGIN + (index // COLUMNS) * cell_height
+        cell_x = (index % COLUMNS) * cell_width
+        cell_y = (index // COLUMNS) * cell_height
+        x = cell_x + (cell_width - QR_SIZE) // 2
+        y = cell_y + (cell_height - QR_SIZE) // 2
         sheet.paste(code, (x, y))
-        draw.text((x, y + QR_SIZE + 12), name, fill="black", font=font)
+        draw.text(
+            (cell_x + cell_width // 2, y + QR_SIZE + 30),
+            name,
+            fill="black",
+            font=font,
+            anchor="mt",
+        )
 
     return sheet

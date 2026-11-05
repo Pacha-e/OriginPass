@@ -33,7 +33,7 @@ class QrCodeTests(TestCase):
             "verification:verify", args=[self.product.passport_code]
         )
         expected = io.BytesIO()
-        passport_qr_image(address).save(expected, format="PNG")
+        passport_qr_image(address).save(expected, format="PNG", dpi=(300, 300))
 
         self.assertEqual(response.content, expected.getvalue())
 

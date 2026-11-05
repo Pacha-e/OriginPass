@@ -16,6 +16,10 @@ from PIL import Image, ImageDraw
 #: Side of the code in pixels: 300 px printed at 300 dpi is about 2.5 cm.
 QR_SIZE = 300
 
+#: Resolution written into every PNG, so a printer uses 300 dpi rather than the
+#: 96 dpi a viewer assumes, which would make the code about 8 cm wide.
+PRINT_DPI = 300
+
 #: Pixels per module before scaling down to QR_SIZE.
 BOX_SIZE = 10
 

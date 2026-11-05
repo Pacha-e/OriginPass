@@ -20,7 +20,7 @@ jobs:
         env:
           POSTGRES_DB: originpass
           POSTGRES_USER: originpass
-          POSTGRES_PASSWORD: ${{ env.CI_POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: ci-only-not-a-secret
         ports:
           - 5432:5432
         options: >-
@@ -30,7 +30,7 @@ jobs:
           --health-retries 10
 
     env:
-      DATABASE_URL: postgres://originpass:${{ env.CI_POSTGRES_PASSWORD }}@localhost:5432/originpass
+      DATABASE_URL: postgres://originpass:ci-only-not-a-secret@localhost:5432/originpass
       SECRET_KEY: only-for-continuous-integration
       DEBUG: "False"
       ALLOWED_HOSTS: localhost,127.0.0.1

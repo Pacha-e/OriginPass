@@ -5,7 +5,7 @@ Estado: **pendiente de ejecución**. Ninguna URL existe hasta completar estos pa
 
 ## Arquitectura
 
-- Una instancia EC2 con Ubuntu Server 24.04 LTS.
+- Una instancia EC2 con Ubuntu Server 26.04.1 LTS. El script de instalación se escribió para 24.04 y se instaló sin cambios en 26.04.1.
 - nginx escucha en el puerto 80 y reenvía a gunicorn en `127.0.0.1:8000` (Django).
 - PostgreSQL 16 local, escuchando solo en `127.0.0.1`. No queda expuesto a Internet.
 - Código: clon público de este repositorio (rama `main`).
@@ -19,7 +19,7 @@ Consola EC2 → **Launch instance**.
 | Campo | Valor |
 |---|---|
 | Name | `originpass-d4` |
-| AMI | **Ubuntu Server 24.04 LTS**, 64-bit (x86) |
+| AMI | **Ubuntu Server 26.04 LTS** (se usó 26.04.1), 64-bit (x86) |
 | Instance type | **t3.small** (2 GiB de RAM). Si no aparece, `t3.micro` (1 GiB) con swap (ver paso 4) |
 | Key pair | **Proceed without a key pair.** El acceso se hace con EC2 Instance Connect desde la consola (paso 2) |
 | Network / VPC | VPC por defecto |
@@ -102,11 +102,37 @@ El sitio arranca sin usuarios. Crea un administrador desde la instancia:
 sudo bash -c 'set -a; . /etc/originpass.env; set +a; cd /opt/originpass/app && /opt/originpass/venv/bin/python manage.py createsuperuser'
 ```
 
-## Datos de demostración: pendiente de decisión
+## HTTPS
 
-`seed_demo` no puede ejecutarse con `DEBUG=0`, y así debe ser: crea cuentas con una contraseña conocida. Por eso el sitio de EC2 arranca **sin productos de demostración**.
+Instalado el 5 de noviembre de 2026 con Let's Encrypt, en `https://13-220-96-49.sslip.io`.
 
-Los códigos de pasaporte y las firmas de integridad dependen de la base de datos y de `SECRET_KEY` de cada instancia. Un QR generado en otra instalación no funciona aquí. Los QR para la clase deben generarse **contra la base de esta instancia**.
+1. En el security group, agrega **HTTPS (443)** con origen **Anywhere-IPv4**.
+2. `sudo apt-get install -y certbot python3-certbot-nginx`
+3. `sudo certbot --nginx -d 13-220-96-49.sslip.io --redirect -m TU_CORREO --agree-tos --no-eff-email`. El `--redirect` manda el HTTP a HTTPS. El certificado vence el 3 de febrero de 2027; la renovación es automática.
+4. En `/etc/originpass.env`, `ALLOWED_HOSTS` incluye el nombre, `CSRF_TRUSTED_ORIGINS=https://13-220-96-49.sslip.io`, y se añaden `BEHIND_TLS_PROXY=1`, `SESSION_COOKIE_SECURE=1` y `CSRF_COOKIE_SECURE=1`.
+5. `sudo systemctl restart originpass`
+
+Los QR impresos deben apuntar a la dirección HTTPS. Los QR antiguos con la IP siguen funcionando por redirección, pero el certificado no cubre la IP y el navegador mostraría una advertencia.
+
+## Actualizar el servidor
+
+La primera vez, trae el script nuevo:
+
+```bash
+sudo -u originpass git -C /opt/originpass/app pull --ff-only
+```
+
+Después, en cada actualización:
+
+```bash
+sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 13-220-96-49.sslip.io
+```
+
+El script instala dependencias, aplica migraciones, copia los archivos estáticos, reinicia el servicio y comprueba `/healthz/` por HTTPS con el certificado validado. Si un paso falla, se detiene.
+
+## Datos de demostración
+
+Se cargaron una vez con `seed_demo`, con `DEBUG=1` solo para ese comando. Las cuentas de demostración comparten una contraseña conocida. Esa decisión es del responsable del proyecto para la demostración en clase, no una práctica de producción.
 
 ## Limitaciones conocidas
 

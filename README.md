@@ -276,7 +276,7 @@ Universidad EAFIT, Medellín, Colombia
 
 ## Entregable 4: setup and status
 
-**Public URL pending: AWS EC2 deployment not executed yet.** The application runs locally at `http://127.0.0.1:8000/`. No production URL is verified.
+**Deployed on AWS EC2:** https://13-220-96-49.sslip.io (HTTPS, Let's Encrypt). `https://13-220-96-49.sslip.io/healthz/` answers `{"status": "ok"}`. The application also runs locally at `http://127.0.0.1:8000/`.
 
 Requirements: Python 3.12 (see Technology) and Docker Compose for PostgreSQL (see Running the project locally). `requirements.txt` lists the runtime dependencies; `requirements-dev.txt` adds the linter.
 
@@ -303,4 +303,4 @@ Entregable 4 documentation, draft: [docs/d4/](docs/d4/)
 - [Retrospective (draft)](docs/d4/retrospectiva.md)
 - [Pitch and demo script](docs/d4/pitch-y-demo.md)
 
-AWS deployment (EC2, AWS Academy Learner Lab): guide at [deploy/aws/README-AWS.md](deploy/aws/README-AWS.md). The deployment is prepared but not executed, and there is no verified URL.
+AWS deployment (EC2, AWS Academy Learner Lab): guide at [deploy/aws/README-AWS.md](deploy/aws/README-AWS.md), with the HTTPS steps and the update procedure. Known limits: the demonstration accounts share one known password, and the photo upload and camera reader have been checked in node but not on the final phones.

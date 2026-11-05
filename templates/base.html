@@ -64,6 +64,7 @@
           </span>
         {% endif %}
         <span class="nav__user">{{ user.email }}</span>
+        <a href="{% url 'accounts:password_change' %}"{% if here == 'accounts:password_change' %} aria-current="page"{% endif %}>{% translate "Change password" %}</a>
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
           <button type="submit" class="btn btn--link">{% translate "Log out" %}</button>

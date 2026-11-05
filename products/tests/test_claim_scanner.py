@@ -27,6 +27,11 @@ class ClaimScannerTests(TestCase):
         self.assertContains(self.response, "vendor/jsqr/jsQR.js")
         self.assertContains(self.response, "js/passport-scanner.js")
 
+    def test_the_page_accepts_a_photo_of_the_qr_that_is_read_in_the_browser(self):
+        self.assertContains(self.response, 'type="file"')
+        self.assertContains(self.response, 'accept="image/*"')
+        self.assertContains(self.response, "data-scanner-photo")
+
     def test_the_shipped_files_exist(self):
         self.assertIsNotNone(finders.find("vendor/jsqr/jsQR.js"))
         self.assertIsNotNone(finders.find("js/passport-scanner.js"))

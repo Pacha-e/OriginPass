@@ -21,6 +21,13 @@
   </div>
 
   <button type="button" class="btn" data-scanner-start hidden>{% translate "Read the QR with the camera" %}</button>
+  <div data-scanner-photo data-scanner-field="id_passport_code" hidden
+       data-msg-found="{% translate 'Code read from the photo. Check it is the piece you are claiming, then press Claim the piece.' %}"
+       data-msg-none="{% translate 'No QR code was found in that photo. Try a closer, sharper photo, or type the code.' %}">
+    <label for="scanner-photo-input">{% translate "Or upload a photo of the QR" %}</label>
+    <input type="file" id="scanner-photo-input" accept="image/*" capture="environment" data-scanner-photo-input>
+    <p class="scanner__status" data-scanner-photo-status role="status"></p>
+  </div>
   <div data-scanner data-scanner-field="id_passport_code" hidden
        data-msg-aim="{% translate 'Point the camera at the QR on the label.' %}"
        data-msg-found="{% translate 'Code read. Check it is the piece you are claiming, then press Claim the piece.' %}"

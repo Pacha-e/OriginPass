@@ -11,7 +11,6 @@ import csv
 import io
 from datetime import timedelta
 
-import qrcode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -42,6 +41,7 @@ from .models import (
     ProductStatus,
     TransferState,
 )
+from .qr import passport_qr_image
 
 # ---- Constants ----
 
@@ -451,7 +451,7 @@ def qr_download(request, pk):
     address = request.build_absolute_uri(
         reverse("verification:verify", args=[product.passport_code])
     )
-    image = qrcode.make(address)
+    image = passport_qr_image(address)
 
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")

@@ -3,11 +3,11 @@
 # ---- External imports ----
 import io
 
-import qrcode
 from django.test import TestCase
 from django.urls import reverse
 
 # ---- Internal imports ----
+from products.qr import passport_qr_image
 from test_support.factories import OWNER_PASSWORD, make_approved_company, make_product
 
 
@@ -25,15 +25,15 @@ class QrCodeTests(TestCase):
 
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
-    def test_the_image_encodes_the_verification_address(self):
-        """Compared against the image the address produces, so no decoder is needed."""
+    def test_the_image_is_the_passport_code_with_the_mark(self):
+        """Compared against the image the shared builder makes for the same address."""
         response = self.client.get(self.url)
 
         address = "http://testserver" + reverse(
             "verification:verify", args=[self.product.passport_code]
         )
         expected = io.BytesIO()
-        qrcode.make(address).save(expected, format="PNG")
+        passport_qr_image(address).save(expected, format="PNG")
 
         self.assertEqual(response.content, expected.getvalue())
 

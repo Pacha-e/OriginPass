@@ -59,10 +59,7 @@ class ExportPassportQrTests(TestCase):
             created.append(code)
             return code
 
-        with patch(
-            "products.management.commands.export_passport_qr.qrcode.QRCode",
-            side_effect=remember,
-        ):
+        with patch("products.qr.qrcode.QRCode", side_effect=remember):
             self._export()
 
         address = BASE + reverse("verification:verify", args=[self.product.passport_code])

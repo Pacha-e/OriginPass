@@ -95,6 +95,11 @@ server {
     server_name _;
     client_max_body_size 10m;
 
+    # Uploaded images: Django serves /media/ only with DEBUG on, so nginx does it.
+    location /media/ {
+        alias /opt/originpass/app/media/;
+    }
+
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;

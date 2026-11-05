@@ -8,6 +8,34 @@ Entries are listed with the most recent first.
 
 ---
 
+## Week 16 — 16 October to 5 November 2026
+
+No commit reached `main` between 16 October and 3 November, so this entry starts from the commits of 4 and 5 November.
+
+**What was done**
+
+- Retired the portable presentation kit from `main` and Azure with it (`49f40c9`, `e0e58ed`). The application was deployed on AWS EC2, Ubuntu 26.04.1 LTS, behind nginx with gunicorn and PostgreSQL. Installation scripts and the deployment guide are in `deploy/aws/` (`e0e58ed`, `87d4570`).
+- Fixed the five defects from the external audit, each with a regression test that failed before the fix: a locked login that revealed nothing, offers on revoked passports, stale company edits, the demonstration seed outside `DEBUG`, and altered passports now shown as altered (`27ae4b7`). Migrations re-sign existing rows and add the altered verdict.
+- Password change for signed-in accounts (`148c76b`).
+- Printable QR codes: one per passport, revoked ones included and labelled with their status, the OriginPass mark in the centre, 300 dpi, twelve per US Letter page (`9058a49`, `72dffc1`, `61e8865`, `fc6b0ef`).
+- Claim page: the passport QR can be read from the camera (HTTPS only) or from an uploaded photo, with jsQR 1.4.0 (Apache-2.0) vendored under `static/vendor/jsqr` (`8831047`, `ce81447`, `9147845`, `64f47ba`). A photo is tried at several widths, because the reader succeeds at some sizes and fails at others.
+- HTTPS with a Let's Encrypt certificate on the instance, nginx serving uploaded images, an update script that installs dependencies, applies migrations and checks HTTPS (`dcca1e8`, `1e66caf`, `64990f9`).
+- Strings added since the last catalogue are translated and the `.mo` is rebuilt (`047089f`).
+- Full test suite: 349 tests passed on PostgreSQL 17 (last full run).
+
+**What comes next**
+
+- Open Sprint 4 requirements: FR27 (bulk CSV registration), FR34 (per-minute limit on verifications), FR56 (publishing the integrity-chain head outside the operator's control) and UR05 (English interface), issues #27, #34, #78 and #60.
+- Usability validation with real users, which is still not done.
+- The external audit findings: custody transfers whose state is not signed, the installer that is unsafe to repeat on an instance with data, and concurrency in offers, revocations and the audit log. They are listed in the project's audit notes.
+- Run the update script on the instance and check the public address on a phone.
+
+**What is blocking**
+
+- The EC2 instance depends on the Learner Lab session. Its public address changes when the instance is restarted, and the certificate and the allowed hosts must be changed with it.
+- Photo reading has been checked against generated images in node, not against photographs taken with the final phones.
+
+---
 ## Week 15 — 6 to 15 October 2026
 
 **What was done**

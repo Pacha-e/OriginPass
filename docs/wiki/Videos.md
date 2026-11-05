@@ -50,7 +50,7 @@ the physical piece; the scope is set out on [Deliverable 3](Deliverable-3).
 The launch videos are published under **CC BY-SA 4.0**: five of the photographs in them
 are CC BY-SA and appear modified. Each photograph, with its author, licence and what was
 changed, is listed in
-[`docs/CREDITOS-VIDEOS.md`](https://github.com/Pacha-e/OriginPass/blob/main/docs/CREDITOS-VIDEOS.md),
+[`delivery/CREDITOS-VIDEOS.md`](https://github.com/Pacha-e/OriginPass/blob/main/delivery/CREDITOS-VIDEOS.md),
 which is also attached to the release.
 
 > Fotos: Fernan Acosta (CC BY 3.0), María Angélica G (CC BY-SA 4.0), Hurluberlue (CC BY-SA

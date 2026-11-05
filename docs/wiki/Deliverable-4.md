@@ -26,6 +26,7 @@ Status on 5 November 2026. This page reports what is built and running, and what
 
 - Usability validation with real users: not done.
 - PVB validation: not done.
+- Open Sprint 4 requirements: FR27 ([#27](https://github.com/Pacha-e/OriginPass/issues/27)), FR34 ([#34](https://github.com/Pacha-e/OriginPass/issues/34)), FR56 ([#78](https://github.com/Pacha-e/OriginPass/issues/78)) and UR05 ([#60](https://github.com/Pacha-e/OriginPass/issues/60)).
 - External audit findings still open (custody signatures, concurrency, installer): listed in the project's audit notes.
 - The remote CI run has not been checked from the development environment.
 - The update script has not yet been run on the instance.

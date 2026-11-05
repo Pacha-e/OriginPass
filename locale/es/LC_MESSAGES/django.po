@@ -1658,3 +1658,51 @@ msgid ""
 msgstr ""
 "Lo que le contaste a quien revisa sobre cómo trabajas. Solo lo lee el "
 "equipo de revisión; nunca se publica."
+
+msgid "Altered"
+msgstr "Alterado"
+
+msgid "Change password"
+msgstr "Cambiar contraseña"
+
+msgid "Choose a photo"
+msgstr "Elegir una foto"
+
+msgid "Close the camera"
+msgstr "Cerrar la cámara"
+
+msgid "Code read from the photo. Check it is the piece you are claiming, then press Claim the piece."
+msgstr "Código leído de la foto. Revisa que sea el producto que vas a recibir y luego pulsa «Recibir el producto»."
+
+msgid "Code read. Check it is the piece you are claiming, then press Claim the piece."
+msgstr "Código leído. Revisa que sea el producto que vas a recibir y luego pulsa «Recibir el producto»."
+
+msgid "No QR code was found in that photo. Try a closer, sharper photo, or type the code."
+msgstr "No se encontró ningún código QR en esa foto. Prueba con una foto más cercana y nítida, o escribe el código."
+
+msgid "Or upload a photo of the QR"
+msgstr "O sube una foto del código QR"
+
+msgid "Password changed"
+msgstr "Contraseña cambiada"
+
+msgid "Point the camera at the QR on the label."
+msgstr "Apunta la cámara al código QR de la etiqueta."
+
+msgid "Read the QR with the camera"
+msgstr "Leer el QR con la cámara"
+
+msgid "The camera is not available. Type the passport code instead."
+msgstr "La cámara no está disponible. Escribe el código del pasaporte."
+
+msgid "The record behind this code does not match the signature OriginPass issued for it. Do not rely on it."
+msgstr "El registro detrás de este código no coincide con la firma que OriginPass emitió para él. No confíes en él."
+
+msgid "The record was changed outside OriginPass, so it cannot be verified. Report the label to the company or to OriginPass."
+msgstr "El registro se cambió fuera de OriginPass, así que no se puede verificar. Reporta la etiqueta a la empresa o a OriginPass."
+
+msgid "This product was revoked after the offer was made, so it cannot be accepted."
+msgstr "Este producto fue anulado después de hacerse la oferta, así que no se puede aceptar."
+
+msgid "Your password was saved. You stay signed in on this device."
+msgstr "Tu contraseña fue guardada. Sigues con la sesión iniciada en este dispositivo."

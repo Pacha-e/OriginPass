@@ -4,6 +4,7 @@ The guard on `save()` is Python. Raw SQL never calls it, so these are the cases
 that matter: the chain is what makes them visible.
 """
 
+# ---- External imports ----
 from datetime import timedelta
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.db import IntegrityError, connection, transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
+# ---- Internal imports ----
 from audit.integrity import sign
 from audit.models import Action, AuditEntry
 from test_support.factories import (
@@ -22,6 +24,7 @@ from test_support.factories import (
 )
 
 
+# ---- Public API ----
 class ChainTests(TestCase):
     def setUp(self):
         self.admin = make_admin()

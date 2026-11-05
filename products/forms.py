@@ -9,13 +9,17 @@ What remains is four required fields and one optional image, which is what keeps
 registration inside the five that UR10 allows.
 """
 
+# ---- External imports ----
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+# ---- Internal imports ----
 from accounts.models import User
 
 from .models import CustodyTransfer, Product, TransferState
+
+# ---- Public API ----
 
 
 class ProductForm(forms.ModelForm):
@@ -67,64 +71,30 @@ class ProductForm(forms.ModelForm):
             raise forms.ValidationError(_("A passport states where the product was made."))
         return origin
 
+    def save(self, commit=True):
+        """Write only the fields this form owns; the status is read under lock."""
+        product = super().save(commit=False)
+        if commit:
+            product.save_edits(self.Meta.fields)
+        return product
 
-class TransferInitiateForm(forms.Form):
-    """FR35: the current holder names the account receiving the product.
 
-    Whether this holder may hand this product over (FR38, FR39, one open offer)
-    is the model's rule; the form asks it and puts its answer on the page.
-    """
+class RevocationForm(forms.Form):
+    """FR41, FR42: a revocation states its reason, and the buyer reads it."""
 
-    to_holder_email = forms.EmailField(
-        label=_("Email address of the receiver"),
-        help_text=_(
-            "The email of the person or business receiving the product. "
-            "They need an OriginPass account."
-        ),
-    )
-    note = forms.CharField(
-        label=_("Note for the chain of custody"),
-        widget=forms.Textarea(attrs={"rows": 2}),
-        required=False,
-        max_length=280,
-        help_text=_(
-            "Optional. Anyone who scans the product reads it, for example: "
-            "Sold at the Cartagena fair."
-        ),
+    reason = forms.CharField(
+        label=_("Reason for the revocation"),
+        widget=forms.Textarea(attrs={"rows": 3}),
+        max_length=500,
+        help_text=_("Required. A buyer who scans this passport reads exactly this text."),
+        error_messages={"required": _("A revocation needs a reason.")},
     )
 
-    def __init__(self, *args, product, holder, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.product = product
-        self.holder = holder
-
-    def clean_to_holder_email(self):
-        email = User.objects.normalize_email(self.cleaned_data["to_holder_email"])
-        receiver = User.objects.filter(email__iexact=email, is_active=True).first()
-        if receiver is None:
-            raise ValidationError(
-                _("No account uses that email address. The receiver has to register first.")
-            )
-        if receiver == self.holder:
-            raise ValidationError(_("You already hold this product."))
-        return receiver
-
-    def clean(self):
-        cleaned = super().clean()
-        receiver = cleaned.get("to_holder_email")
-        if receiver is not None:
-            self.transfer = CustodyTransfer(
-                product=self.product,
-                from_holder=self.holder,
-                to_holder=receiver,
-                note=cleaned.get("note", "").strip(),
-            )
-            self.transfer.clean()
-        return cleaned
-
-    def save(self):
-        self.transfer.save()
-        return self.transfer
+    def clean_reason(self):
+        reason = self.cleaned_data["reason"].strip()
+        if not reason:
+            raise ValidationError(_("A revocation needs a reason."))
+        return reason
 
 
 class TransferClaimForm(forms.Form):
@@ -179,19 +149,60 @@ class TransferClaimForm(forms.Form):
         return cleaned
 
 
-class RevocationForm(forms.Form):
-    """FR41, FR42: a revocation states its reason, and the buyer reads it."""
+class TransferInitiateForm(forms.Form):
+    """FR35: the current holder names the account receiving the product.
 
-    reason = forms.CharField(
-        label=_("Reason for the revocation"),
-        widget=forms.Textarea(attrs={"rows": 3}),
-        max_length=500,
-        help_text=_("Required. A buyer who scans this passport reads exactly this text."),
-        error_messages={"required": _("A revocation needs a reason.")},
+    Whether this holder may hand this product over (FR38, FR39, one open offer)
+    is the model's rule; the form asks it and puts its answer on the page.
+    """
+
+    to_holder_email = forms.EmailField(
+        label=_("Email address of the receiver"),
+        help_text=_(
+            "The email of the person or business receiving the product. "
+            "They need an OriginPass account."
+        ),
+    )
+    note = forms.CharField(
+        label=_("Note for the chain of custody"),
+        widget=forms.Textarea(attrs={"rows": 2}),
+        required=False,
+        max_length=280,
+        help_text=_(
+            "Optional. Anyone who scans the product reads it, for example: "
+            "Sold at the Cartagena fair."
+        ),
     )
 
-    def clean_reason(self):
-        reason = self.cleaned_data["reason"].strip()
-        if not reason:
-            raise ValidationError(_("A revocation needs a reason."))
-        return reason
+    def __init__(self, *args, product, holder, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.product = product
+        self.holder = holder
+
+    def clean(self):
+        cleaned = super().clean()
+        receiver = cleaned.get("to_holder_email")
+        if receiver is not None:
+            self.transfer = CustodyTransfer(
+                product=self.product,
+                from_holder=self.holder,
+                to_holder=receiver,
+                note=cleaned.get("note", "").strip(),
+            )
+            self.transfer.clean()
+        return cleaned
+
+    def clean_to_holder_email(self):
+        email = User.objects.normalize_email(self.cleaned_data["to_holder_email"])
+        receiver = User.objects.filter(email__iexact=email, is_active=True).first()
+        if receiver is None:
+            raise ValidationError(
+                _("No account uses that email address. The receiver has to register first.")
+            )
+        if receiver == self.holder:
+            raise ValidationError(_("You already hold this product."))
+        return receiver
+
+    def save(self):
+        self.transfer.save()
+        return self.transfer

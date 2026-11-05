@@ -1,8 +1,8 @@
 """Builders for the records the tests need, with sensible defaults.
 
-Every factory takes the piece above it and creates one if it is not given, so a
-test that only cares about a product writes `make_product()` and a test that
-cares about who owns it passes the company in. Anything a test wants to be
+Every factory takes the record it belongs to and creates one if it is not given,
+so a test that only cares about a product writes `make_product()` and a test
+that cares about who owns it passes the company in. Anything a test wants to be
 specific about is an override; everything else stays out of the way.
 
 The values are the ones the project's own examples use: a workshop in Tuchin
@@ -13,20 +13,25 @@ from accounts.models import User
 from companies.models import Company, CompanyStatus, CompanyType, VerificationTrack
 from products.models import PRODUCT_TYPE_BY_COMPANY_TYPE, Product
 
-OWNER_PASSWORD = "Vueltiao-2026"
+# ---- Constants ----
+
 ADMIN_PASSWORD = "Admin-Pass-2026"
+OWNER_PASSWORD = "Vueltiao-2026"
 
 #: A status the company did not choose has to say why it holds it, or the
 #: database refuses the row.
 _DEFAULT_REASON = "Not enough evidence."
 
 
-def make_user(email="weaver@tuchin.co", password=OWNER_PASSWORD):
-    return User.objects.create_user(email, password)
+# ---- Public factories ----
 
 
 def make_admin(email="admin@originpass.co", password=ADMIN_PASSWORD):
     return User.objects.create_superuser(email, password)
+
+
+def make_approved_company(owner=None, **overrides):
+    return make_company(owner, status=CompanyStatus.APPROVED, **overrides)
 
 
 def make_company(
@@ -60,10 +65,6 @@ def make_company(
     return Company.objects.create(owner=owner or make_user(email), **fields)
 
 
-def make_approved_company(owner=None, **overrides):
-    return make_company(owner, status=CompanyStatus.APPROVED, **overrides)
-
-
 def make_product(company=None, **overrides):
     """A passport for an approved company, made alongside it if none is given.
 
@@ -82,3 +83,7 @@ def make_product(company=None, **overrides):
     fields.update(overrides)
 
     return Product.objects.create(company=company, **fields)
+
+
+def make_user(email="weaver@tuchin.co", password=OWNER_PASSWORD):
+    return User.objects.create_user(email, password)

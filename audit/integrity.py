@@ -23,29 +23,24 @@ that a rebuilt chain no longer matches what was published. That is the anchoring
 step, and it is not implemented here.
 """
 
+# ---- External imports ----
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
+
+# ---- Constants ----
+
+#: Stands in for the signature of the record before the first one.
+GENESIS = "0" * 64
 
 #: Namespaces the derived key. Changing it invalidates every existing signature,
 #: which is the point: it is how a signing scheme is versioned.
 KEY_SALT = "originpass.integrity.v1"
 
-#: Stands in for the signature of the record before the first one.
-GENESIS = "0" * 64
-
 #: Separates the parts of a signed value so that ("ab", "c") and ("a", "bc")
 #: cannot produce the same signature.
 SEPARATOR = "\x1f"
 
-
-def _sign_with(secret, *parts):
-    payload = SEPARATOR.join("" if part is None else str(part) for part in parts)
-    return salted_hmac(KEY_SALT, payload, secret=secret, algorithm="sha256").hexdigest()
-
-
-def sign(*parts):
-    """Sign the parts with a key derived from SECRET_KEY, never stored in the database."""
-    return _sign_with(settings.SECRET_KEY, *parts)
+# ---- Public API ----
 
 
 def matches(signature, *parts):
@@ -69,6 +64,11 @@ def matches(signature, *parts):
         for secret in (settings.SECRET_KEY, *settings.SECRET_KEY_FALLBACKS)
     ]
     return any(against_each_key)
+
+
+def sign(*parts):
+    """Sign the parts with a key derived from SECRET_KEY, never stored in the database."""
+    return _sign_with(settings.SECRET_KEY, *parts)
 
 
 def verify_chain(records, parts_of):
@@ -95,3 +95,11 @@ def verify_chain(records, parts_of):
         previous = record.entry_hash
 
     return True, None
+
+
+# ---- Private helpers ----
+
+
+def _sign_with(secret, *parts):
+    payload = SEPARATOR.join("" if part is None else str(part) for part in parts)
+    return salted_hmac(KEY_SALT, payload, secret=secret, algorithm="sha256").hexdigest()

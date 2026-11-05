@@ -1,11 +1,13 @@
 """FR44: the administrator lists the audit trail filtered by actor, action and date."""
 
+# ---- External imports ----
 from datetime import timedelta
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+# ---- Internal imports ----
 from audit.models import Action
 from companies.models import CompanyStatus
 from test_support.factories import (
@@ -18,6 +20,7 @@ from test_support.factories import (
 from test_support.timing import measure
 
 
+# ---- Public API ----
 class AuditLogViewTests(TestCase):
     def setUp(self):
         self.admin = make_admin()

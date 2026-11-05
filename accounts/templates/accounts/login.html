@@ -17,6 +17,9 @@
   {% for error in form.non_field_errors %}
     <div class="form-error" role="alert">{{ error }}</div>
   {% endfor %}
+  {% if lock_error %}
+    <div class="form-error" role="alert">{{ lock_error }}</div>
+  {% endif %}
 
   {% include "partials/field.html" with field=form.email %}
   {% include "partials/field.html" with field=form.password %}

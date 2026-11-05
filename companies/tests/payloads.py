@@ -5,8 +5,10 @@ POST bodies, so a test can start from a valid one and change the single field it
 is about with `COMMERCIAL_APPLICATION | {"registry_code": ""}`.
 """
 
+# ---- Internal imports ----
 from companies.models import CompanyType, VerificationTrack
 
+# ---- Constants ----
 COMMERCIAL_APPLICATION = {
     "legal_name": "Artesanias La Bonga SAS",
     "company_type": CompanyType.COMMERCIAL,

@@ -4,13 +4,16 @@ These assert what holds however the row was written, so several of them go behin
 the model with `update()` to check that the database refuses the row on its own.
 """
 
+# ---- External imports ----
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
+# ---- Internal imports ----
 from companies.models import Company, CompanyStatus, CompanyType, VerificationTrack
 from test_support.factories import make_admin, make_company, make_user
 
 
+# ---- Public API ----
 class CompanyRecordTests(TestCase):
     """DBR01 - Store the company record."""
 
@@ -31,15 +34,17 @@ class CompanyRecordTests(TestCase):
         "status_changed_at",
     }
 
+    def test_one_company_per_account(self):
+        owner = make_user()
+        make_company(owner)
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            make_company(owner, legal_name="Second SAS")
+
     def test_the_model_holds_every_field_listed_in_the_domain_model(self):
         declared = {field.name for field in Company._meta.get_fields()}
 
         self.assertTrue(self.DOMAIN_MODEL_FIELDS.issubset(declared))
-
-    def test_the_submission_timestamp_is_set_on_creation(self):
-        company = make_company()
-
-        self.assertIsNotNone(company.submitted_at)
 
     def test_the_status_change_timestamp_is_updated_on_every_status_change(self):
         admin = make_admin()
@@ -54,12 +59,10 @@ class CompanyRecordTests(TestCase):
         self.assertGreater(after_approval, before)
         self.assertGreater(after_suspension, after_approval)
 
-    def test_one_company_per_account(self):
-        owner = make_user()
-        make_company(owner)
+    def test_the_submission_timestamp_is_set_on_creation(self):
+        company = make_company()
 
-        with self.assertRaises(IntegrityError), transaction.atomic():
-            make_company(owner, legal_name="Second SAS")
+        self.assertIsNotNone(company.submitted_at)
 
 
 class ReasonRequiredTests(TestCase):

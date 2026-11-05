@@ -3,13 +3,16 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
+# ---- External imports ----
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from accounts.models import Role, User
 from test_support.factories import make_user
 from test_support.timing import measure
 
+# ---- Constants ----
 EMAIL = "weaver@tuchin.co"
 PASSWORD = "Vueltiao-2026"
 
@@ -21,6 +24,7 @@ SAME_ADDRESS_ANOTHER_PASSWORD = {
 }
 
 
+# ---- Public API ----
 class CreateAccountTests(TestCase):
     """FR01 - Create an account."""
 

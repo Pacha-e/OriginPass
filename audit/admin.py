@@ -1,6 +1,10 @@
+# ---- External imports ----
 from django.contrib import admin
 
+# ---- Internal imports ----
 from .models import AuditEntry
+
+# ---- Public API ----
 
 
 @admin.register(AuditEntry)

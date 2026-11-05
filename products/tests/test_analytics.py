@@ -1,15 +1,18 @@
 """FR46 to FR52 through the company's analytics page and its CSV export."""
 
+# ---- External imports ----
 from datetime import timedelta
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+# ---- Internal imports ----
 from test_support.factories import OWNER_PASSWORD, make_company, make_product, make_user
 from verification.models import ScanEvent, Verdict
 
 
+# ---- Public API ----
 def scan(product, days_ago, region="Córdoba"):
     event = ScanEvent.objects.create(product=product, verdict=Verdict.GENUINE, region=region)
     ScanEvent.objects.filter(pk=event.pk).update(
@@ -23,6 +26,11 @@ class AnalyticsTests(TestCase):
         self.product = make_product(company=make_company(owner=self.owner, status="APPROVED"))
         self.client.login(email=self.owner.email, password=OWNER_PASSWORD)
         self.url = reverse("products:analytics")
+
+    def test_a_company_sees_only_its_own_scans(self):
+        other = make_product(company=make_company(email="other@example.com", status="APPROVED"))
+        scan(other, 1)
+        self.assertEqual(self.client.get(self.url).context["total"], 0)
 
     def test_a_range_that_is_not_a_number_falls_back_instead_of_failing(self):
         """Defect: ?days=abc answered with a server error."""
@@ -49,11 +57,6 @@ class AnalyticsTests(TestCase):
             row["region"]: row["count"] for row in self.client.get(self.url).context["by_region"]
         }
         self.assertEqual(regions, {"Antioquia": 2, "Córdoba": 1})
-
-    def test_a_company_sees_only_its_own_scans(self):
-        other = make_product(company=make_company(email="other@example.com", status="APPROVED"))
-        scan(other, 1)
-        self.assertEqual(self.client.get(self.url).context["total"], 0)
 
     def test_the_csv_cannot_carry_a_formula(self):
         self.product.name = "=HYPERLINK(1)"

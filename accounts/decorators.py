@@ -4,11 +4,14 @@
 prototype contracts put on every administrative call.
 """
 
+# ---- External imports ----
 from functools import wraps
 
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
+
+# ---- Public API ----
 
 
 def admin_required(view):

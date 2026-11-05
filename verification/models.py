@@ -21,6 +21,7 @@ class DeviceCategory(models.TextChoices):
 class Verdict(models.TextChoices):
     GENUINE = "GENUINE", _("Genuine")
     REVOKED = "REVOKED", _("Revoked")
+    ALTERED = "ALTERED", _("Altered")
     NOT_FOUND = "NOT_FOUND", _("Not found")
 
 

@@ -6,6 +6,7 @@ Postgres prints, which is faithful and unreadable. So the tests hold it to
 reading from the database and to naming each rule the way it was named.
 """
 
+# ---- External imports ----
 from io import StringIO
 
 from django.core.management import call_command
@@ -19,6 +20,7 @@ def report():
     return out.getvalue()
 
 
+# ---- Public API ----
 class TablesTests(TestCase):
     def test_it_covers_the_six_tables_this_project_designed(self):
         text = report()

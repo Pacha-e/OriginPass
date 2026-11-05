@@ -6,45 +6,21 @@ Exits non-zero when something fails, so it can be run on a schedule and have
 the failure noticed rather than logged into a file nobody reads.
 """
 
+# ---- External imports ----
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
+# ---- Internal imports ----
 from audit.models import AuditEntry
 from products.models import CustodyTransfer, Product
+
+# ---- Public API ----
 
 
 class Command(BaseCommand):
     help = "Verify the audit trail, the product signatures and every chain of custody."
-
-    def _refuse_if_the_schema_is_behind(self):
-        """Say nothing about a database that is not the one the code describes.
-
-        Everything below reports on what the database holds. A database still
-        missing a migration is missing the rules that migration adds, and two
-        of them are the constraints that keep each chain linear. Reporting
-        "intact" against it would be the most misleading thing this command
-        could print: an answer about integrity, given by a database without the
-        constraints that defend it.
-
-        This is not hypothetical. Both chain constraints sat unapplied on the
-        development database and nothing noticed, because the test suite builds
-        its own database from the migrations every run and so never reads the
-        one being worked on.
-        """
-        executor = MigrationExecutor(connection)
-        pending = executor.migration_plan(executor.loader.graph.leaf_nodes())
-        if not pending:
-            return
-
-        self.stderr.write("This database is behind the code. Nothing is verified.")
-        self.stderr.write("")
-        for migration, _backwards in pending:
-            self.stderr.write(f"  unapplied  {migration.app_label}.{migration.name}")
-        self.stderr.write("")
-        self.stderr.write("Run: python manage.py migrate")
-        raise SystemExit(1)
 
     def handle(self, *args, **options):
         self._refuse_if_the_schema_is_behind()
@@ -106,3 +82,33 @@ class Command(BaseCommand):
                 "Retired keys are still accepted, so a record signed under one of them counts "
                 "as verified. Drop them from SECRET_KEY_FALLBACKS once nothing needs them."
             )
+
+    # ---- Private helpers ----
+
+    def _refuse_if_the_schema_is_behind(self):
+        """Say nothing about a database that is not the one the code describes.
+
+        Everything below reports on what the database holds. A database still
+        missing a migration is missing the rules that migration adds, and two
+        of them are the constraints that keep each chain linear. Reporting
+        "intact" against it would be the most misleading thing this command
+        could print: an answer about integrity, given by a database without the
+        constraints that defend it.
+
+        This is not hypothetical. Both chain constraints sat unapplied on the
+        development database and nothing noticed, because the test suite builds
+        its own database from the migrations every run and so never reads the
+        one being worked on.
+        """
+        executor = MigrationExecutor(connection)
+        pending = executor.migration_plan(executor.loader.graph.leaf_nodes())
+        if not pending:
+            return
+
+        self.stderr.write("This database is behind the code. Nothing is verified.")
+        self.stderr.write("")
+        for migration, _backwards in pending:
+            self.stderr.write(f"  unapplied  {migration.app_label}.{migration.name}")
+        self.stderr.write("")
+        self.stderr.write("Run: python manage.py migrate")
+        raise SystemExit(1)

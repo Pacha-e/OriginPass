@@ -3,16 +3,19 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
+# ---- External imports ----
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from accounts import forms
 from test_support.factories import make_user
 from test_support.timing import measure
 
 #: Resolved once, here, because the form holds it as a lazy translation and the
 #: assertions below compare it against text that has already been rendered.
+# ---- Constants ----
 AUTHENTICATION_ERROR = str(forms.AUTHENTICATION_ERROR)
 
 EMAIL = "weaver@tuchin.co"
@@ -20,6 +23,7 @@ PASSWORD = "Vueltiao-2026"
 WRONG_PASSWORD = "not-the-password"
 
 
+# ---- Public API ----
 class LoginTests(TestCase):
     """FR03 - Log in with email and password."""
 

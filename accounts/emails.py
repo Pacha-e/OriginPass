@@ -8,6 +8,7 @@ mail server that refuses it must not undo the decision or show the actor an
 error page. The failure is logged instead of swallowed, so it can be found.
 """
 
+# ---- External imports ----
 import logging
 import smtplib
 
@@ -16,20 +17,14 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
+# ---- Constants ----
+
 logger = logging.getLogger(__name__)
 
-
-def _send(subject, template, context, recipient):
-    body = render_to_string(template, context)
-    try:
-        send_mail(
-            subject=str(subject),
-            message=body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[recipient],
-        )
-    except (smtplib.SMTPException, OSError):
-        logger.exception("Could not send %r to %s", template, recipient)
+# ---- Public API ----
+#
+# The notify_* functions are plain functions because other apps import them by
+# name; their signatures are part of that contract.
 
 
 def notify_company_decision(company):
@@ -52,6 +47,20 @@ def notify_company_decision(company):
     )
 
 
+def notify_revocation(product, holder):
+    """FR55: the holder at the moment of revocation is told why.
+
+    The holder is passed in rather than read from the product, because it has to
+    be the one who held the product when it was revoked.
+    """
+    _send(
+        _("A product you hold has been revoked"),
+        "products/email/product_revoked.txt",
+        {"product_name": product.name, "reason": product.revocation_reason},
+        holder.email,
+    )
+
+
 def notify_transfer(transfer):
     """FR54: the receiver is told a transfer is waiting for their answer."""
     _send(
@@ -65,15 +74,17 @@ def notify_transfer(transfer):
     )
 
 
-def notify_revocation(product, holder):
-    """FR55: the holder at the moment of revocation is told why.
+# ---- Private helpers ----
 
-    The holder is passed in rather than read from the product, because it has to
-    be the one who held the product when it was revoked.
-    """
-    _send(
-        _("A product you hold has been revoked"),
-        "products/email/product_revoked.txt",
-        {"product_name": product.name, "reason": product.revocation_reason},
-        holder.email,
-    )
+
+def _send(subject, template, context, recipient):
+    body = render_to_string(template, context)
+    try:
+        send_mail(
+            subject=str(subject),
+            message=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient],
+        )
+    except (smtplib.SMTPException, OSError):
+        logger.exception("Could not send %r to %s", template, recipient)

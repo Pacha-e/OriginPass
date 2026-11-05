@@ -4,17 +4,20 @@ It is also what is shown when someone asks to see the data, so it has to cover
 what the current sprint built rather than only what the first one did.
 """
 
+# ---- External imports ----
 from io import StringIO
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 
+# ---- Internal imports ----
 from companies.models import Company, CompanyStatus, CompanyType
 from products.models import PRODUCT_TYPE_BY_COMPANY_TYPE, Product, ProductStatus
 from verification.models import ScanEvent
 
 
+# ---- Public API ----
 class SeedDemoCommandTests(TestCase):
     @override_settings(DEBUG=True)
     def test_it_creates_one_company_in_each_status(self):
@@ -24,6 +27,14 @@ class SeedDemoCommandTests(TestCase):
 
         self.assertEqual(statuses, {value for value, _ in CompanyStatus.choices})
 
+    @override_settings(DEBUG=False)
+    def test_it_refuses_to_run_with_debug_off(self):
+        """Every account it creates shares one known password."""
+        with self.assertRaises(CommandError):
+            call_command("seed_demo", stdout=StringIO())
+
+        self.assertFalse(Company.objects.exists())
+
     @override_settings(DEBUG=True)
     def test_running_it_twice_creates_nothing_new(self):
         call_command("seed_demo", stdout=StringIO())
@@ -32,14 +43,6 @@ class SeedDemoCommandTests(TestCase):
         call_command("seed_demo", stdout=StringIO())
 
         self.assertEqual(Company.objects.count(), before)
-
-    @override_settings(DEBUG=False)
-    def test_it_refuses_to_run_with_debug_off(self):
-        """Every account it creates shares one known password."""
-        with self.assertRaises(CommandError):
-            call_command("seed_demo", stdout=StringIO())
-
-        self.assertFalse(Company.objects.exists())
 
 
 @override_settings(DEBUG=True)
@@ -58,9 +61,6 @@ class SeedDemoPassportsTests(TestCase):
         self.assertGreaterEqual(Product.objects.values("category").distinct().count(), 5)
         self.assertGreaterEqual(Product.objects.count(), 7)
 
-    def test_it_issues_passports(self):
-        self.assertGreater(Product.objects.count(), 0)
-
     def test_every_passport_belongs_to_an_approved_company(self):
         statuses = {product.company.status for product in Product.objects.select_related("company")}
 
@@ -78,6 +78,9 @@ class SeedDemoPassportsTests(TestCase):
 
         self.assertTrue(revoked.exists())
         self.assertTrue(all(product.revocation_reason for product in revoked))
+
+    def test_it_issues_passports(self):
+        self.assertGreater(Product.objects.count(), 0)
 
     def test_it_records_a_history_of_verifications(self):
         self.assertGreater(ScanEvent.objects.count(), 0)

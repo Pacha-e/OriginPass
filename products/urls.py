@@ -1,6 +1,10 @@
+# ---- External imports ----
 from django.urls import path
 
+# ---- Internal imports ----
 from . import views
+
+# ---- Constants ----
 
 app_name = "products"
 

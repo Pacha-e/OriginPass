@@ -4,6 +4,7 @@ The views orchestrate and check permission. What a status change means, and
 when it is allowed, is decided by the model.
 """
 
+# ---- External imports ----
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
@@ -11,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
+# ---- Internal imports ----
 from accounts.decorators import admin_required
 from accounts.emails import notify_company_decision
 from accounts.models import Role
@@ -19,16 +21,7 @@ from audit.models import Action, AuditEntry
 from .forms import CompanyApplicationForm, RejectionForm, SuspensionForm
 from .models import Company, CompanyStatus, TransitionNotAllowed
 
-# ---------------------------------------------------------------- owner side
-
-
-@login_required
-def application_detail(request):
-    """FR17: the owner sees the status and, for a negative decision, the reason."""
-    company = Company.objects.owned_by(request.user)
-    if company is None:
-        return redirect("companies:application_create")
-    return render(request, "companies/application_detail.html", {"company": company})
+# ---- Public API ----
 
 
 @login_required
@@ -71,6 +64,15 @@ def application_create(request):
 
 
 @login_required
+def application_detail(request):
+    """FR17: the owner sees the status and, for a negative decision, the reason."""
+    company = Company.objects.owned_by(request.user)
+    if company is None:
+        return redirect("companies:application_create")
+    return render(request, "companies/application_detail.html", {"company": company})
+
+
+@login_required
 def application_edit(request):
     """FR10 while editable, FR11 once it is not."""
     company = get_object_or_404(Company, owner=request.user)
@@ -99,7 +101,68 @@ def application_edit(request):
     return render(request, "companies/application_form.html", {"form": form, "company": company})
 
 
-# ---------------------------------------------------------- administrator side
+def public_profile(request, pk):
+    """FR18: an approved company's public page, reachable without an account.
+
+    Only approved companies have one: a pending or rejected application is not
+    something OriginPass vouches for, and a suspended company is not either.
+    """
+    company = get_object_or_404(Company.objects.filter(status=CompanyStatus.APPROVED), pk=pk)
+    products = company.products.filter(status="ACTIVE").order_by("name")
+    return render(
+        request,
+        "companies/public_profile.html",
+        {"company": company, "products": products},
+    )
+
+
+@admin_required
+@require_POST
+def reactivate_company(request, pk):
+    """FR16: a suspended company is approved again and can issue passports."""
+    company = get_object_or_404(Company, pk=pk)
+    try:
+        company.reactivate(actor=request.user)
+    except TransitionNotAllowed as refusal:
+        messages.error(request, str(refusal))
+    else:
+        messages.success(request, _("%(company)s has been reactivated.") % {"company": company})
+    return redirect("companies:review_detail", pk=company.pk)
+
+
+@admin_required
+@require_POST
+def review_approve(request, pk):
+    """FR13: a pending application becomes Approved.
+
+    Which statuses an approval may be made from is the model's rule, so the view
+    asks and reports the answer rather than deciding it.
+    """
+    company = get_object_or_404(Company, pk=pk)
+
+    try:
+        company.approve(actor=request.user)
+    except TransitionNotAllowed as refusal:
+        messages.error(request, str(refusal))
+    else:
+        messages.success(request, _("%(company)s has been approved.") % {"company": company})
+        notify_company_decision(company)
+
+    return redirect("companies:review_detail", pk=company.pk)
+
+
+@admin_required
+def review_detail(request, pk):
+    company = get_object_or_404(Company.objects.select_related("owner"), pk=pk)
+    return render(
+        request,
+        "companies/review_detail.html",
+        {
+            "company": company,
+            "rejection_form": RejectionForm(),
+            "suspension_form": SuspensionForm(),
+        },
+    )
 
 
 @admin_required
@@ -123,41 +186,6 @@ def review_list(request):
             "selected_status": selected,
         },
     )
-
-
-@admin_required
-def review_detail(request, pk):
-    company = get_object_or_404(Company.objects.select_related("owner"), pk=pk)
-    return render(
-        request,
-        "companies/review_detail.html",
-        {
-            "company": company,
-            "rejection_form": RejectionForm(),
-            "suspension_form": SuspensionForm(),
-        },
-    )
-
-
-@admin_required
-@require_POST
-def review_approve(request, pk):
-    """FR13: a pending application becomes Approved.
-
-    Which statuses an approval may be made from is the model's rule, so the view
-    asks and reports the answer rather than deciding it.
-    """
-    company = get_object_or_404(Company, pk=pk)
-
-    try:
-        company.approve(actor=request.user)
-    except TransitionNotAllowed as refusal:
-        messages.error(request, str(refusal))
-    else:
-        messages.success(request, _("%(company)s has been approved.") % {"company": company})
-        notify_company_decision(company)
-
-    return redirect("companies:review_detail", pk=company.pk)
 
 
 @admin_required
@@ -206,35 +234,3 @@ def suspend_company(request, pk):
     else:
         messages.success(request, _("%(company)s has been suspended.") % {"company": company})
     return redirect("companies:review_detail", pk=company.pk)
-
-
-@admin_required
-@require_POST
-def reactivate_company(request, pk):
-    """FR16: a suspended company is approved again and can issue passports."""
-    company = get_object_or_404(Company, pk=pk)
-    try:
-        company.reactivate(actor=request.user)
-    except TransitionNotAllowed as refusal:
-        messages.error(request, str(refusal))
-    else:
-        messages.success(request, _("%(company)s has been reactivated.") % {"company": company})
-    return redirect("companies:review_detail", pk=company.pk)
-
-
-# ------------------------------------------------------------- public side
-
-
-def public_profile(request, pk):
-    """FR18: an approved company's public page, reachable without an account.
-
-    Only approved companies have one: a pending or rejected application is not
-    something OriginPass vouches for, and a suspended company is not either.
-    """
-    company = get_object_or_404(Company.objects.filter(status=CompanyStatus.APPROVED), pk=pk)
-    products = company.products.filter(status="ACTIVE").order_by("name")
-    return render(
-        request,
-        "companies/public_profile.html",
-        {"company": company, "products": products},
-    )

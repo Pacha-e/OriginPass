@@ -27,5 +27,6 @@ verdict is also written as the heading next to it (UR03).
   <circle class="seal__core" cx="60" cy="60" r="26" fill="currentColor"/>
   {% if verdict == "GENUINE" %}<path class="seal__icon" d="M48 60.5l8.5 8.5L73 52.5" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
   {% elif verdict == "REVOKED" %}<path class="seal__icon" d="M50 50l20 20M70 50L50 70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  {% elif verdict == "ALTERED" %}<path class="seal__icon" d="M60 40v28M60 77v2" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
   {% else %}<path class="seal__icon" d="M53 53.5a7 7 0 1 1 9.5 6.5c-1.6.7-2.5 2-2.5 3.7v1.8M60 71.5v.5" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>{% endif %}
 </svg>

@@ -5,24 +5,17 @@ RegistroEmpresas.sol. Each is stated once, here, so that a view cannot bypass
 it, and the ones the database can express are also written as constraints.
 """
 
+# ---- External imports ----
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+# ---- Internal imports ----
 from audit.models import Action, AuditEntry
 
-
-class CompanyType(models.TextChoices):
-    COMMERCIAL = "COMMERCIAL", _("Commercial company")
-    ARTISAN = "ARTISAN", _("Artisan workshop")
-
-
-class VerificationTrack(models.TextChoices):
-    CHAMBER_OF_COMMERCE = "CHAMBER_OF_COMMERCE", _("Chamber of Commerce")
-    OFFICIAL_REGISTRY = "OFFICIAL_REGISTRY", _("Official registry")
-    ARTISAN_REVIEW = "ARTISAN_REVIEW", _("Manual artisan review")
+# ---- Types ----
 
 
 class CompanyStatus(models.TextChoices):
@@ -31,6 +24,28 @@ class CompanyStatus(models.TextChoices):
     REJECTED = "REJECTED", _("Rejected")
     SUSPENDED = "SUSPENDED", _("Suspended")
 
+
+class CompanyType(models.TextChoices):
+    COMMERCIAL = "COMMERCIAL", _("Commercial company")
+    ARTISAN = "ARTISAN", _("Artisan workshop")
+
+
+class TransitionNotAllowed(ValueError):
+    """A status change asked for from a status it cannot be made from.
+
+    A ValueError, so that callers written before this existed keep working: the
+    reason-is-missing refusal is a ValueError too, and both mean the same thing
+    to a caller, which is that the change was not made.
+    """
+
+
+class VerificationTrack(models.TextChoices):
+    CHAMBER_OF_COMMERCE = "CHAMBER_OF_COMMERCE", _("Chamber of Commerce")
+    OFFICIAL_REGISTRY = "OFFICIAL_REGISTRY", _("Official registry")
+    ARTISAN_REVIEW = "ARTISAN_REVIEW", _("Manual artisan review")
+
+
+# ---- Constants ----
 
 #: A commercial company is verified through a registry; an artisan workshop is
 #: verified by a person. Crossing the two is the ModoVerificacionInvalido error
@@ -43,6 +58,7 @@ VERIFICATION_TRACKS_BY_COMPANY_TYPE = {
     CompanyType.ARTISAN: [VerificationTrack.ARTISAN_REVIEW],
 }
 
+# Defined from the mapping above, so it has to follow it.
 COMMERCIAL_TRACKS = VERIFICATION_TRACKS_BY_COMPANY_TYPE[CompanyType.COMMERCIAL]
 
 #: The owner may edit only while the outcome is still open (FR10, FR11).
@@ -55,13 +71,7 @@ EDITABLE_STATUSES = (CompanyStatus.PENDING, CompanyStatus.REJECTED)
 STATUSES_REQUIRING_REASON = (CompanyStatus.REJECTED, CompanyStatus.SUSPENDED)
 
 
-class TransitionNotAllowed(ValueError):
-    """A status change asked for from a status it cannot be made from.
-
-    A ValueError, so that callers written before this existed keep working: the
-    reason-is-missing refusal is a ValueError too, and both mean the same thing
-    to a caller, which is that the change was not made.
-    """
+# ---- Public API ----
 
 
 class CompanyManager(models.Manager):
@@ -154,16 +164,6 @@ class Company(models.Model):
     # ---- queries the templates and views ask ----
 
     @property
-    def is_editable(self):
-        """False once a decision has been taken that the owner cannot undo."""
-        return self.status in EDITABLE_STATUSES
-
-    @property
-    def requires_manual_review(self):
-        """An artisan application is reviewed by a person, not by a registry (FR09)."""
-        return self.verification_track == VerificationTrack.ARTISAN_REVIEW
-
-    @property
     def can_register_products(self):
         return self.status == CompanyStatus.APPROVED
 
@@ -175,6 +175,16 @@ class Company(models.Model):
             "This application cannot be edited because it is %(status)s. "
             "Contact the administrator if the details need to change."
         ) % {"status": self.get_status_display().lower()}
+
+    @property
+    def is_editable(self):
+        """False once a decision has been taken that the owner cannot undo."""
+        return self.status in EDITABLE_STATUSES
+
+    @property
+    def requires_manual_review(self):
+        """An artisan application is reviewed by a person, not by a registry (FR09)."""
+        return self.verification_track == VerificationTrack.ARTISAN_REVIEW
 
     # ---- transitions ----
 
@@ -192,6 +202,10 @@ class Company(models.Model):
         return self.status in self.APPROVE_FROM
 
     @property
+    def can_be_reactivated(self):
+        return self.status in self.REACTIVATE_FROM
+
+    @property
     def can_be_rejected(self):
         return self.status in self.REJECT_FROM
 
@@ -199,9 +213,52 @@ class Company(models.Model):
     def can_be_suspended(self):
         return self.status in self.SUSPEND_FROM
 
-    @property
-    def can_be_reactivated(self):
-        return self.status in self.REACTIVATE_FROM
+    def approve(self, actor):
+        """FR13: a pending application becomes approved."""
+        self._set_status(
+            CompanyStatus.APPROVED,
+            allowed_from=self.APPROVE_FROM,
+            actor=actor,
+            action=Action.COMPANY_APPROVED,
+        )
+
+    def reactivate(self, actor):
+        """A suspension is lifted and the company is approved again."""
+        self._set_status(
+            CompanyStatus.APPROVED,
+            allowed_from=self.REACTIVATE_FROM,
+            actor=actor,
+            action=Action.COMPANY_REACTIVATED,
+        )
+
+    def reject(self, actor, reason):
+        """FR14: a pending application is refused, with the reason recorded."""
+        self._set_status(
+            CompanyStatus.REJECTED,
+            allowed_from=self.REJECT_FROM,
+            actor=actor,
+            action=Action.COMPANY_REJECTED,
+            reason=reason,
+        )
+
+    def resubmit(self, actor):
+        """An edited application goes back into the queue (FR10)."""
+        self._set_status(
+            CompanyStatus.PENDING,
+            allowed_from=EDITABLE_STATUSES,
+            actor=actor,
+            action=Action.COMPANY_RESUBMITTED,
+        )
+
+    def suspend(self, actor, reason):
+        """An approved company stops issuing passports; the ones it issued keep working."""
+        self._set_status(
+            CompanyStatus.SUSPENDED,
+            allowed_from=self.SUSPEND_FROM,
+            actor=actor,
+            action=Action.COMPANY_SUSPENDED,
+            reason=reason,
+        )
 
     def _set_status(self, status, *, allowed_from, actor, action, reason=""):
         """Take the decision and record it, as one act or not at all.
@@ -243,50 +300,3 @@ class Company(models.Model):
             self.status_changed_at = timezone.now()
             self.save(update_fields=["status", "status_reason", "status_changed_at"])
             AuditEntry.record(actor=actor, action=action, target=self, reason=self.status_reason)
-
-    def approve(self, actor):
-        """FR13: a pending application becomes approved."""
-        self._set_status(
-            CompanyStatus.APPROVED,
-            allowed_from=self.APPROVE_FROM,
-            actor=actor,
-            action=Action.COMPANY_APPROVED,
-        )
-
-    def reject(self, actor, reason):
-        """FR14: a pending application is refused, with the reason recorded."""
-        self._set_status(
-            CompanyStatus.REJECTED,
-            allowed_from=self.REJECT_FROM,
-            actor=actor,
-            action=Action.COMPANY_REJECTED,
-            reason=reason,
-        )
-
-    def suspend(self, actor, reason):
-        """An approved company stops issuing passports; the ones it issued keep working."""
-        self._set_status(
-            CompanyStatus.SUSPENDED,
-            allowed_from=self.SUSPEND_FROM,
-            actor=actor,
-            action=Action.COMPANY_SUSPENDED,
-            reason=reason,
-        )
-
-    def reactivate(self, actor):
-        """A suspension is lifted and the company is approved again."""
-        self._set_status(
-            CompanyStatus.APPROVED,
-            allowed_from=self.REACTIVATE_FROM,
-            actor=actor,
-            action=Action.COMPANY_REACTIVATED,
-        )
-
-    def resubmit(self, actor):
-        """An edited application goes back into the queue (FR10)."""
-        self._set_status(
-            CompanyStatus.PENDING,
-            allowed_from=EDITABLE_STATUSES,
-            actor=actor,
-            action=Action.COMPANY_RESUBMITTED,
-        )

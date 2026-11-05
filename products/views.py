@@ -6,6 +6,7 @@ sees its own. Whether a company may issue passports at all is decided by the
 model; these views ask and then explain the answer.
 """
 
+# ---- External imports ----
 import csv
 import io
 from datetime import timedelta
@@ -24,9 +25,11 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
+# ---- Internal imports ----
 from accounts.decorators import admin_required
 from accounts.emails import notify_revocation, notify_transfer
 from audit.models import Action, AuditEntry
+from companies.decorators import owned_company_required
 from companies.models import Company, CompanyStatus
 from verification.models import ScanEvent
 
@@ -39,6 +42,11 @@ from .models import (
     ProductStatus,
     TransferState,
 )
+
+# ---- Constants ----
+
+#: The ranges a company can pick, in days. Anything else falls back to 30.
+ANALYTICS_RANGES = (7, 30, 90, 365)
 
 #: Why a company in each non-approving status cannot issue a passport. Kept
 #: here rather than in the template so that the view can also refuse a POST.
@@ -64,60 +72,198 @@ REVOKED_PASSPORT_REFUSAL = gettext_lazy(
     "issued and is not edited."
 )
 
+#: A cell starting with one of these is run as a formula by spreadsheets.
+_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
 
-def _refuse(request, company, heading, reason):
-    """FR20: a refusal states its cause instead of hiding the page."""
+# ---- Public API ----
+
+
+@admin_required
+def admin_overview(request):
+    """FR50: the platform totals by status, with the latest alerts and passports."""
+    companies = {
+        row["status"]: row["count"]
+        for row in Company.objects.values("status").order_by().annotate(count=Count("id"))
+    }
+    products = {
+        row["status"]: row["count"]
+        for row in Product.objects.values("status").order_by().annotate(count=Count("id"))
+    }
     return render(
         request,
-        "products/refusal.html",
-        {"company": company, "heading": heading, "reason": reason},
-        status=403,
+        "products/admin_overview.html",
+        {
+            "company_totals": [
+                (value, label, companies.get(value, 0)) for value, label in CompanyStatus.choices
+            ],
+            "product_totals": [
+                (value, label, products.get(value, 0)) for value, label in ProductStatus.choices
+            ],
+            "company_count": sum(companies.values()),
+            "product_count": sum(products.values()),
+            "scan_count": ScanEvent.objects.count(),
+            "recent_alerts": Alert.objects.select_related("product__company", "scan")[:10],
+            "recent_products": Product.objects.select_related("company").order_by("-registered_at")[
+                :8
+            ],
+        },
     )
 
 
-@login_required
-def product_list(request):
-    """FR24 filtered by status, FR25 searched by name, category or passport code."""
-    company = Company.objects.owned_by(request.user)
-    if company is None:
-        return redirect("companies:application_create")
+@admin_required
+def admin_revoke_product(request, pk):
+    """FR42: the administrator revokes any passport, under the same obligation
+    to state the reason. The administrator has no product pages of their own,
+    so the decision lands on the public page, which now shows it.
+    """
+    product = get_object_or_404(Product.objects.select_related("company"), pk=pk)
+    if product.status == ProductStatus.REVOKED:
+        messages.info(request, _("This passport had already been revoked."))
+        return redirect("verification:verify", code=product.passport_code)
 
-    products = Product.objects.filter(company=company)
-
-    selected = request.GET.get("status", "")
-    if selected in {value for value, label in ProductStatus.choices}:
-        products = products.filter(status=selected)
-    else:
-        selected = ""
-
-    query = request.GET.get("q", "").strip()
-    if query:
-        products = products.filter(
-            Q(name__icontains=query)
-            | Q(category__icontains=query)
-            | Q(passport_code__icontains=query)
-        )
+    form = RevocationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        _revoke(request, product, form)
+        return redirect("verification:verify", code=product.passport_code)
 
     return render(
         request,
-        "products/product_list.html",
+        "products/product_revoke.html",
         {
-            "company": company,
-            "products": products,
-            "statuses": ProductStatus.choices,
-            "selected_status": selected,
-            "query": query,
-            "can_register": company.can_register_products,
+            "product": product,
+            "form": form,
+            "by_admin": True,
+            "cancel_url": reverse("products:admin_overview"),
         },
     )
 
 
 @login_required
-def product_create(request):
+@owned_company_required
+def company_analytics(request, company):
+    """FR46 counts over a range, FR47 regions, FR48 ranking, FR49 alerts and
+    FR52 the change against the period of equal length before it. A company
+    only ever sees scans of its own products.
+    """
+    days = _selected_range(request)
+    since = timezone.now() - timedelta(days=days)
+    scans = ScanEvent.objects.filter(product__company=company)
+    current = scans.filter(scanned_at__gte=since)
+    total = current.count()
+    previous_total = scans.filter(
+        scanned_at__gte=since - timedelta(days=days), scanned_at__lt=since
+    ).count()
+
+    by_day = list(
+        current.annotate(day=TruncDay("scanned_at"))
+        .values("day")
+        .order_by("day")
+        .annotate(count=Count("id"))
+    )
+    by_region = list(
+        current.values("region").order_by().annotate(count=Count("id")).order_by("-count")
+    )
+    by_product = list(
+        current.values("product__name", "product__passport_code")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:10]
+    )
+    alerts = (
+        Alert.objects.filter(product__company=company)
+        .select_related("product", "scan")
+        .order_by("-created_at")[:10]
+    )
+
+    # Bar lengths as percentages, worked out here so the template only draws.
+    peak = max([row["count"] for row in by_day] + [1])
+    for row in by_day:
+        row["share"] = round(row["count"] * 100 / peak)
+    for row in by_region:
+        row["share"] = round(row["count"] * 100 / total) if total else 0
+    top = max([row["count"] for row in by_product] + [1])
+    for row in by_product:
+        row["share"] = round(row["count"] * 100 / top)
+
+    change = None
+    if previous_total:
+        change = round((total - previous_total) * 100 / previous_total)
+
+    return render(
+        request,
+        "products/analytics.html",
+        {
+            "company": company,
+            "days": days,
+            "ranges": ANALYTICS_RANGES,
+            "total": total,
+            "previous_total": previous_total,
+            "change": change,
+            "by_day": by_day,
+            "by_region": by_region,
+            "by_product": by_product,
+            "alerts": alerts,
+        },
+    )
+
+
+@login_required
+@owned_company_required
+def company_analytics_csv(request, company):
+    """FR51: the scans of the selected range, one row per day, product and region."""
+    days = _selected_range(request)
+    since = timezone.now() - timedelta(days=days)
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="originpass-analytics-{days}d.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["day", "product", "passport_code", "region", "scans"])
+    rows = (
+        ScanEvent.objects.filter(product__company=company, scanned_at__gte=since)
+        .annotate(day=TruncDay("scanned_at"))
+        .values("day", "product__name", "product__passport_code", "region")
+        .annotate(count=Count("id"))
+        .order_by("day", "product__name")
+    )
+    for row in rows:
+        writer.writerow(
+            [
+                row["day"].date().isoformat(),
+                _csv_cell(row["product__name"]),
+                row["product__passport_code"],
+                _csv_cell(row["region"]),
+                row["count"],
+            ]
+        )
+    return response
+
+
+@login_required
+def custody(request):
+    """Everything about custody for one account: what it holds, what is offered
+    to it, and what it is offering. Open to every account, with or without a
+    company, because a distributor or a buyer holds products too.
+    """
+    held = Product.objects.held_by(request.user).select_related("company").order_by("name")
+    incoming = (
+        CustodyTransfer.objects.filter(to_holder=request.user, state=TransferState.INITIATED)
+        .select_related("product", "from_holder")
+        .order_by("-created_at")
+    )
+    outgoing = (
+        CustodyTransfer.objects.filter(from_holder=request.user, state=TransferState.INITIATED)
+        .select_related("product", "to_holder")
+        .order_by("-created_at")
+    )
+    return render(
+        request,
+        "products/custody.html",
+        {"held": held, "incoming": incoming, "outgoing": outgoing},
+    )
+
+
+@login_required
+@owned_company_required
+def product_create(request, company):
     """FR19 for an approved company, FR20 for any other, FR21 and FR23 on save."""
-    company = Company.objects.owned_by(request.user)
-    if company is None:
-        return redirect("companies:application_create")
     if not company.can_register_products:
         return _refuse(
             request,
@@ -233,6 +379,70 @@ def product_edit(request, pk):
 
 
 @login_required
+@owned_company_required
+def product_list(request, company):
+    """FR24 filtered by status, FR25 searched by name, category or passport code."""
+    products = Product.objects.filter(company=company)
+
+    selected = request.GET.get("status", "")
+    if selected in {value for value, label in ProductStatus.choices}:
+        products = products.filter(status=selected)
+    else:
+        selected = ""
+
+    query = request.GET.get("q", "").strip()
+    if query:
+        products = products.filter(
+            Q(name__icontains=query)
+            | Q(category__icontains=query)
+            | Q(passport_code__icontains=query)
+        )
+
+    return render(
+        request,
+        "products/product_list.html",
+        {
+            "company": company,
+            "products": products,
+            "statuses": ProductStatus.choices,
+            "selected_status": selected,
+            "query": query,
+            "can_register": company.can_register_products,
+        },
+    )
+
+
+@login_required
+def product_revoke(request, pk):
+    """FR41: the company that registered a product revokes it, stating why."""
+    company = Company.objects.owned_by(request.user)
+    product = get_object_or_404(Product, pk=pk, company=company)
+
+    if product.status == ProductStatus.REVOKED:
+        return _refuse(
+            request,
+            company,
+            heading=_("This passport has already been revoked"),
+            reason=REVOKED_PASSPORT_REFUSAL,
+        )
+
+    form = RevocationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        _revoke(request, product, form)
+        return redirect("products:product_detail", pk=product.pk)
+
+    return render(
+        request,
+        "products/product_revoke.html",
+        {
+            "product": product,
+            "form": form,
+            "cancel_url": reverse("products:product_detail", args=[product.pk]),
+        },
+    )
+
+
+@login_required
 def qr_download(request, pk):
     """FR22: a PNG encoding the public verification address of this passport."""
     company = Company.objects.owned_by(request.user)
@@ -253,31 +463,26 @@ def qr_download(request, pk):
     return response
 
 
-# ------------------------------------------------------------ custody (FR35-FR40)
-
-
 @login_required
-def custody(request):
-    """Everything about custody for one account: what it holds, what is offered
-    to it, and what it is offering. Open to every account, with or without a
-    company, because a distributor or a buyer holds products too.
-    """
-    held = Product.objects.held_by(request.user).select_related("company").order_by("name")
-    incoming = (
-        CustodyTransfer.objects.filter(to_holder=request.user, state=TransferState.INITIATED)
-        .select_related("product", "from_holder")
-        .order_by("-created_at")
-    )
-    outgoing = (
-        CustodyTransfer.objects.filter(from_holder=request.user, state=TransferState.INITIATED)
-        .select_related("product", "to_holder")
-        .order_by("-created_at")
-    )
-    return render(
-        request,
-        "products/custody.html",
-        {"held": held, "incoming": incoming, "outgoing": outgoing},
-    )
+def transfer_claim(request):
+    """FR40: the buyer claims the product with its passport code and the transfer code."""
+    if request.method == "POST":
+        form = TransferClaimForm(request.POST, claimant=request.user)
+        if form.is_valid():
+            transfer = form.cleaned_data["transfer"]
+            try:
+                transfer.accept(actor=request.user)
+            except ValueError:
+                messages.info(request, _("This transfer had already been answered."))
+            else:
+                messages.success(
+                    request, _("You now hold %(product)s.") % {"product": transfer.product.name}
+                )
+            return redirect("products:custody")
+    else:
+        form = TransferClaimForm(claimant=request.user)
+
+    return render(request, "products/transfer_claim.html", {"form": form})
 
 
 @login_required
@@ -356,6 +561,12 @@ def transfer_respond(request, pk):
         action = request.POST.get("action")
         if action not in {"accept", "decline"}:
             return redirect("products:transfer_respond", pk=transfer.pk)
+        if action == "accept" and transfer.product.status == ProductStatus.REVOKED:
+            messages.error(
+                request,
+                _("This product was revoked after the offer was made, so it cannot be accepted."),
+            )
+            return redirect("products:custody")
         try:
             if action == "accept":
                 transfer.accept(actor=request.user)
@@ -376,116 +587,7 @@ def transfer_respond(request, pk):
     return render(request, "products/transfer_respond.html", {"transfer": transfer})
 
 
-@login_required
-def transfer_claim(request):
-    """FR40: the buyer claims the product with its passport code and the transfer code."""
-    if request.method == "POST":
-        form = TransferClaimForm(request.POST, claimant=request.user)
-        if form.is_valid():
-            transfer = form.cleaned_data["transfer"]
-            try:
-                transfer.accept(actor=request.user)
-            except ValueError:
-                messages.info(request, _("This transfer had already been answered."))
-            else:
-                messages.success(
-                    request, _("You now hold %(product)s.") % {"product": transfer.product.name}
-                )
-            return redirect("products:custody")
-    else:
-        form = TransferClaimForm(claimant=request.user)
-
-    return render(request, "products/transfer_claim.html", {"form": form})
-
-
-# ------------------------------------------------------- analytics (FR46-FR52)
-
-#: The ranges a company can pick, in days. Anything else falls back to 30.
-ANALYTICS_RANGES = (7, 30, 90, 365)
-
-
-def _selected_range(request):
-    """The range asked for in the query string, if it is one on offer."""
-    try:
-        days = int(request.GET.get("days", 30))
-    except ValueError:
-        return 30
-    return days if days in ANALYTICS_RANGES else 30
-
-
-@login_required
-def company_analytics(request):
-    """FR46 counts over a range, FR47 regions, FR48 ranking, FR49 alerts and
-    FR52 the change against the period of equal length before it. A company
-    only ever sees scans of its own products.
-    """
-    company = Company.objects.owned_by(request.user)
-    if company is None:
-        return redirect("companies:application_create")
-
-    days = _selected_range(request)
-    since = timezone.now() - timedelta(days=days)
-    scans = ScanEvent.objects.filter(product__company=company)
-    current = scans.filter(scanned_at__gte=since)
-    total = current.count()
-    previous_total = scans.filter(
-        scanned_at__gte=since - timedelta(days=days), scanned_at__lt=since
-    ).count()
-
-    by_day = list(
-        current.annotate(day=TruncDay("scanned_at"))
-        .values("day")
-        .order_by("day")
-        .annotate(count=Count("id"))
-    )
-    by_region = list(
-        current.values("region").order_by().annotate(count=Count("id")).order_by("-count")
-    )
-    by_product = list(
-        current.values("product__name", "product__passport_code")
-        .annotate(count=Count("id"))
-        .order_by("-count")[:10]
-    )
-    alerts = (
-        Alert.objects.filter(product__company=company)
-        .select_related("product", "scan")
-        .order_by("-created_at")[:10]
-    )
-
-    # Bar lengths as percentages, worked out here so the template only draws.
-    peak = max([row["count"] for row in by_day] + [1])
-    for row in by_day:
-        row["share"] = round(row["count"] * 100 / peak)
-    for row in by_region:
-        row["share"] = round(row["count"] * 100 / total) if total else 0
-    top = max([row["count"] for row in by_product] + [1])
-    for row in by_product:
-        row["share"] = round(row["count"] * 100 / top)
-
-    change = None
-    if previous_total:
-        change = round((total - previous_total) * 100 / previous_total)
-
-    return render(
-        request,
-        "products/analytics.html",
-        {
-            "company": company,
-            "days": days,
-            "ranges": ANALYTICS_RANGES,
-            "total": total,
-            "previous_total": previous_total,
-            "change": change,
-            "by_day": by_day,
-            "by_region": by_region,
-            "by_product": by_product,
-            "alerts": alerts,
-        },
-    )
-
-
-#: A cell starting with one of these is run as a formula by spreadsheets.
-_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+# ---- Private helpers ----
 
 
 def _csv_cell(value):
@@ -494,40 +596,14 @@ def _csv_cell(value):
     return "'" + text if text.startswith(_FORMULA_PREFIXES) else text
 
 
-@login_required
-def company_analytics_csv(request):
-    """FR51: the scans of the selected range, one row per day, product and region."""
-    company = Company.objects.owned_by(request.user)
-    if company is None:
-        return redirect("companies:application_create")
-
-    days = _selected_range(request)
-    since = timezone.now() - timedelta(days=days)
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = f'attachment; filename="originpass-analytics-{days}d.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["day", "product", "passport_code", "region", "scans"])
-    rows = (
-        ScanEvent.objects.filter(product__company=company, scanned_at__gte=since)
-        .annotate(day=TruncDay("scanned_at"))
-        .values("day", "product__name", "product__passport_code", "region")
-        .annotate(count=Count("id"))
-        .order_by("day", "product__name")
+def _refuse(request, company, heading, reason):
+    """FR20: a refusal states its cause instead of hiding the page."""
+    return render(
+        request,
+        "products/refusal.html",
+        {"company": company, "heading": heading, "reason": reason},
+        status=403,
     )
-    for row in rows:
-        writer.writerow(
-            [
-                row["day"].date().isoformat(),
-                _csv_cell(row["product__name"]),
-                row["product__passport_code"],
-                _csv_cell(row["region"]),
-                row["count"],
-            ]
-        )
-    return response
-
-
-# -------------------------------------------------------- revocation (FR41, FR42)
 
 
 def _revoke(request, product, form):
@@ -542,94 +618,10 @@ def _revoke(request, product, form):
     messages.success(request, _("%(product)s has been revoked.") % {"product": product.name})
 
 
-@login_required
-def product_revoke(request, pk):
-    """FR41: the company that registered a product revokes it, stating why."""
-    company = Company.objects.owned_by(request.user)
-    product = get_object_or_404(Product, pk=pk, company=company)
-
-    if product.status == ProductStatus.REVOKED:
-        return _refuse(
-            request,
-            company,
-            heading=_("This passport has already been revoked"),
-            reason=REVOKED_PASSPORT_REFUSAL,
-        )
-
-    form = RevocationForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        _revoke(request, product, form)
-        return redirect("products:product_detail", pk=product.pk)
-
-    return render(
-        request,
-        "products/product_revoke.html",
-        {
-            "product": product,
-            "form": form,
-            "cancel_url": reverse("products:product_detail", args=[product.pk]),
-        },
-    )
-
-
-@admin_required
-def admin_revoke_product(request, pk):
-    """FR42: the administrator revokes any passport, under the same obligation
-    to state the reason. The administrator has no product pages of their own,
-    so the decision lands on the public page, which now shows it.
-    """
-    product = get_object_or_404(Product.objects.select_related("company"), pk=pk)
-    if product.status == ProductStatus.REVOKED:
-        messages.info(request, _("This passport had already been revoked."))
-        return redirect("verification:verify", code=product.passport_code)
-
-    form = RevocationForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        _revoke(request, product, form)
-        return redirect("verification:verify", code=product.passport_code)
-
-    return render(
-        request,
-        "products/product_revoke.html",
-        {
-            "product": product,
-            "form": form,
-            "by_admin": True,
-            "cancel_url": reverse("products:admin_overview"),
-        },
-    )
-
-
-# --------------------------------------------------------------- admin (FR50)
-
-
-@admin_required
-def admin_overview(request):
-    """FR50: the platform totals by status, with the latest alerts and passports."""
-    companies = {
-        row["status"]: row["count"]
-        for row in Company.objects.values("status").order_by().annotate(count=Count("id"))
-    }
-    products = {
-        row["status"]: row["count"]
-        for row in Product.objects.values("status").order_by().annotate(count=Count("id"))
-    }
-    return render(
-        request,
-        "products/admin_overview.html",
-        {
-            "company_totals": [
-                (value, label, companies.get(value, 0)) for value, label in CompanyStatus.choices
-            ],
-            "product_totals": [
-                (value, label, products.get(value, 0)) for value, label in ProductStatus.choices
-            ],
-            "company_count": sum(companies.values()),
-            "product_count": sum(products.values()),
-            "scan_count": ScanEvent.objects.count(),
-            "recent_alerts": Alert.objects.select_related("product__company", "scan")[:10],
-            "recent_products": Product.objects.select_related("company").order_by("-registered_at")[
-                :8
-            ],
-        },
-    )
+def _selected_range(request):
+    """The range asked for in the query string, if it is one on offer."""
+    try:
+        days = int(request.GET.get("days", 30))
+    except ValueError:
+        return 30
+    return days if days in ANALYTICS_RANGES else 30

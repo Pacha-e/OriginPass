@@ -3,6 +3,7 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
+# ---- External imports ----
 import io
 import tempfile
 
@@ -11,78 +12,18 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 
+# ---- Internal imports ----
 from products.models import ProductStatus
 from test_support.factories import OWNER_PASSWORD, make_admin, make_approved_company, make_product
 from test_support.timing import measure
 
+# ---- Constants ----
 VALID_PRODUCT = {
     "name": "Sombrero vueltiao 21 vueltas",
     "description": "Hand woven over three weeks.",
     "category": "Headwear",
     "origin": "Tuchin, Cordoba",
 }
-
-
-class ProductListTests(TestCase):
-    """FR24 list filtered by status, FR25 search by name, category or code."""
-
-    def setUp(self):
-        self.company = make_approved_company(email="weaver@tuchin.co")
-        self.hat = make_product(self.company, name="Sombrero vueltiao", category="Headwear")
-        self.basket = make_product(
-            self.company,
-            name="Canasto de iraca",
-            description="Woven palm.",
-            category="Basketry",
-            origin="Usiacuri, Atlantico",
-            status=ProductStatus.REVOKED,
-            revocation_reason="Reported as a copy.",
-        )
-        self.client.login(email="weaver@tuchin.co", password=OWNER_PASSWORD)
-
-    def test_the_list_shows_the_products_of_this_company(self):
-        response = self.client.get(reverse("products:product_list"))
-
-        self.assertContains(response, "Sombrero vueltiao")
-        self.assertContains(response, "Canasto de iraca")
-
-    def test_the_list_hides_the_products_of_another_company(self):
-        other = make_approved_company(email="otro@barranquilla.co")
-        make_product(other, name="Mochila arhuaca", category="Bags", origin="Nabusimake, Cesar")
-
-        response = self.client.get(reverse("products:product_list"))
-
-        self.assertNotContains(response, "Mochila arhuaca")
-
-    def test_the_list_filters_by_status(self):
-        response = self.client.get(reverse("products:product_list"), {"status": "REVOKED"})
-
-        self.assertContains(response, "Canasto de iraca")
-        self.assertNotContains(response, "Sombrero vueltiao")
-
-    def test_the_search_matches_a_name(self):
-        response = self.client.get(reverse("products:product_list"), {"q": "vueltiao"})
-
-        self.assertContains(response, "Sombrero vueltiao")
-        self.assertNotContains(response, "Canasto de iraca")
-
-    def test_the_search_matches_a_category(self):
-        response = self.client.get(reverse("products:product_list"), {"q": "Basketry"})
-
-        self.assertContains(response, "Canasto de iraca")
-        self.assertNotContains(response, "Sombrero vueltiao")
-
-    def test_the_search_matches_a_passport_code(self):
-        response = self.client.get(reverse("products:product_list"), {"q": self.hat.passport_code})
-
-        self.assertContains(response, "Sombrero vueltiao")
-        self.assertNotContains(response, "Canasto de iraca")
-
-    def test_the_list_answers_within_three_seconds(self):
-        """FR24 states the bound, so it is measured rather than assumed."""
-        _, seconds = measure(lambda: self.client.get(reverse("products:product_list")))
-
-        self.assertLess(seconds, 3.0, f"the list took {seconds:.3f}s")
 
 
 class ProductEditTests(TestCase):
@@ -93,43 +34,13 @@ class ProductEditTests(TestCase):
         self.product = make_product(self.company, **VALID_PRODUCT)
         self.client.login(email="weaver@tuchin.co", password=OWNER_PASSWORD)
 
-    def test_owner_can_add_a_photo_after_registration_and_public_sees_it(self):
-        original_code = self.product.passport_code
-        picture = io.BytesIO()
-        Image.new("RGB", (16, 16), "#b98052").save(picture, format="PNG")
-        picture.seek(0)
+    def test_a_company_cannot_edit_the_product_of_another(self):
+        make_approved_company(email="otro@barranquilla.co")
+        self.client.login(email="otro@barranquilla.co", password=OWNER_PASSWORD)
 
-        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
-            response = self.client.post(
-                reverse("products:product_edit", args=[self.product.pk]),
-                {
-                    **VALID_PRODUCT,
-                    "image": SimpleUploadedFile(
-                        "woven-piece.png", picture.read(), content_type="image/png"
-                    ),
-                },
-            )
-            self.assertEqual(response.status_code, 302)
-            self.product.refresh_from_db()
-            self.assertEqual(self.product.passport_code, original_code)
-            self.assertTrue(self.product.image.name.startswith("product-images/"))
-            self.assertTrue(self.product.image.storage.exists(self.product.image.name))
-            public = self.client.get(
-                reverse("verification:verify", args=[self.product.passport_code])
-            )
-            self.assertContains(public, self.product.image.url)
+        response = self.client.get(reverse("products:product_edit", args=[self.product.pk]))
 
-    def test_editing_changes_the_description_and_keeps_the_code(self):
-        original_code = self.product.passport_code
-
-        self.client.post(
-            reverse("products:product_edit", args=[self.product.pk]),
-            {**VALID_PRODUCT, "description": "Hand woven over four weeks."},
-        )
-
-        self.product.refresh_from_db()
-        self.assertEqual(self.product.description, "Hand woven over four weeks.")
-        self.assertEqual(self.product.passport_code, original_code)
+        self.assertEqual(response.status_code, 404)
 
     def test_a_revoked_passport_is_not_edited(self):
         self.product.revoke(actor=make_admin(), reason="Reported as a copy.")
@@ -159,10 +70,103 @@ class ProductEditTests(TestCase):
         self.product.refresh_from_db()
         self.assertEqual(self.product.description, VALID_PRODUCT["description"])
 
-    def test_a_company_cannot_edit_the_product_of_another(self):
-        make_approved_company(email="otro@barranquilla.co")
-        self.client.login(email="otro@barranquilla.co", password=OWNER_PASSWORD)
+    def test_editing_changes_the_description_and_keeps_the_code(self):
+        original_code = self.product.passport_code
 
-        response = self.client.get(reverse("products:product_edit", args=[self.product.pk]))
+        self.client.post(
+            reverse("products:product_edit", args=[self.product.pk]),
+            {**VALID_PRODUCT, "description": "Hand woven over four weeks."},
+        )
 
-        self.assertEqual(response.status_code, 404)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.description, "Hand woven over four weeks.")
+        self.assertEqual(self.product.passport_code, original_code)
+
+    def test_owner_can_add_a_photo_after_registration_and_public_sees_it(self):
+        original_code = self.product.passport_code
+        picture = io.BytesIO()
+        Image.new("RGB", (16, 16), "#b98052").save(picture, format="PNG")
+        picture.seek(0)
+
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(
+                reverse("products:product_edit", args=[self.product.pk]),
+                {
+                    **VALID_PRODUCT,
+                    "image": SimpleUploadedFile(
+                        "woven-piece.png", picture.read(), content_type="image/png"
+                    ),
+                },
+            )
+            self.assertEqual(response.status_code, 302)
+            self.product.refresh_from_db()
+            self.assertEqual(self.product.passport_code, original_code)
+            self.assertTrue(self.product.image.name.startswith("product-images/"))
+            self.assertTrue(self.product.image.storage.exists(self.product.image.name))
+            public = self.client.get(
+                reverse("verification:verify", args=[self.product.passport_code])
+            )
+            self.assertContains(public, self.product.image.url)
+
+
+# ---- Public API ----
+class ProductListTests(TestCase):
+    """FR24 list filtered by status, FR25 search by name, category or code."""
+
+    def setUp(self):
+        self.company = make_approved_company(email="weaver@tuchin.co")
+        self.hat = make_product(self.company, name="Sombrero vueltiao", category="Headwear")
+        self.basket = make_product(
+            self.company,
+            name="Canasto de iraca",
+            description="Woven palm.",
+            category="Basketry",
+            origin="Usiacuri, Atlantico",
+            status=ProductStatus.REVOKED,
+            revocation_reason="Reported as a copy.",
+        )
+        self.client.login(email="weaver@tuchin.co", password=OWNER_PASSWORD)
+
+    def test_the_list_answers_within_three_seconds(self):
+        """FR24 states the bound, so it is measured rather than assumed."""
+        _, seconds = measure(lambda: self.client.get(reverse("products:product_list")))
+
+        self.assertLess(seconds, 3.0, f"the list took {seconds:.3f}s")
+
+    def test_the_list_filters_by_status(self):
+        response = self.client.get(reverse("products:product_list"), {"status": "REVOKED"})
+
+        self.assertContains(response, "Canasto de iraca")
+        self.assertNotContains(response, "Sombrero vueltiao")
+
+    def test_the_list_hides_the_products_of_another_company(self):
+        other = make_approved_company(email="otro@barranquilla.co")
+        make_product(other, name="Mochila arhuaca", category="Bags", origin="Nabusimake, Cesar")
+
+        response = self.client.get(reverse("products:product_list"))
+
+        self.assertNotContains(response, "Mochila arhuaca")
+
+    def test_the_list_shows_the_products_of_this_company(self):
+        response = self.client.get(reverse("products:product_list"))
+
+        self.assertContains(response, "Sombrero vueltiao")
+        self.assertContains(response, "Canasto de iraca")
+
+    def test_the_search_matches_a_category(self):
+        response = self.client.get(reverse("products:product_list"), {"q": "Basketry"})
+
+        self.assertContains(response, "Canasto de iraca")
+        self.assertNotContains(response, "Sombrero vueltiao")
+
+    def test_the_search_matches_a_name(self):
+        response = self.client.get(reverse("products:product_list"), {"q": "vueltiao"})
+
+        self.assertContains(response, "Sombrero vueltiao")
+        self.assertNotContains(response, "Canasto de iraca")
+
+    def test_the_search_matches_a_passport_code(self):
+        response = self.client.get(reverse("products:product_list"), {"q": self.hat.passport_code})
+
+        self.assertContains(response, "Sombrero vueltiao")
+        self.assertNotContains(response, "Canasto de iraca")

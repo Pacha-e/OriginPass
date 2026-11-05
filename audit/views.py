@@ -5,18 +5,24 @@ refuses edits anyway. The state of the signed chain is shown above the entries,
 because a filtered list of rows says nothing about whether rows were removed.
 """
 
+# ---- External imports ----
 from datetime import datetime, time
 
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.utils import timezone
 
+# ---- Internal imports ----
 from accounts.decorators import admin_required
 
 from .forms import AuditFilterForm
 from .models import AuditEntry
 
+# ---- Constants ----
+
 PAGE_SIZE = 50
+
+# ---- Public API ----
 
 
 @admin_required

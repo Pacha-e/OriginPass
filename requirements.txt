@@ -4,3 +4,5 @@ dj-database-url>=2.3
 python-dotenv>=1.0
 Pillow>=11.0
 qrcode>=8.0
+gunicorn>=23.0,<24
+whitenoise>=6.7,<7

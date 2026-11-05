@@ -23,6 +23,7 @@ distinguish these colours reads the same answer as everyone else.
   <h1 class="verdict__label">
     {% if verdict == "GENUINE" %}{% translate "Genuine" %}
     {% elif verdict == "REVOKED" %}{% translate "Revoked" %}
+    {% elif verdict == "ALTERED" %}{% translate "Altered" %}
     {% else %}{% translate "Not found" %}{% endif %}
   </h1>
   <p class="verdict__detail">
@@ -32,6 +33,8 @@ distinguish these colours reads the same answer as everyone else.
       {% blocktranslate trimmed with withdrawn=product.updated_at|date:"j F Y" %}
         This passport was withdrawn on {{ withdrawn }} and is no longer valid.
       {% endblocktranslate %}
+    {% elif verdict == "ALTERED" %}
+      {% translate "The record behind this code does not match the signature OriginPass issued for it. Do not rely on it." %}
     {% else %}
       {% translate "This code does not match any passport issued by OriginPass." %}
     {% endif %}
@@ -151,6 +154,11 @@ distinguish these colours reads the same answer as everyone else.
       {% blocktranslate trimmed %}
         Its company or OriginPass withdrew this passport, and the reason is above. Do not
         take this piece as the one the passport was issued for.
+      {% endblocktranslate %}
+    {% elif verdict == "ALTERED" %}
+      {% blocktranslate trimmed %}
+        The record was changed outside OriginPass, so it cannot be verified. Report the
+        label to the company or to OriginPass.
       {% endblocktranslate %}
     {% else %}
       {% blocktranslate trimmed %}

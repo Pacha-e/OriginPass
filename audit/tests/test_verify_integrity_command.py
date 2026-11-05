@@ -10,6 +10,7 @@ A report on integrity given by a database missing the constraints that defend
 it is worse than no report, so the command refuses to give one.
 """
 
+# ---- External imports ----
 from io import StringIO
 from unittest.mock import patch
 
@@ -17,9 +18,11 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase
 
+# ---- Internal imports ----
 from test_support.factories import make_admin, make_approved_company, make_product
 
 
+# ---- Public API ----
 class CleanDatabaseTests(TestCase):
     def setUp(self):
         self.admin = make_admin()

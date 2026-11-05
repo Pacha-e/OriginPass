@@ -8,13 +8,11 @@ and `500.html` from the project template directory, and replacing them with
 handlers of our own would add code whose only effect is to move three files.
 """
 
+from django.db import OperationalError, connection
+from django.http import JsonResponse
 from django.shortcuts import render
 
-
-def home(request):
-    """The public landing page, reachable without an account."""
-    return render(request, "pages/home.html")
-
+# ---- Constants ----
 
 #: The photographs shown in the interface and in the demonstration data. Each
 #: one is under a free licence that asks for its author to be named, so they are
@@ -112,6 +110,28 @@ PHOTO_CREDITS = [
 ]
 
 
+# ---- Public views ----
+
+
 def credits(request):
     """Who took each photograph, and under which licence it is shown."""
     return render(request, "pages/credits.html", {"credits": PHOTO_CREDITS})
+
+
+def healthz(request):
+    """Report 200 if the database answers a query, 503 if it does not.
+
+    A query, not just an open connection: a pooled connection can outlive a
+    database restart and still look open until it is used.
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+    except OperationalError:
+        return JsonResponse({"status": "unavailable"}, status=503)
+    return JsonResponse({"status": "ok"})
+
+
+def home(request):
+    """The public landing page, reachable without an account."""
+    return render(request, "pages/home.html")

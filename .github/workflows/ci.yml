@@ -1,5 +1,9 @@
 name: CI
 
+# The CI database is ephemeral and holds no real data; the value is not a secret.
+env:
+  CI_POSTGRES_PASSWORD: ci-only-not-a-secret
+
 on:
   push:
     branches: [main]
@@ -16,7 +20,7 @@ jobs:
         env:
           POSTGRES_DB: originpass
           POSTGRES_USER: originpass
-          POSTGRES_PASSWORD: originpass
+          POSTGRES_PASSWORD: ${{ env.CI_POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -26,7 +30,7 @@ jobs:
           --health-retries 10
 
     env:
-      DATABASE_URL: postgres://originpass:originpass@localhost:5432/originpass
+      DATABASE_URL: postgres://originpass:${{ env.CI_POSTGRES_PASSWORD }}@localhost:5432/originpass
       SECRET_KEY: only-for-continuous-integration
       DEBUG: "False"
       ALLOWED_HOSTS: localhost,127.0.0.1

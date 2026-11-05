@@ -1,15 +1,18 @@
+# ---- External imports ----
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+# ---- Internal imports ----
 from .models import User
+
+# ---- Public API ----
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    ordering = ["email"]
-    list_display = ["email", "role", "is_active", "is_staff", "date_joined"]
-    list_filter = ["role", "is_active", "is_staff"]
-    search_fields = ["email"]
+    add_fieldsets = [
+        (None, {"classes": ["wide"], "fields": ["email", "role", "password1", "password2"]}),
+    ]
     fieldsets = [
         (None, {"fields": ["email", "password"]}),
         ("Role", {"fields": ["role"]}),
@@ -27,6 +30,7 @@ class UserAdmin(BaseUserAdmin):
         ),
         ("Dates", {"fields": ["last_login", "date_joined"]}),
     ]
-    add_fieldsets = [
-        (None, {"classes": ["wide"], "fields": ["email", "role", "password1", "password2"]}),
-    ]
+    list_display = ["email", "role", "is_active", "is_staff", "date_joined"]
+    list_filter = ["role", "is_active", "is_staff"]
+    ordering = ["email"]
+    search_fields = ["email"]

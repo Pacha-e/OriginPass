@@ -1,11 +1,14 @@
 """FR17 - Show the application status, and the reason behind a negative one, to its owner."""
 
+# ---- External imports ----
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from test_support.factories import make_admin, make_company, make_user
 
 
+# ---- Public API ----
 class ApplicationStatusVisibleToOwnerTests(TestCase):
     """FR17 - Show application status and reason to the owner."""
 
@@ -14,11 +17,6 @@ class ApplicationStatusVisibleToOwnerTests(TestCase):
         self.admin = make_admin()
         self.company = make_company(self.owner)
         self.client.force_login(self.owner)
-
-    def test_the_owner_sees_the_current_status(self):
-        response = self.client.get(reverse("companies:application_detail"))
-
-        self.assertContains(response, "Pendiente")
 
     def test_a_rejection_shows_the_stored_reason(self):
         self.company.reject(actor=self.admin, reason="The registry code does not match.")
@@ -43,3 +41,8 @@ class ApplicationStatusVisibleToOwnerTests(TestCase):
         response = self.client.get(reverse("companies:application_detail"))
 
         self.assertRedirects(response, reverse("companies:application_create"))
+
+    def test_the_owner_sees_the_current_status(self):
+        response = self.client.get(reverse("companies:application_detail"))
+
+        self.assertContains(response, "Pendiente")

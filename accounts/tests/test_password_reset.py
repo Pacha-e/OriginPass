@@ -1,14 +1,17 @@
 """FR06: a registered user asks for a reset link by email."""
 
+# ---- External imports ----
 import re
 
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from test_support.factories import make_user
 
 
+# ---- Public API ----
 class PasswordResetTests(TestCase):
     def setUp(self):
         self.user = make_user(email="holder@example.com")

@@ -7,15 +7,22 @@ not. Each failure is attached to the field that caused it so that the template
 renders the cause next to that input (UR08).
 """
 
+# ---- External imports ----
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+# ---- Internal imports ----
 from .models import COMMERCIAL_TRACKS, Company, CompanyType, VerificationTrack
+
+# ---- Constants ----
 
 #: Stated once because the form raises it twice: as the required-field message
 #: and again when the submitted reason turns out to be only whitespace.
 REJECTION_REASON_REQUIRED = _("A reason is required to reject an application.")
 SUSPENSION_REASON_REQUIRED = _("A reason is required to suspend a company.")
+
+
+# ---- Public API ----
 
 
 class CompanyApplicationForm(forms.ModelForm):
@@ -137,6 +144,13 @@ class CompanyApplicationForm(forms.ModelForm):
             )
 
         return cleaned
+
+    def save(self, commit=True):
+        """Write only the fields this form owns, so a status changed meanwhile survives."""
+        company = super().save(commit=False)
+        if commit:
+            company.save(update_fields=self.Meta.fields)
+        return company
 
 
 class RejectionForm(forms.Form):

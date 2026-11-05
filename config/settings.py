@@ -11,6 +11,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
+# ---- Helpers ----
+
+
+def env_flag(name, default="False"):
+    return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
+
 
 def require_env(name):
     value = os.getenv(name)
@@ -19,9 +25,7 @@ def require_env(name):
     return value
 
 
-def env_flag(name, default="False"):
-    return os.getenv(name, default).strip().lower() in {"1", "true", "yes", "on"}
-
+# ---- Core ----
 
 # Also the key every integrity signature is derived from. New signatures are
 # always made with this key; the ones in SECRET_KEY_FALLBACKS are still
@@ -35,6 +39,8 @@ SECRET_KEY_FALLBACKS = [
 ]
 DEBUG = env_flag("DEBUG")
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
+
+# ---- Applications and middleware ----
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -53,6 +59,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves the files collectstatic gathered into STATIC_ROOT when DEBUG is off.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # Between the session and the common middleware, which is where it can read
     # the language from the session and still act before the URL is resolved.
@@ -84,11 +92,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
+# ---- Database ----
+
 # PostgreSQL only. A missing DATABASE_URL is an error rather than a silent
 # fallback to another engine, so development and deployment run on the same one.
 DATABASES = {"default": dj_database_url.parse(require_env("DATABASE_URL"), conn_max_age=600)}
 # Fail fast when the database is not up, rather than blocking on the connect.
 DATABASES["default"].setdefault("OPTIONS", {})["connect_timeout"] = 5
+
+# ---- Authentication ----
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -111,6 +123,8 @@ LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "companies:application_detail"
 LOGOUT_REDIRECT_URL = "pages:home"
 
+# ---- Localization ----
+
 # UR04 asks for the interface in Spanish; the course asks for every artefact in
 # English. Both hold at once: code, comments, commit messages and documentation
 # stay in English, and the interface strings are translated at render time. The
@@ -126,6 +140,8 @@ TIME_ZONE = "America/Bogota"
 USE_I18N = True
 USE_TZ = True
 
+# ---- Static and media files ----
+
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -133,9 +149,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# ---- Framework defaults ----
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+
+# ---- Email ----
 
 # Notifications (FR06, FR53-FR55). Development prints every message to the
 # console running the server, so a demo shows them without a mail account; a
@@ -143,12 +163,16 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "OriginPass <no-reply@originpass.co>")
 
+# ---- Scan geolocation ----
+
 # FR33 stores a coarse region per scan, read from the geolocation headers a CDN
 # such as Cloudflare adds. Outside such a proxy those headers are written by the
 # client, and trusting them would let anyone raise a duplicate-scan alert
 # (FR49) against a genuine product, so they are ignored unless the deployment
 # says a proxy sets them. Development trusts them so the alert can be shown.
 TRUST_GEO_HEADERS = env_flag("TRUST_GEO_HEADERS", "True" if DEBUG else "False")
+
+# ---- Transport security ----
 
 # Transport hardening is driven by its own variables rather than by DEBUG,
 # because whether the site is served over HTTPS is a property of the
@@ -162,3 +186,12 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
 SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+
+# Behind a TLS-terminating proxy such as Azure App Service, the proxy sets the
+# scheme in this header. A bare server would let any client forge it, so the
+# deployment turns it on instead of the default doing so.
+if env_flag("BEHIND_TLS_PROXY"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()
+]

@@ -16,20 +16,14 @@ Which tables to describe comes from the application registry, so the tables
 Django keeps for itself stay out and the ones this project designed stay in.
 """
 
+# ---- External imports ----
 import re
 
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-#: The apps whose tables this project designed. Django's own tables exist to
-#: make the framework work and say nothing about the domain.
-OUR_APPS = ["accounts", "companies", "products", "verification", "audit"]
-
-#: Marks a constraint name Django built rather than one this project chose.
-#: Django hashes part of the columns into the name, which is what the eight hex
-#: characters are, and ends the plain ones in a fixed suffix.
-GENERATED_NAME = re.compile(r"_[0-9a-f]{8}(_|$)|_(pkey|key|uniq|check)$")
+# ---- Constants ----
 
 #: What each constraint letter means in `pg_constraint.contype`, in the order
 #: the report shows them: identity first, then the rules, then the links.
@@ -39,6 +33,17 @@ CONSTRAINT_KINDS = [
     ("c", "check"),
     ("f", "foreign key"),
 ]
+
+#: Marks a constraint name Django built rather than one this project chose.
+#: Django hashes part of the columns into the name, which is what the eight hex
+#: characters are, and ends the plain ones in a fixed suffix.
+GENERATED_NAME = re.compile(r"_[0-9a-f]{8}(_|$)|_(pkey|key|uniq|check)$")
+
+#: The apps whose tables this project designed. Django's own tables exist to
+#: make the framework work and say nothing about the domain.
+OUR_APPS = ["accounts", "companies", "products", "verification", "audit"]
+
+# ---- Public API ----
 
 
 class Command(BaseCommand):
@@ -86,6 +91,65 @@ class Command(BaseCommand):
         with connection.cursor() as cursor:
             cursor.execute("SHOW server_version")
             return f"PostgreSQL {cursor.fetchone()[0]}"
+
+    # ---- how to show it ----
+
+    def _as_words(self, name, definition):
+        """What this constraint is for, taken from its name when we chose the name.
+
+        A name we chose is a sentence about the domain and says more than the
+        definition ever will. A name Django generated says less, so the
+        definition speaks instead.
+        """
+        if GENERATED_NAME.search(name):
+            return self._plainly(definition)
+        return name.replace("_", " ")
+
+    def _plainly(self, definition):
+        """Drop the parts of a generated definition that carry no meaning here.
+
+        Kept to plain ASCII: this prints to whatever console the machine has,
+        and the Windows default cannot encode an arrow.
+        """
+        return (
+            definition.replace("PRIMARY KEY ", "")
+            .replace("UNIQUE ", "")
+            .replace("FOREIGN KEY ", "")
+            .replace(" DEFERRABLE INITIALLY DEFERRED", "")
+            .replace(") REFERENCES ", ") -> ")
+        )
+
+    def _write_columns(self, columns):
+        if not columns:
+            return
+        width = max(len(column["name"]) for column in columns)
+        for column in columns:
+            notes = []
+            if column["nullable"]:
+                notes.append("null")
+            if column["generated"]:
+                notes.append("generated")
+            trailer = f"  {', '.join(notes)}" if notes else ""
+            self.stdout.write(f"    {column['name']:<{width}}  {column['type']}{trailer}")
+
+    def _write_constraints(self, by_kind):
+        """The rule in words first, then the definition that proves it.
+
+        Postgres renders a check with every cast it inserted, which is faithful
+        and close to unreadable. The constraint's own name is the sentence the
+        rule was written to be, so it leads, and the rendered definition
+        follows indented as the evidence for it.
+        """
+        for kind, label in CONSTRAINT_KINDS:
+            for name, definition in by_kind.get(kind, []):
+                self.stdout.write(f"    {label:<12} {self._as_words(name, definition)}")
+                if kind == "c":
+                    self.stdout.write(f"    {'':<12}   {definition}")
+
+    def _write_indexes(self, indexes):
+        for name, definition in indexes:
+            using = definition.split(" USING ", 1)[-1]
+            self.stdout.write(f"    {'index':<12} {using}  named {name}")
 
     # ---- what the database says ----
 
@@ -159,62 +223,3 @@ class Command(BaseCommand):
         for table, name, definition in rows:
             by_table.setdefault(table, []).append((name, definition))
         return by_table
-
-    # ---- how to show it ----
-
-    def _write_columns(self, columns):
-        if not columns:
-            return
-        width = max(len(column["name"]) for column in columns)
-        for column in columns:
-            notes = []
-            if column["nullable"]:
-                notes.append("null")
-            if column["generated"]:
-                notes.append("generated")
-            trailer = f"  {', '.join(notes)}" if notes else ""
-            self.stdout.write(f"    {column['name']:<{width}}  {column['type']}{trailer}")
-
-    def _write_constraints(self, by_kind):
-        """The rule in words first, then the definition that proves it.
-
-        Postgres renders a check with every cast it inserted, which is faithful
-        and close to unreadable. The constraint's own name is the sentence the
-        rule was written to be, so it leads, and the rendered definition
-        follows indented as the evidence for it.
-        """
-        for kind, label in CONSTRAINT_KINDS:
-            for name, definition in by_kind.get(kind, []):
-                self.stdout.write(f"    {label:<12} {self._as_words(name, definition)}")
-                if kind == "c":
-                    self.stdout.write(f"    {'':<12}   {definition}")
-
-    def _as_words(self, name, definition):
-        """What this constraint is for, taken from its name when we chose the name.
-
-        A name we chose is a sentence about the domain and says more than the
-        definition ever will. A name Django generated says less, so the
-        definition speaks instead.
-        """
-        if GENERATED_NAME.search(name):
-            return self._plainly(definition)
-        return name.replace("_", " ")
-
-    def _plainly(self, definition):
-        """Drop the parts of a generated definition that carry no meaning here.
-
-        Kept to plain ASCII: this prints to whatever console the machine has,
-        and the Windows default cannot encode an arrow.
-        """
-        return (
-            definition.replace("PRIMARY KEY ", "")
-            .replace("UNIQUE ", "")
-            .replace("FOREIGN KEY ", "")
-            .replace(" DEFERRABLE INITIALLY DEFERRED", "")
-            .replace(") REFERENCES ", ") -> ")
-        )
-
-    def _write_indexes(self, indexes):
-        for name, definition in indexes:
-            using = definition.split(" USING ", 1)[-1]
-            self.stdout.write(f"    {'index':<12} {using}  named {name}")

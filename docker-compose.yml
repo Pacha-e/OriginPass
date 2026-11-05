@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: originpass
       POSTGRES_USER: originpass
-      POSTGRES_PASSWORD: originpass
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}"
     ports:
       - "5432:5432"
     volumes:
@@ -42,7 +42,7 @@ services:
       - "127.0.0.1:8080:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@originpass.co
-      PGADMIN_DEFAULT_PASSWORD: originpass
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_PASSWORD:?Define PGADMIN_PASSWORD en .env}"
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
       # Otherwise the first thing on screen is a banner announcing that a newer

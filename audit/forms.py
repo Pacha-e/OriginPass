@@ -1,9 +1,13 @@
 """The filters of the audit log (FR44)."""
 
+# ---- External imports ----
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+# ---- Internal imports ----
 from .models import Action
+
+# ---- Public API ----
 
 
 class AuditFilterForm(forms.Form):

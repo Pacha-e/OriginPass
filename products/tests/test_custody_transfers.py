@@ -7,10 +7,12 @@ revoked when they accepted it, and offers made by an account that no longer
 held the product.
 """
 
+# ---- External imports ----
 from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from products.models import CustodyTransfer, TransferState
 from test_support.factories import (
     ADMIN_PASSWORD,
@@ -22,10 +24,35 @@ from test_support.factories import (
 )
 
 
-def logged_in(user, password=OWNER_PASSWORD):
-    client = Client()
-    assert client.login(email=user.email, password=password)
-    return client
+class RevocationNoticeTests(TestCase):
+    def setUp(self):
+        self.owner = make_user(email="maker@tuchin.co")
+        self.holder = make_user(email="holder@example.com")
+        self.product = make_product(company=make_company(owner=self.owner, status="APPROVED"))
+        CustodyTransfer.objects.create(
+            product=self.product, from_holder=self.owner, to_holder=self.holder
+        ).accept(actor=self.holder)
+
+    def test_an_admin_revocation_lands_on_the_public_page(self):
+        """Defect: the administrator's revocation ended on a missing page."""
+        admin = make_admin()
+        response = logged_in(admin, ADMIN_PASSWORD).post(
+            reverse("products:admin_revoke", args=[self.product.pk]),
+            {"reason": "Fraud confirmed."},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Anulado")
+        self.assertContains(response, "Fraud confirmed.")
+        self.assertEqual(mail.outbox[-1].to, [self.holder.email])
+
+    def test_the_holder_is_told_when_the_company_revokes(self):
+        logged_in(self.owner).post(
+            reverse("products:product_revoke", args=[self.product.pk]),
+            {"reason": "Recalled for a defect."},
+        )
+        self.assertEqual(mail.outbox[-1].to, [self.holder.email])
+        self.assertIn("Recalled for a defect.", mail.outbox[-1].body)
 
 
 class TransferFlowTests(TestCase):
@@ -194,32 +221,8 @@ class TransferFlowTests(TestCase):
         self.assertContains(response, "Ninguna entrega pendiente para tu cuenta")
 
 
-class RevocationNoticeTests(TestCase):
-    def setUp(self):
-        self.owner = make_user(email="maker@tuchin.co")
-        self.holder = make_user(email="holder@example.com")
-        self.product = make_product(company=make_company(owner=self.owner, status="APPROVED"))
-        CustodyTransfer.objects.create(
-            product=self.product, from_holder=self.owner, to_holder=self.holder
-        ).accept(actor=self.holder)
-
-    def test_the_holder_is_told_when_the_company_revokes(self):
-        logged_in(self.owner).post(
-            reverse("products:product_revoke", args=[self.product.pk]),
-            {"reason": "Recalled for a defect."},
-        )
-        self.assertEqual(mail.outbox[-1].to, [self.holder.email])
-        self.assertIn("Recalled for a defect.", mail.outbox[-1].body)
-
-    def test_an_admin_revocation_lands_on_the_public_page(self):
-        """Defect: the administrator's revocation ended on a missing page."""
-        admin = make_admin()
-        response = logged_in(admin, ADMIN_PASSWORD).post(
-            reverse("products:admin_revoke", args=[self.product.pk]),
-            {"reason": "Fraud confirmed."},
-            follow=True,
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Anulado")
-        self.assertContains(response, "Fraud confirmed.")
-        self.assertEqual(mail.outbox[-1].to, [self.holder.email])
+# ---- Public API ----
+def logged_in(user, password=OWNER_PASSWORD):
+    client = Client()
+    assert client.login(email=user.email, password=password)
+    return client

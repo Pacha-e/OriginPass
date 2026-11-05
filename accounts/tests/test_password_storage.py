@@ -1,14 +1,18 @@
 """DBR11 - Store passwords as salted hashes, and never the plain text."""
 
+# ---- External imports ----
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from accounts.models import User
 from test_support.factories import make_user
 
+# ---- Constants ----
 PASSWORD = "Vueltiao-2026"
 
 
+# ---- Public API ----
 class PasswordStorageTests(TestCase):
     """DBR11 - Store passwords as salted hashes."""
 

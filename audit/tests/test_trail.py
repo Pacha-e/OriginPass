@@ -1,12 +1,15 @@
 """Every status change appends an entry, and no entry is edited afterwards."""
 
+# ---- External imports ----
 from django.test import TestCase
 
+# ---- Internal imports ----
 from audit.models import Action, AuditEntry
 from companies.models import Company
 from test_support.factories import make_admin, make_company
 
 
+# ---- Public API ----
 class AuditTrailTests(TestCase):
     def setUp(self):
         self.admin = make_admin()

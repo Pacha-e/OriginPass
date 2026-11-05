@@ -6,6 +6,8 @@ Every figure here was read from the project: the test count from continuous
 integration, the requirement states from the backlog, the limits from the code.
 """
 
+# ---- Slides ----
+
 SLIDES = [
     {
         "kind": "cover",

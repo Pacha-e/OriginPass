@@ -1,4 +1,7 @@
+# ---- External imports ----
 from django.apps import AppConfig
+
+# ---- Public API ----
 
 
 class ProductsConfig(AppConfig):

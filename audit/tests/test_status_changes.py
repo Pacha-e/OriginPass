@@ -12,15 +12,18 @@ The administration site is not being taken away here. What it may no longer do
 is decide, which is what the pages built for deciding are for.
 """
 
+# ---- External imports ----
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from audit.models import AuditEntry
 from companies.models import CompanyStatus
 from products.models import ProductStatus
 from test_support.factories import ADMIN_PASSWORD, make_admin, make_approved_company, make_product
 
 
+# ---- Public API ----
 class CompanyStatusTests(TestCase):
     def setUp(self):
         self.admin = make_admin()

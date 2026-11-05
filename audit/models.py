@@ -11,12 +11,16 @@ What remains open is the operator, who holds the key as well as the database.
 See `audit/integrity.py`.
 """
 
+# ---- External imports ----
 from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+# ---- Internal imports ----
 from .integrity import GENESIS, sign, verify_chain
+
+# ---- Types ----
 
 
 class Action(models.TextChoices):
@@ -30,6 +34,9 @@ class Action(models.TextChoices):
     PRODUCT_REVOKED = "PRODUCT_REVOKED", _("Product revoked")
     CUSTODY_ACCEPTED = "CUSTODY_ACCEPTED", _("Custody transfer accepted")
     CUSTODY_DECLINED = "CUSTODY_DECLINED", _("Custody transfer declined")
+
+
+# ---- Public API ----
 
 
 class AuditEntry(models.Model):
@@ -86,17 +93,6 @@ class AuditEntry(models.Model):
             raise ValueError("Audit entries are append-only and cannot be edited.")
         return super().save(*args, **kwargs)
 
-    def signed_parts(self):
-        """The values this entry's signature covers."""
-        return (
-            self.actor_id,
-            self.action,
-            self.target_type,
-            self.target_id,
-            self.reason,
-            self.created_at.isoformat(),
-        )
-
     @property
     def is_intact(self):
         """Whether this entry still matches its own signature, ignoring the chain."""
@@ -146,6 +142,17 @@ class AuditEntry(models.Model):
             entry.entry_hash = sign(previous, *entry.signed_parts())
             entry.save()
             return entry
+
+    def signed_parts(self):
+        """The values this entry's signature covers."""
+        return (
+            self.actor_id,
+            self.action,
+            self.target_type,
+            self.target_id,
+            self.reason,
+            self.created_at.isoformat(),
+        )
 
     @classmethod
     def verify_chain(cls):

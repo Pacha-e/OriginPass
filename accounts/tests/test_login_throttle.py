@@ -7,17 +7,20 @@ asserted "we are locked" by string-matching a lockout message would lock the
 implementation into leaking that fact to a crawler.
 """
 
+# ---- External imports ----
 from datetime import timedelta
 
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+# ---- Internal imports ----
 from accounts.forms import AUTHENTICATION_ERROR
 from accounts.models import LoginAttempt
 from test_support.factories import OWNER_PASSWORD, make_user
 
 
+# ---- Public API ----
 class LoginThrottleTests(TestCase):
     def setUp(self):
         self.user = make_user(email="holder@example.com")

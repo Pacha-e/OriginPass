@@ -5,23 +5,20 @@ rejecting an application failed with a template error, so the decision was the
 thing that broke. These tests render the real templates.
 """
 
+# ---- External imports ----
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from test_support.factories import ADMIN_PASSWORD, make_admin, make_company
 
 
+# ---- Public API ----
 class DecisionEmailTests(TestCase):
     def setUp(self):
         self.company = make_company(email="weaver@tuchin.co")
         self.client.login(email=make_admin().email, password=ADMIN_PASSWORD)
-
-    def test_an_approval_is_emailed_to_the_owner(self):
-        self.client.post(reverse("companies:review_approve", args=[self.company.pk]))
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, ["weaver@tuchin.co"])
-        self.assertIn(self.company.legal_name, mail.outbox[0].body)
 
     def test_a_rejection_carries_its_reason(self):
         self.client.post(
@@ -30,3 +27,9 @@ class DecisionEmailTests(TestCase):
         )
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("The registry code does not match.", mail.outbox[0].body)
+
+    def test_an_approval_is_emailed_to_the_owner(self):
+        self.client.post(reverse("companies:review_approve", args=[self.company.pk]))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["weaver@tuchin.co"])
+        self.assertIn(self.company.legal_name, mail.outbox[0].body)

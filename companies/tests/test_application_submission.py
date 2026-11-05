@@ -3,11 +3,13 @@
 Where an issue states a time bound, the test measures the response and asserts it.
 """
 
+# ---- External imports ----
 from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
 
+# ---- Internal imports ----
 from accounts.models import Role
 from companies.models import Company, CompanyStatus, VerificationTrack
 from test_support.factories import make_admin, make_company, make_user
@@ -16,56 +18,93 @@ from test_support.timing import measure
 from .payloads import ARTISAN_APPLICATION, COMMERCIAL_APPLICATION
 
 
-class SubmitApplicationTests(TestCase):
-    """FR07 - Submit a company application."""
+class ArtisanApplicationTests(TestCase):
+    """FR09 - Accept an artisan application for manual review."""
 
     def setUp(self):
         self.owner = make_user()
         self.client.force_login(self.owner)
 
-    def test_the_form_captures_every_required_detail(self):
-        response = self.client.get(reverse("companies:application_create"))
+    def test_an_artisan_application_may_not_carry_a_registry_code(self):
+        payload = ARTISAN_APPLICATION | {"registry_code": "NIT-900123456-7"}
 
-        for field in ["legal_name", "company_type", "description", "location", "website"]:
-            self.assertIn(field, response.context["form"].fields)
+        response = self.client.post(reverse("companies:application_create"), payload)
 
-    def test_the_record_is_stored_with_status_pending(self):
-        response, seconds = measure(
-            lambda: self.client.post(
-                reverse("companies:application_create"), COMMERCIAL_APPLICATION
-            )
-        )
+        self.assertIn("registry_code", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_the_application_is_accepted_with_no_registry_code(self):
+        response = self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
 
         company = Company.objects.get(owner=self.owner)
         self.assertRedirects(response, reverse("companies:application_detail"))
-        self.assertEqual(company.status, CompanyStatus.PENDING)
-        self.assertEqual(company.legal_name, "Artesanias La Bonga SAS")
-        self.assertLess(seconds, 3, "The confirmation must be shown within 3 seconds.")
+        self.assertEqual(company.registry_code, "")
 
-    def test_submitting_makes_the_user_a_company(self):
-        self.client.post(reverse("companies:application_create"), COMMERCIAL_APPLICATION)
+    def test_the_stored_record_is_flagged_for_manual_review(self):
+        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
 
-        self.owner.refresh_from_db()
-        self.assertEqual(self.owner.role, Role.COMPANY)
+        company = Company.objects.get(owner=self.owner)
+        self.assertEqual(company.verification_track, VerificationTrack.ARTISAN_REVIEW)
+        self.assertTrue(company.requires_manual_review)
 
-    def test_a_second_submission_that_races_the_first_lands_on_the_application(self):
-        """A double-clicked submit button sends the form twice.
 
-        The page that decides whether this account has already applied reads
-        the answer before either write has landed, so both requests get past it
-        and the second one meets the database rule that an account owns one
-        company. That is the same answer the page already knows how to give, so
-        it gives it rather than failing.
-        """
-        make_company(self.owner)
+class ArtisanEvidenceTests(TestCase):
+    """FR09 - a manual review needs something to review, and a public profile
+    needs the applicant's consent."""
 
-        with patch.object(Company.objects, "owned_by", return_value=None):
-            response = self.client.post(
-                reverse("companies:application_create"), COMMERCIAL_APPLICATION
-            )
+    def setUp(self):
+        self.owner = make_user()
+        self.client.force_login(self.owner)
 
-        self.assertRedirects(response, reverse("companies:application_detail"))
-        self.assertEqual(Company.objects.filter(owner=self.owner).count(), 1)
+    def test_a_commercial_application_without_consent_is_refused(self):
+        payload = {
+            key: value for key, value in COMMERCIAL_APPLICATION.items() if key != "publish_consent"
+        }
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("publish_consent", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_an_artisan_application_without_consent_is_refused(self):
+        payload = {
+            key: value for key, value in ARTISAN_APPLICATION.items() if key != "publish_consent"
+        }
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("publish_consent", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_an_artisan_application_without_evidence_is_refused(self):
+        payload = ARTISAN_APPLICATION | {"evidence_notes": "   "}
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("evidence_notes", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
+
+    def test_evidence_and_consent_are_stored(self):
+        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
+
+        company = Company.objects.get(owner=self.owner)
+        self.assertEqual(company.evidence_notes, ARTISAN_APPLICATION["evidence_notes"])
+        self.assertTrue(company.publish_consent)
+
+    def test_the_form_captures_evidence_and_consent(self):
+        response = self.client.get(reverse("companies:application_create"))
+
+        for field in ["evidence_notes", "publish_consent"]:
+            self.assertIn(field, response.context["form"].fields)
+
+    def test_the_reviewer_sees_the_evidence(self):
+        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
+        company = Company.objects.get(owner=self.owner)
+
+        self.client.force_login(make_admin())
+        response = self.client.get(reverse("companies:review_detail", args=[company.pk]))
+
+        self.assertContains(response, ARTISAN_APPLICATION["evidence_notes"])
 
 
 class CommercialRegistryCodeTests(TestCase):
@@ -73,6 +112,14 @@ class CommercialRegistryCodeTests(TestCase):
 
     def setUp(self):
         self.client.force_login(make_user())
+
+    def test_a_commercial_application_cannot_use_the_artisan_track(self):
+        payload = COMMERCIAL_APPLICATION | {"verification_track": VerificationTrack.ARTISAN_REVIEW}
+
+        response = self.client.post(reverse("companies:application_create"), payload)
+
+        self.assertIn("verification_track", response.context["form"].errors)
+        self.assertFalse(Company.objects.exists())
 
     def test_a_commercial_application_without_a_code_is_refused(self):
         payload = COMMERCIAL_APPLICATION | {"registry_code": ""}
@@ -94,99 +141,55 @@ class CommercialRegistryCodeTests(TestCase):
         self.assertIn("registry_code", response.context["form"].errors)
         self.assertContains(response, "field-row--invalid")
 
-    def test_a_commercial_application_cannot_use_the_artisan_track(self):
-        payload = COMMERCIAL_APPLICATION | {"verification_track": VerificationTrack.ARTISAN_REVIEW}
 
-        response = self.client.post(reverse("companies:application_create"), payload)
-
-        self.assertIn("verification_track", response.context["form"].errors)
-        self.assertFalse(Company.objects.exists())
-
-
-class ArtisanApplicationTests(TestCase):
-    """FR09 - Accept an artisan application for manual review."""
+# ---- Public API ----
+class SubmitApplicationTests(TestCase):
+    """FR07 - Submit a company application."""
 
     def setUp(self):
         self.owner = make_user()
         self.client.force_login(self.owner)
 
-    def test_the_application_is_accepted_with_no_registry_code(self):
-        response = self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
+    def test_a_second_submission_that_races_the_first_lands_on_the_application(self):
+        """A double-clicked submit button sends the form twice.
+
+        The page that decides whether this account has already applied reads
+        the answer before either write has landed, so both requests get past it
+        and the second one meets the database rule that an account owns one
+        company. That is the same answer the page already knows how to give, so
+        it gives it rather than failing.
+        """
+        make_company(self.owner)
+
+        with patch.object(Company.objects, "owned_by", return_value=None):
+            response = self.client.post(
+                reverse("companies:application_create"), COMMERCIAL_APPLICATION
+            )
+
+        self.assertRedirects(response, reverse("companies:application_detail"))
+        self.assertEqual(Company.objects.filter(owner=self.owner).count(), 1)
+
+    def test_submitting_makes_the_user_a_company(self):
+        self.client.post(reverse("companies:application_create"), COMMERCIAL_APPLICATION)
+
+        self.owner.refresh_from_db()
+        self.assertEqual(self.owner.role, Role.COMPANY)
+
+    def test_the_form_captures_every_required_detail(self):
+        response = self.client.get(reverse("companies:application_create"))
+
+        for field in ["legal_name", "company_type", "description", "location", "website"]:
+            self.assertIn(field, response.context["form"].fields)
+
+    def test_the_record_is_stored_with_status_pending(self):
+        response, seconds = measure(
+            lambda: self.client.post(
+                reverse("companies:application_create"), COMMERCIAL_APPLICATION
+            )
+        )
 
         company = Company.objects.get(owner=self.owner)
         self.assertRedirects(response, reverse("companies:application_detail"))
-        self.assertEqual(company.registry_code, "")
-
-    def test_the_stored_record_is_flagged_for_manual_review(self):
-        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
-
-        company = Company.objects.get(owner=self.owner)
-        self.assertEqual(company.verification_track, VerificationTrack.ARTISAN_REVIEW)
-        self.assertTrue(company.requires_manual_review)
-
-    def test_an_artisan_application_may_not_carry_a_registry_code(self):
-        payload = ARTISAN_APPLICATION | {"registry_code": "NIT-900123456-7"}
-
-        response = self.client.post(reverse("companies:application_create"), payload)
-
-        self.assertIn("registry_code", response.context["form"].errors)
-        self.assertFalse(Company.objects.exists())
-
-
-class ArtisanEvidenceTests(TestCase):
-    """FR09 - a manual review needs something to review, and a public profile
-    needs the applicant's consent."""
-
-    def setUp(self):
-        self.owner = make_user()
-        self.client.force_login(self.owner)
-
-    def test_the_form_captures_evidence_and_consent(self):
-        response = self.client.get(reverse("companies:application_create"))
-
-        for field in ["evidence_notes", "publish_consent"]:
-            self.assertIn(field, response.context["form"].fields)
-
-    def test_an_artisan_application_without_evidence_is_refused(self):
-        payload = ARTISAN_APPLICATION | {"evidence_notes": "   "}
-
-        response = self.client.post(reverse("companies:application_create"), payload)
-
-        self.assertIn("evidence_notes", response.context["form"].errors)
-        self.assertFalse(Company.objects.exists())
-
-    def test_an_artisan_application_without_consent_is_refused(self):
-        payload = {
-            key: value for key, value in ARTISAN_APPLICATION.items() if key != "publish_consent"
-        }
-
-        response = self.client.post(reverse("companies:application_create"), payload)
-
-        self.assertIn("publish_consent", response.context["form"].errors)
-        self.assertFalse(Company.objects.exists())
-
-    def test_a_commercial_application_without_consent_is_refused(self):
-        payload = {
-            key: value for key, value in COMMERCIAL_APPLICATION.items() if key != "publish_consent"
-        }
-
-        response = self.client.post(reverse("companies:application_create"), payload)
-
-        self.assertIn("publish_consent", response.context["form"].errors)
-        self.assertFalse(Company.objects.exists())
-
-    def test_evidence_and_consent_are_stored(self):
-        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
-
-        company = Company.objects.get(owner=self.owner)
-        self.assertEqual(company.evidence_notes, ARTISAN_APPLICATION["evidence_notes"])
-        self.assertTrue(company.publish_consent)
-
-    def test_the_reviewer_sees_the_evidence(self):
-        self.client.post(reverse("companies:application_create"), ARTISAN_APPLICATION)
-        company = Company.objects.get(owner=self.owner)
-
-        self.client.force_login(make_admin())
-        response = self.client.get(reverse("companies:review_detail", args=[company.pk]))
-
-        self.assertContains(response, ARTISAN_APPLICATION["evidence_notes"])
+        self.assertEqual(company.status, CompanyStatus.PENDING)
+        self.assertEqual(company.legal_name, "Artesanias La Bonga SAS")
+        self.assertLess(seconds, 3, "The confirmation must be shown within 3 seconds.")

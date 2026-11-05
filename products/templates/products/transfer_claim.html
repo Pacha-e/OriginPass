@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% translate "Claim a piece" %} — OriginPass{% endblock %}
 
@@ -20,6 +20,17 @@
     <p class="muted">{% translate "The passport code is printed under the QR, on the label. The transfer code is the one the seller gave you." %}</p>
   </div>
 
+  <button type="button" class="btn" data-scanner-start hidden>{% translate "Read the QR with the camera" %}</button>
+  <div data-scanner data-scanner-field="id_passport_code" hidden
+       data-msg-aim="{% translate 'Point the camera at the QR on the label.' %}"
+       data-msg-found="{% translate 'Code read. Check it is the piece you are claiming, then press Claim the piece.' %}"
+       data-msg-denied="{% translate 'The camera is not available. Type the passport code instead.' %}">
+    <video class="scanner__video" width="320" playsinline muted></video>
+    <canvas hidden></canvas>
+    <p class="scanner__status" data-scanner-status role="status"></p>
+    <button type="button" class="btn" data-scanner-stop>{% translate "Close the camera" %}</button>
+  </div>
+
   <form method="post" novalidate>
     {% csrf_token %}
     {% for error in form.non_field_errors %}
@@ -36,4 +47,6 @@
     </div>
   </form>
 </div>
+<script src="{% static 'vendor/jsqr/jsQR.js' %}"></script>
+<script src="{% static 'js/passport-scanner.js' %}"></script>
 {% endblock %}

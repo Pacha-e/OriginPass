@@ -58,9 +58,9 @@ class Command(BaseCommand):
         base = _validated_base(options["base_url"])
         output = options["output"]
 
-        products = list(Product.objects.filter(status=ProductStatus.ACTIVE).order_by("pk"))
+        products = list(Product.objects.order_by("pk"))
         if not products:
-            raise CommandError("There are no active passports in this database.")
+            raise CommandError("There are no passports in this database.")
 
         output.mkdir(parents=True, exist_ok=True)
         tiles = []
@@ -68,13 +68,20 @@ class Command(BaseCommand):
             address = base + reverse("verification:verify", args=[product.passport_code])
             code = _qr_image(address)
             code.save(output / f"qr-{product.passport_code}.png")
-            tiles.append((product.name, code))
+            tiles.append((_label(product), code))
 
         _sheet(tiles).save(output / SHEET_FILE)
         self.stdout.write(f"{len(tiles)} QR codes written to {output}")
 
 
 # ---- Private helpers ----
+
+
+def _label(product):
+    """The name under the code; a passport that is not active says so on the sheet."""
+    if product.status == ProductStatus.ACTIVE:
+        return product.name
+    return f"{product.name} ({product.get_status_display()})"
 
 
 def _validated_base(url):

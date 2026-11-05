@@ -57,8 +57,15 @@ class ExportPassportQrTests(TestCase):
         address = BASE + reverse("verification:verify", args=[self.product.passport_code])
         make.assert_called_once_with(address)
 
-    def test_a_revoked_passport_gets_no_code(self):
+    def test_a_revoked_passport_gets_a_code_too(self):
         self.product.revoke(actor=make_admin(), reason="Counterfeit reports")
+
+        self._export()
+
+        self.assertTrue((self.output / f"qr-{self.product.passport_code}.png").is_file())
+
+    def test_an_empty_database_is_an_error(self):
+        self.product.delete()
 
         with self.assertRaises(CommandError):
             self._export()

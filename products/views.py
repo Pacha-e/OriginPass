@@ -23,7 +23,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
-from PIL import Image
 
 # ---- Internal imports ----
 from accounts.decorators import admin_required
@@ -42,7 +41,7 @@ from .models import (
     ProductStatus,
     TransferState,
 )
-from .qr import PRINT_DPI, passport_card_image, passport_qr_image
+from .qr import PRINT_DPI, passport_qr_image
 
 # ---- Constants ----
 
@@ -441,32 +440,6 @@ def product_revoke(request, pk):
             "cancel_url": reverse("products:product_detail", args=[product.pk]),
         },
     )
-
-
-@login_required
-def qr_card_download(request, pk):
-    """The product's photograph with its passport code on it, to post or print."""
-    company = Company.objects.owned_by(request.user)
-    product = get_object_or_404(Product, pk=pk, company=company)
-
-    address = request.build_absolute_uri(
-        reverse("verification:verify", args=[product.passport_code])
-    )
-    photo = None
-    if product.image:
-        with product.image.storage.open(product.image.name) as source:
-            photo = Image.open(source)
-            photo.load()
-    card = passport_card_image(address, photo)
-
-    buffer = io.BytesIO()
-    card.save(buffer, format="PNG", dpi=(PRINT_DPI, PRINT_DPI))
-
-    response = HttpResponse(buffer.getvalue(), content_type="image/png")
-    response["Content-Disposition"] = (
-        f'attachment; filename="originpass-tarjeta-{product.passport_code}.png"'
-    )
-    return response
 
 
 @login_required

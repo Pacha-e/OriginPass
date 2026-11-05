@@ -30,16 +30,6 @@ BORDER = 4
 #: codewords under it; this covers about 5% of the area.
 LOGO_RATIO = 0.22
 
-#: Side of the square used when a passport has no photograph.
-CARD_SIDE = 1200
-
-#: The code's side as a share of the card's width.
-CARD_CODE_RATIO = 0.28
-
-#: White margin around the code, and distance from the card's edges, as shares of the width.
-CARD_PAD_RATIO = 0.015
-CARD_MARGIN_RATIO = 0.03
-
 NAVY = "#1E2B58"
 GOLD = "#D9C28A"
 
@@ -62,32 +52,6 @@ def passport_qr_image(address):
     image = Image.open(buffer).convert("RGB").resize((QR_SIZE, QR_SIZE), Image.Resampling.NEAREST)
     _cover_centre_with_mark(image)
     return image
-
-
-def passport_card_image(address, photo=None):
-    """The photograph with the passport code on a white square in its lower-right corner.
-
-    Without a photograph, the code alone, centred on a white square.
-    """
-    code = passport_qr_image(address)
-    if photo is None:
-        side = CARD_SIDE
-        card = Image.new("RGB", (side, side), "white")
-        scaled = round(side * CARD_CODE_RATIO)
-        offset = (side - scaled) // 2
-        card.paste(code.resize((scaled, scaled), Image.Resampling.NEAREST), (offset, offset))
-        return card
-
-    card = photo.convert("RGB")
-    width, height = card.size
-    scaled = round(width * CARD_CODE_RATIO)
-    pad = round(width * CARD_PAD_RATIO)
-    panel = scaled + 2 * pad
-    left = width - panel - round(width * CARD_MARGIN_RATIO)
-    top = height - panel - round(width * CARD_MARGIN_RATIO)
-    card.paste(Image.new("RGB", (panel, panel), "white"), (left, top))
-    card.paste(code.resize((scaled, scaled), Image.Resampling.NEAREST), (left + pad, top + pad))
-    return card
 
 
 # ---- Private helpers ----

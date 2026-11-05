@@ -70,7 +70,6 @@
       <span class="tip tip--start">
         <a class="btn btn--primary" href="{% url 'products:qr_download' product.pk %}" aria-describedby="tip-qr">{% translate "Download the QR code" %}</a>
         <span class="tip__text" id="tip-qr" role="tooltip">{% translate "Saves the QR as an image, to print and stick on the product label." %}</span>
-        <a class="btn" href="{% url 'products:qr_card_download' product.pk %}">{% translate "Download the photo with the QR" %}</a>
       </span>
     </div>
   </div>

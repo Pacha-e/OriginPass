@@ -1,0 +1,5 @@
+chore: repository hygiene, root docs and compose
+
+<Two to three lines: artifacts removed, README and compose updated.>
+
+Closes #<n>

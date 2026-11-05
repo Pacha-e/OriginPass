@@ -1,0 +1,7 @@
+HOW TO WRITE A SKILL (follow exactly):
+- One folder per skill: `agentes\habilidades\<skill-name>\` containing:
+  - SKILL.md with YAML frontmatter: `name` (= folder name) and `description` (third person, says WHAT the skill enforces and WHEN to load it: concrete triggers such as file kinds and tasks; under 1024 characters).
+  - Body sections: `# <Title>`, `## Moral` (one technology-agnostic sentence), `## Rules` (each rule id from `agentes\reglas\global-rules.md` with the imperative rule and a short why), `## How to check` (concrete review or lint checks, greppable when possible), `## Example` (minimal bad -> good pair in Python/Django), `## When not to apply` (counter-tests), `## References` (links to `reglas\global-rules.md`, and to a `references\` file only when it adds concrete Django application).
+  - `references\<technology>.md`: only when it adds technology-specific application (file layout, snippets, ruff rule names). Skip it if it would only repeat the moral.
+- Keep SKILL.md under 200 lines; push detail to references. English, precise, no filler.
+- Content must come from `agentes\reglas\global-rules.md` and the sources it cites. Do not invent rules. Rules derived from the course or the professor (ordering, separators, classes for utilities, English only) must be stated as hard rules.

@@ -1,0 +1,5 @@
+feat(<app>): add <model> fields and constraints
+
+<One or two lines: fields and constraints added.>
+
+Closes #<n>

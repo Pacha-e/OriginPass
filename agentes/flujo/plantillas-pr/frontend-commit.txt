@@ -1,0 +1,5 @@
+refactor(<app>): clean up templates
+
+<Two lines: structure and translation changes, no behavior change.>
+
+Closes #<n>

@@ -1,0 +1,5 @@
+feat(<app>): add <feature> section
+
+<Two lines: pages added and where their data comes from.>
+
+Closes #<n>

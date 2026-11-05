@@ -1,0 +1,5 @@
+docs: <imperative summary>
+
+<Two lines: which documents changed and why.>
+
+Closes #<n>

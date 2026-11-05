@@ -21,6 +21,7 @@ urlpatterns = [
     path("<int:pk>/", views.product_detail, name="product_detail"),
     path("<int:pk>/edit/", views.product_edit, name="product_edit"),
     path("<int:pk>/qr/", views.qr_download, name="qr_download"),
+    path("<int:pk>/qr-card/", views.qr_card_download, name="qr_card_download"),
     path("<int:pk>/transfer/", views.transfer_initiate, name="transfer_initiate"),
     path("<int:pk>/revoke/", views.product_revoke, name="product_revoke"),
 ]

@@ -7,7 +7,7 @@ Verified on 2026-10-29 on `d4/integracion-20261029`. Each limitation cites the f
 | ID | Limitation | Evidence |
 |---|---|---|
 | T1 | MVP on Django 5.2 and PostgreSQL 17. PostgreSQL is mandatory: the application does not fall back to another engine | `README.md:94-96`, `README.md:118`, `config/settings.py:87-89`, `requirements.txt:1-6` |
-| T2 | No production configuration yet. HEAD has no application server in its dependencies; the working tree adds `gunicorn` without a commit. No WhiteNoise in MIDDLEWARE. With `DEBUG` off, Django does not serve static files on its own | `requirements.txt:1-6` (HEAD); `requirements.txt:7` (working tree); `config/settings.py:36`, `config/settings.py:54-65`, `config/settings.py:129-131`; `deploy/azure/README-AZURE.md:98` |
+| T2 | Production configuration: gunicorn, WhiteNoise and HTTPS are in place on the AWS instance. Limits: the instance disk holds the database and media with no backup, and the sslip.io name and the IP depend on the instance running | `requirements.txt`; `config/settings.py:63`; `deploy/aws/README-AWS.md` |
 | T3 | Email: in development, messages print to the server console; a deployment must configure an SMTP backend | `config/settings.py:143`; `README.md:175-176` |
 | T4 | Scan region: taken from CDN headers only when `TRUST_GEO_HEADERS` is on; in development it is on whenever `DEBUG` is on | `config/settings.py:151`; `README.md:177-179` |
 | T5 | Integrity: signatures use a server key derived from `SECRET_KEY`. Detects tampering by someone who holds only the database, not by whoever runs the server | `README.md:36-38`, `README.md:248-250`, `config/settings.py:33` |
@@ -42,7 +42,7 @@ Verified on 2026-10-29 on `d4/integracion-20261029`. Each limitation cites the f
 
 | ID | Limitation | Evidence |
 |---|---|---|
-| D1 | No public URL. `deploy/azure/` exists in the working tree, uncommitted, and is marked "prepared, not executed" | `deploy/azure/README-AZURE.md:3`, `deploy/azure/README-AZURE.md:101`; `README.md:139` (the only URL: `http://127.0.0.1:8000/`) |
+| D1 | Public URL: deployed at https://13-220-96-49.sslip.io (5 November 2026). It depends on the Learner Lab instance: while the instance is stopped, the URL does not answer | `deploy/aws/README-AWS.md`; `docs/d4/seguimiento.md` |
 | D2 | No first-run test on a second laptop | `README.md:42` |
 | D3 | Tests have not been re-run on this date | `docs/GUIA-DEMO.md:91-94` ("Estado verificado", 1 October) |
 | D4 | The portable kit contains Sprint 3 code and demo; no live database, no user uploads, no personal signing key | `README.md:42` |

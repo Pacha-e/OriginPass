@@ -23,7 +23,7 @@ Status on 2026-10-29. The items below were verified with `git` and repository se
 | `main` | `81fbe6d` (merge of PR #85, 2026-10-15). No Entregable 4 changes | `git log -n 3 main` |
 | Subagent branches `d4/design-20261029`, `d4/docs-20261029`, `d4/runtime-20261029` | Their worktrees show `81fbe6d` and are marked "prunable" | `git worktree list` |
 | `docs/d4/` | Did not exist when this write-up started. This write-up created the five files listed here. Other agents have since added `analitica.md`, `diagramas.md`, `PREGUNTAS-REVISION.md`, `requisitos-matriz.md`, `usabilidad-protocolo.md` and `vision-board.md` (uncommitted; not reviewed or referenced by this write-up) | `ls docs/d4` |
-| Azure deployment | Prepared, not executed. The Azure guide says "Estado: preparado, NO ejecutado" | `deploy/azure/README-AZURE.md:3`, `:101` |
+| AWS deployment | Deployed on 5 November 2026 at https://13-220-96-49.sslip.io. At the time of this update the instance did not answer from outside, which points to a stopped Learner Lab session: start it and check `/healthz/` before the demonstration | `deploy/aws/README-AWS.md`; `README.md` (Entregable 4) |
 | Public URL | None | `README.md:139` |
 | Health route | Exists in the working tree, uncommitted. Its 200 response against PostgreSQL is not verified | `pages/views.py:122`, `pages/urls.py:10`; docstring at `pages/views.py:123-127` |
 | Tests | Not confirmed on this date. Last recorded run: 293 tests passing on 1 October | `docs/GUIA-DEMO.md:91-94` |

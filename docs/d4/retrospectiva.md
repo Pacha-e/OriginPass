@@ -1,3 +1,5 @@
+> **Record of 29 October 2026.** This retrospective describes the Entregable 4 working tree on that date. Items that mention uncommitted files, the portable kit or Azure are superseded; see REPORTE-SUPERVISOR-D4.md, section 0, for the current status.
+
 # Retrospective: Entregable 4 (DRAFT)
 
 > **DRAFT.** Every point is PENDING VALIDATION BY EMMANUEL.

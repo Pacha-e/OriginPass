@@ -1,5 +1,21 @@
 # Reporte para el supervisor: Entregable 4 de OriginPass
 
+## 0. Current status (5 November 2026)
+
+This section is the current status. Sections 1 onward are the record of 29 October 2026 and are kept as history.
+
+| Item | Status |
+|---|---|
+| Deployment | Deployed on AWS EC2 (AWS Academy Learner Lab), Ubuntu 26.04.1 LTS. Public URL: `https://13-220-96-49.sslip.io`, HTTPS with Let's Encrypt. `/healthz/` answered `{"status": "ok"}` on 5 November 2026 |
+| Availability | At the time of this update the instance did not answer from outside. Check the Learner Lab session and `/healthz/` before the demonstration |
+| Code | Branch `main`, pushed to `origin`. Latest commits include `64990f9` (CI expression fixed, update script, deployment record) |
+| Automated tests | 349 tests passed on PostgreSQL 17 in the last full run (commit `047089f`) |
+| Changes since 29 October | Password change for signed-in accounts; printable QR codes at 300 dpi on US Letter sheets, twelve per page; the claim page reads the passport QR from the camera (HTTPS only) or from an uploaded photo; media files served by nginx on the instance |
+| CI | Invalid `env` references removed in `64990f9`. The remote run was not checked from this environment |
+| Pending | Usability validation with users; PVB validation; Wiki pages for Entregable 4; QR photo reading checked on the final phones; the external audit findings (`05-Auditorias-y-planes/OriginPass-pendientes-auditoria.md`), mainly custody signatures and concurrency; the update script not yet run on the server |
+
+## Record of 29 October 2026 (superseded)
+
 Fecha: 29-oct-2026. Estado: **NO APTO PARA MERGE**.
 
 Este reporte separa lo heredado, lo propuesto, lo escrito por los workers, lo añadido hoy, y lo integrado y probado frente a lo pendiente. Lo no ejecutado se marca como no ejecutado. La afirmación anterior de "todo listo" fue incorrecta y no se repite aquí.

@@ -1,34 +1,36 @@
 # OriginPass: Entregable 4 UML diagrams
 
-Branch `d4/integracion-20261029`. Mermaid diagrams for the Wiki and the README. Artifacts are in English (course requirement; see `config/settings.py:114-118`). Everything related to Azure is pending execution.
+Mermaid diagrams for the Wiki and the README. Artifacts are in English (course requirement; see `config/settings.py:114-118`). The deployment diagram reflects the AWS EC2 instance that is running as of 5 November 2026.
 
 ## 1. Deployment
 
-### 1.1 Scenario A: Azure target (pending execution)
+### 1.1 Scenario A: AWS EC2 (deployed 5 November 2026)
 
 ```mermaid
 flowchart LR
     NAV["Browser"]
-    subgraph AZ["Scenario A: Azure target (pending execution)"]
-        APP["Azure App Service (Linux)<br/>gunicorn + Python 3.12<br/>(pending execution)"]
-        SET["App Settings<br/>SECRET_KEY, DATABASE_URL, ALLOWED_HOSTS, DEBUG<br/>(pending execution)"]
-        PG["Azure Database for PostgreSQL<br/>Flexible Server<br/>(pending execution)"]
-        MED["Media files on App Service local disk<br/>(limitation; pending execution)"]
+    subgraph EC2["Scenario A: AWS EC2, Ubuntu 26.04.1 LTS"]
+        NG["nginx :80 and :443<br/>TLS with Let's Encrypt<br/>/media/ served from disk"]
+        GU["gunicorn 127.0.0.1:8000<br/>2 workers, Python 3.12"]
+        APP["Django application<br/>WhiteNoise serves /static/"]
+        PG["PostgreSQL 16<br/>127.0.0.1:5432"]
+        MED["media/ on the instance disk"]
+        ENV["/etc/originpass.env<br/>SECRET_KEY, DATABASE_URL, ALLOWED_HOSTS,<br/>CSRF_TRUSTED_ORIGINS, BEHIND_TLS_PROXY"]
     end
-    NAV -->|"HTTPS"| APP
-    SET -.->|"environment variables"| APP
+    NAV -->|"HTTPS 443; HTTP 80 redirects"| NG
+    NG -->|"proxy"| GU
+    NG -->|"/media/ alias"| MED
+    GU --> APP
+    ENV -.->|"EnvironmentFile"| GU
     APP -->|"DATABASE_URL"| PG
-    APP -->|"MEDIA_ROOT = BASE_DIR/media"| MED
+    APP -->|"MEDIA_ROOT"| MED
 ```
 
-- Pending execution: `README.md:303` states that the Azure deployment is not executed.
-- Azure assets exist only as uncommitted working-tree files: `deploy/azure/desplegar-azure.ps1` (startup command `gunicorn --bind=0.0.0.0:8000 --workers=2 config.wsgi:application`, line 57), `deploy/azure/verificar-azure.ps1`, `deploy/azure/README-AZURE.md`. The repository has no Dockerfile (`deploy/azure/README-AZURE.md:15`).
-- `gunicorn>=23.0,<24` is an uncommitted change in `requirements.txt:7`. It is absent at HEAD. The WSGI entry point is `config/wsgi.py:7`.
-- Python 3.12: CI (`.github/workflows/ci.yml:39`), App Service runtime `PYTHON:3.12` (`deploy/azure/desplegar-azure.ps1:68`), and ruff target (`pyproject.toml:3`).
-- Media limitation: `MEDIA_ROOT` points to `BASE_DIR/media` (`config/settings.py:134`). `config/urls.py:20-21` serves media only when `DEBUG=True`. Company logos (`companies/models.py:92`) and product images (`products/models.py:95`) are stored on that disk. `deploy/azure/README-AZURE.md:105` states that no persistent storage is configured.
-- Static files: `STATIC_ROOT` (`config/settings.py:131`). With `DEBUG=0`, Django does not serve `/static/` without WhiteNoise, which is not in `requirements.txt` (`deploy/azure/README-AZURE.md:98`).
-- App Settings: `SECRET_KEY` (`config/settings.py:32`), `DEBUG` (`:36`), `ALLOWED_HOSTS` (`:37`), `DATABASE_URL` (`:89`). The script sets `DATABASE_URL` in App Settings (`deploy/azure/desplegar-azure.ps1:75`).
-
+- Public address: `https://13-220-96-49.sslip.io`. `/healthz/` answers `{"status": "ok"}`.
+- Install and update: `deploy/aws/instalar-ec2.sh` (first install) and `deploy/aws/actualizar-ec2.sh` (updates: dependencies, migrations, static files, restart, HTTPS check). Guide: `deploy/aws/README-AWS.md`.
+- Media: nginx serves `/media/` from `/opt/originpass/app/media` because Django serves media only with `DEBUG=True`.
+- Limitation: media and the database live on the instance disk. There is no backup yet, and terminating the instance deletes them.
+- Limitation: the IP changes when the instance is stopped and started (no Elastic IP). The certificate covers the sslip.io name only.
 ### 1.2 Scenario B: project laptop (local)
 
 ```mermaid
@@ -204,14 +206,14 @@ erDiagram
 
 | Diagram | Element | Source (path:line) |
 |---|---|---|
-| 1.1 Azure | Pending status | `README.md:303` |
-| 1.1 Azure | App Service Linux, gunicorn startup | `deploy/azure/desplegar-azure.ps1:57`, `:68`; `deploy/azure/README-AZURE.md:15` |
-| 1.1 Azure | gunicorn (uncommitted) | `requirements.txt:7`; `config/wsgi.py:7` |
-| 1.1 Azure | Python 3.12 | `.github/workflows/ci.yml:39`, `pyproject.toml:3` |
-| 1.1 Azure | PostgreSQL Flexible Server, version 16 to confirm | `deploy/azure/desplegar-azure.ps1:70`; `deploy/azure/README-AZURE.md:12` |
-| 1.1 Azure | App Settings | `config/settings.py:32`, `:36`, `:37`, `:89`; `deploy/azure/desplegar-azure.ps1:75` |
-| 1.1 Azure | Media on local disk | `config/settings.py:134`; `config/urls.py:20-21`; `companies/models.py:92`; `products/models.py:95`; `deploy/azure/README-AZURE.md:105` |
-| 1.1 Azure | Static files | `config/settings.py:131`; `deploy/azure/README-AZURE.md:98` |
+| 1.1 AWS | Deployed status and public address | `README.md` (Entregable 4); `docs/d4/backlog.md` (D4-01) |
+| 1.1 AWS | nginx, gunicorn, install and update | `deploy/aws/instalar-ec2.sh`; `deploy/aws/actualizar-ec2.sh` |
+| 1.1 AWS | HTTPS steps | `deploy/aws/README-AWS.md` (HTTPS section) |
+| 1.1 AWS | gunicorn dependency | `requirements.txt` |
+| 1.1 AWS | Python 3.12 | `.github/workflows/ci.yml`, `pyproject.toml:3` |
+| 1.1 AWS | WhiteNoise middleware | `config/settings.py:63` |
+| 1.1 AWS | Media on instance disk | `config/settings.py:150` (MEDIA_ROOT); `config/urls.py:25` |
+| 1.1 AWS | Static files | `config/settings.py:145-147` (STATIC_URL, STATIC_ROOT) |
 | 1.2 Local | runserver on 127.0.0.1:8000 | `README.md:136-139`; `delivery/Start-OriginPass.ps1:18` |
 | 1.2 Local | PostgreSQL 17 container, port 5432 | `docker-compose.yml:2-10`, `:3`; `README.md:96`, `README.md:126` |
 | 1.2 Local | pgAdmin on 127.0.0.1:8080 | `docker-compose.yml:38-42` |
@@ -251,9 +253,8 @@ erDiagram
 
 ## Unconfirmed items
 
-- Azure end to end: pending execution. The assets are uncommitted (`deploy/azure/`, `requirements.txt:7`).
-- PostgreSQL version on Azure: `16`, marked "to confirm" (`deploy/azure/README-AZURE.md:12`). Local uses 17.
-- Azure PostgreSQL firewall opened with `--public-access 0.0.0.0` (`deploy/azure/README-AZURE.md:63`, `:81`). Pending review.
-- Serving static files with `DEBUG=False`: no WhiteNoise or alternative configuration.
-- `DEBUG`, `ALLOWED_HOSTS`, and `DATABASE_URL` values for the laptop: they live in `.env`, which was not read.
-- Port 5432 is published on all interfaces (`docker-compose.yml:10`), while the README says `localhost:5432`.
+- The logged-in pages (owner and administrator views) were not checked in a browser in this revision; the public verification pages were read with `curl`.
+- The certificate and `ALLOWED_HOSTS` depend on the sslip.io name. If the instance IP changes, both must be updated.
+- Media and the database live on the instance disk, with no backup yet.
+- Open audit findings (installer, custody signatures, concurrency) are listed in `05-Auditorias-y-planes/OriginPass-pendientes-auditoria.md`.
+- `DEBUG`, `ALLOWED_HOSTS`, `SECRET_KEY` and `DATABASE_URL` values on the instance live in `/etc/originpass.env`; they are not recorded in this repository.

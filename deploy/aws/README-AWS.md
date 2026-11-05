@@ -7,7 +7,7 @@ Estado: **desplegado** el 5 de noviembre de 2026, con HTTPS (sección HTTPS). La
 
 - Una instancia EC2 con Ubuntu Server 26.04.1 LTS. El script de instalación se escribió para 24.04 y se instaló sin cambios en 26.04.1.
 - nginx escucha en los puertos 80 y 443 y reenvía a gunicorn en `127.0.0.1:8000` (Django). El puerto 80 redirige a HTTPS.
-- PostgreSQL local del paquete `postgresql` de Ubuntu 26.04, escuchando solo en `127.0.0.1`. No queda expuesto a Internet. Python es el `python3` del sistema. Para ver las versiones exactas en la instancia: `python3 --version; psql --version`.
+- PostgreSQL local del paquete `postgresql` de Ubuntu 26.04, escuchando solo en `127.0.0.1`. No queda expuesto a Internet. Python es el `python3` del sistema. Versiones leídas en la instancia el 5 de noviembre de 2026 con `python3 --version; psql --version`: Python 3.14.4 y PostgreSQL 18.6.
 - Código: clon público de este repositorio (rama `main`).
 - HTTPS con un certificado de Let's Encrypt para el nombre sslip.io de la instancia.
 - Archivos subidos (`media/`) en disco local de la instancia.

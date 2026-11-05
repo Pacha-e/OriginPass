@@ -171,7 +171,7 @@ The three models are draw.io files in [`docs/diagrams/`](https://github.com/Pach
 | GitHub | Repository, wiki, backlog; Actions runs the checks against `postgres:17-alpine` | The instance pulls `main` through `actualizar-ec2.sh` |
 | Let's Encrypt | Issues and renews the certificate through certbot | The instance, HTTP-01 challenge on port 80 |
 
-Python and PostgreSQL on the instance are the ones Ubuntu 26.04 LTS installs with its `python3` and `postgresql` packages; the diagram gives them as Python 3.14 and PostgreSQL 18, the versions that release ships. `python3 --version; psql --version` on the instance confirms them. Development and continuous integration use Python 3.12 and PostgreSQL 17.
+Python and PostgreSQL on the instance are the ones Ubuntu 26.04 LTS installs with its `python3` and `postgresql` packages: Python 3.14.4 and PostgreSQL 18.6, read on the instance with `python3 --version; psql --version` on 5 November 2026. Development and continuous integration use Python 3.12 and PostgreSQL 17.
 
 ### 2.2. Implementation View
 

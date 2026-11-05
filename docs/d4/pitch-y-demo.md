@@ -23,7 +23,7 @@ python manage.py runserver
 | 0:30-1:15 | Solution: one passport per unit, with a code that cannot be guessed and a QR that opens a verification page with no account. The page shows the custody trail | `README.md:3`, `README.md:17-18` |
 | 1:15-2:00 | What exists today: a Django application on PostgreSQL; informal workshops reviewed by a person; company revocation, suspension and public profile; a signed audit chain | `README.md:15`, `README.md:23`, `README.md:234-239`, `README.md:273-275` |
 | 2:00-2:40 | Limits: the QR certifies the registry state, not the physical piece; the signature depends on the server key; Monad is a roadmap item, not implemented | `README.md:25-28`, `README.md:32-38` |
-| 2:40-3:00 | Status: no public deployment and no user testing yet. Next: validate with users and deploy | `README.md:139`; `docs/wiki/Problem-Validation.md:113` |
+| 2:40-3:00 | Status: deployed on AWS EC2 with HTTPS; no user testing yet. Next: validate with users and anchor the chain outside the server (FR56) | `deploy/aws/README-AWS.md`; `docs/wiki/Problem-Validation.md:113` |
 
 ## Demo (5 minutes)
 
@@ -41,10 +41,11 @@ python manage.py runserver
 
 - The copy alert in the demo is seeded (`companies/management/commands/seed_demo.py:444-465`). Real detection is in `verification/views.py:133-142`, and the region only comes from CDN headers when `TRUST_GEO_HEADERS` is on (`config/settings.py:151`).
 - Scan counts are demonstration figures (`README.md:148-153`; `seed_demo.py:153-218`). They are not real usage.
-- Say out loud that the demo is local (`README.md:139`).
+- On the deployed instance new scans record no region (no CDN in front), so the alert does not fire live; show the seeded one and say so.
+- If the deployed address does not answer, run the demo locally and say so.
 
 ## What is not claimed
 
 - That Monad is implemented (`README.md:25-28`).
-- That the application is deployed or has a public URL (`docs/d4/backlog.md`, D4-01).
+- That the deployment is production-grade: one Learner Lab instance, no backup, no outgoing email (`deploy/aws/README-AWS.md`).
 - That potential users have validated the product (`docs/wiki/Problem-Validation.md:113`).

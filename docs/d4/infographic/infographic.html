@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>OriginPass — Executive infographic</title>
+    <style>
+      :root {
+        --navy: #1e2b58;
+        --gold: #c9a962;
+        --cream: #f3f1ea;
+        --ink: #222831;
+        --muted: #565c6b;
+        --teal: #138a84;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 1275px;
+        height: 1650px;
+      }
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        color: var(--ink);
+        background: #fff;
+      }
+      h1,
+      h2,
+      h3,
+      .stat b {
+        font-family: Bahnschrift, "DIN Alternate", "Segoe UI", sans-serif;
+      }
+      .page {
+        padding: 40px 48px 28px;
+        height: 1650px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 4px solid var(--navy);
+        padding-bottom: 18px;
+      }
+      header img {
+        height: 92px;
+      }
+      header .meta {
+        text-align: right;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      header .meta b {
+        color: var(--navy);
+        font-size: 18px;
+      }
+      .tagline {
+        font-size: 22px;
+        color: var(--navy);
+        font-weight: 600;
+        margin-top: 6px;
+      }
+      .row {
+        display: flex;
+        gap: 22px;
+      }
+      .card {
+        background: var(--cream);
+        border-radius: 10px;
+        padding: 18px 20px;
+      }
+      .card h2 {
+        font-size: 15px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--navy);
+        margin-bottom: 10px;
+      }
+      .card p {
+        font-size: 15.5px;
+        line-height: 1.5;
+      }
+      .overview {
+        flex: 0 0 300px;
+      }
+      .overview p + p {
+        margin-top: 8px;
+      }
+      .problem {
+        flex: 0 0 330px;
+        border-left: 6px solid #b85450;
+      }
+      .solution {
+        flex: 1;
+        border-left: 6px solid var(--teal);
+      }
+      .snap {
+        display: flex;
+        gap: 22px;
+      }
+      .shots {
+        flex: 0 0 690px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .shots figure {
+        border: 1px solid #d5d2c8;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .shots .desk {
+        width: 440px;
+        height: 540px;
+      }
+      .shots .desk img {
+        width: 440px;
+        display: block;
+      }
+      .shots .mob {
+        width: 234px;
+        height: 540px;
+      }
+      .shots .mob img {
+        width: 234px;
+        display: block;
+      }
+      .caption {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .features {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .features h2 {
+        font-size: 15px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--navy);
+      }
+      .feat {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .feat svg {
+        flex: 0 0 38px;
+        height: 38px;
+      }
+      .feat h3 {
+        font-size: 16px;
+        color: var(--navy);
+      }
+      .feat p {
+        font-size: 13.5px;
+        line-height: 1.35;
+        color: var(--ink);
+      }
+      .feat .fr {
+        color: var(--teal);
+        font-weight: 600;
+        font-size: 12.5px;
+      }
+      .stats {
+        display: flex;
+        gap: 18px;
+      }
+      .stat {
+        flex: 1;
+        background: var(--navy);
+        color: #fff;
+        border-radius: 10px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .stat b {
+        font-size: 40px;
+        color: var(--gold);
+        white-space: nowrap;
+      }
+      .stat span {
+        font-size: 14.5px;
+        line-height: 1.35;
+      }
+      .bottom {
+        display: flex;
+        gap: 22px;
+      }
+      .stack {
+        flex: 1;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        background: #fff;
+        border: 1.5px solid var(--navy);
+        color: var(--navy);
+        border-radius: 18px;
+        padding: 5px 13px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .links {
+        flex: 0 0 470px;
+      }
+      .links p {
+        font-size: 14.5px;
+        line-height: 1.6;
+      }
+      .links b {
+        color: var(--navy);
+      }
+      footer {
+        margin-top: auto;
+        font-size: 12.5px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #d5d2c8;
+        padding-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div>
+          <img
+            src="../../../static/brand/originpass-logo.svg"
+            alt="OriginPass"
+          />
+          <div class="tagline">
+            Prove where a product came from, without having to trust the seller.
+          </div>
+        </div>
+        <div class="meta">
+          <b>Executive infographic · Deliverable 4</b><br />ST0251 Proyecto
+          Integrador 1, 2026-2<br />Universidad EAFIT · Medellín, Colombia
+        </div>
+      </header>
+
+      <div class="row">
+        <div class="card overview">
+          <h2>Project overview</h2>
+          <p>
+            <b>OriginPass</b> — a verifiable digital passport for every physical
+            product.
+          </p>
+          <p><b>Team:</b> Emmanuel Hernández Melo, individual project.</p>
+          <p>
+            <b>Product Owner:</b> Emmanuel Hernández Melo, who also acts as
+            Scrum Master and developer.
+          </p>
+        </div>
+        <div class="card problem">
+          <h2>Problem</h2>
+          <p>
+            Imitations of Colombian crafts and small brands are sold next to the
+            genuine piece. Printed certificates can be photocopied, brand-owned
+            apps serve only large brands, and a buyer at a market stall cannot
+            check, before paying, who made a piece or how it reached the stall.
+          </p>
+        </div>
+        <div class="card solution">
+          <h2>Proposed solution</h2>
+          <p>
+            OriginPass issues a digital passport for every physical unit, with a
+            QR code that anyone can scan without an account or an app. The
+            public page gives a verdict — genuine, revoked, altered or not found
+            — names the verified producer and shows the chain of custody from
+            the maker to the current owner. Companies are approved through an
+            official registry and artisan workshops through a manual review.
+            Every handover is signed and chained, every withdrawal states its
+            reason, and scan analytics can warn a producer when one code appears
+            in two regions at once.
+          </p>
+        </div>
+      </div>
+
+      <div class="snap">
+        <div>
+          <div class="shots">
+            <figure class="desk">
+              <img
+                src="../images/deployed-verdict-genuine.png"
+                alt="Verification page of a passport, deployed"
+              />
+            </figure>
+            <figure class="mob">
+              <img
+                src="../images/deployed-verdict-mobile.png"
+                alt="The same page on a 360 px phone"
+              />
+            </figure>
+          </div>
+          <div class="caption">
+            System snapshot, taken from the deployed application: the verdict
+            Auténtico, the passport and its chain of custody, on a computer and
+            on a 360 px phone.
+          </div>
+        </div>
+        <div class="features">
+          <h2>Implemented features</h2>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="18" fill="#1E7A55" />
+              <path
+                d="M11 21l6 6 12-13"
+                stroke="#fff"
+                stroke-width="4"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <div>
+              <h3>Verify with no account</h3>
+              <p>
+                Scan the QR and read the verdict: genuine, revoked, altered or
+                not found. <span class="fr">FR28–FR31, FR62</span>
+              </p>
+            </div>
+          </div>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <rect x="3" y="3" width="34" height="34" rx="5" fill="#1E2B58" />
+              <rect x="8" y="8" width="9" height="9" fill="#fff" />
+              <rect x="23" y="8" width="9" height="9" fill="#fff" />
+              <rect x="8" y="23" width="9" height="9" fill="#fff" />
+              <rect x="23" y="23" width="4" height="4" fill="#fff" />
+              <rect x="28" y="28" width="4" height="4" fill="#fff" />
+            </svg>
+            <div>
+              <h3>One passport per unit</h3>
+              <p>
+                A code that cannot be derived from another, and a printable QR
+                with the OriginPass mark.
+                <span class="fr">FR21, FR22, FR61</span>
+              </p>
+            </div>
+          </div>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="18" fill="#138a84" />
+              <rect
+                x="7"
+                y="16"
+                width="14"
+                height="8"
+                rx="4"
+                stroke="#fff"
+                stroke-width="3"
+                fill="none"
+              />
+              <rect
+                x="19"
+                y="16"
+                width="14"
+                height="8"
+                rx="4"
+                stroke="#fff"
+                stroke-width="3"
+                fill="none"
+              />
+            </svg>
+            <div>
+              <h3>Chain of custody</h3>
+              <p>
+                Every handover is signed and chained; the buyer claims the piece
+                with two codes, reading the QR by camera or from a photo.
+                <span class="fr">FR32, FR35–FR40, FR60</span>
+              </p>
+            </div>
+          </div>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <path
+                d="M20 3l14 6v10c0 9-6 15-14 18C12 34 6 28 6 19V9z"
+                fill="#6c8ebf"
+              />
+              <path
+                d="M13 20l5 5 9-10"
+                stroke="#fff"
+                stroke-width="3.5"
+                fill="none"
+                stroke-linecap="round"
+              />
+            </svg>
+            <div>
+              <h3>Verified producers</h3>
+              <p>
+                Official registry for companies, manual review for artisan
+                workshops, and a public profile.
+                <span class="fr">FR07–FR18</span>
+              </p>
+            </div>
+          </div>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="18" fill="#b85450" />
+              <rect x="18" y="9" width="4" height="15" rx="2" fill="#fff" />
+              <circle cx="20" cy="30" r="2.5" fill="#fff" />
+            </svg>
+            <div>
+              <h3>Revocation and audit</h3>
+              <p>
+                A withdrawal always states its reason, and every status change
+                goes to a signed audit log. <span class="fr">FR41–FR45</span>
+              </p>
+            </div>
+          </div>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <rect x="3" y="3" width="34" height="34" rx="5" fill="#C9A962" />
+              <rect x="9" y="22" width="5" height="10" fill="#1E2B58" />
+              <rect x="17.5" y="14" width="5" height="18" fill="#1E2B58" />
+              <rect x="26" y="9" width="5" height="23" fill="#1E2B58" />
+            </svg>
+            <div>
+              <h3>Scan analytics</h3>
+              <p>
+                Scans by date and region, product ranking, trend, CSV export and
+                a duplicate-scan alert. <span class="fr">FR46–FR52</span>
+              </p>
+            </div>
+          </div>
+          <div class="feat">
+            <svg viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="18" fill="#9673a6" />
+              <circle
+                cx="15"
+                cy="17"
+                r="6"
+                stroke="#fff"
+                stroke-width="3"
+                fill="none"
+              />
+              <path
+                d="M19 21l10 10M25 27l3-3"
+                stroke="#fff"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+            </svg>
+            <div>
+              <h3>Accounts and abuse resistance</h3>
+              <p>
+                Registration, login lockout, password reset and change, and a
+                cap on stored scans.
+                <span class="fr">FR01–FR06, FR57–FR59</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <b>54 / 62</b
+          ><span>functional requirements delivered,<br />5 more in part</span>
+        </div>
+        <div class="stat">
+          <b>349</b><span>automated tests passing<br />on PostgreSQL</span>
+        </div>
+        <div class="stat">
+          <b>HTTPS</b
+          ><span>deployed on AWS EC2,<br />Let's Encrypt certificate</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="card stack">
+          <h2>Technology stack</h2>
+          <div class="chips">
+            <span class="chip">Python</span><span class="chip">Django 5.2</span
+            ><span class="chip">PostgreSQL</span
+            ><span class="chip">gunicorn</span> <span class="chip">nginx</span
+            ><span class="chip">WhiteNoise</span
+            ><span class="chip">AWS EC2 · Ubuntu 26.04</span
+            ><span class="chip">Let's Encrypt</span>
+            <span class="chip">qrcode + Pillow</span
+            ><span class="chip">jsQR</span
+            ><span class="chip">GitHub Actions</span
+            ><span class="chip">draw.io (UML)</span>
+          </div>
+        </div>
+        <div class="card links">
+          <h2>Project links</h2>
+          <p>
+            <b>Source code:</b> github.com/Pacha-e/OriginPass<br /><b>Wiki:</b>
+            github.com/Pacha-e/OriginPass/wiki<br /><b>Deployed application:</b>
+            {{DEPLOYED}}
+          </p>
+        </div>
+      </div>
+
+      <footer>
+        <span
+          >ST0251 Proyecto Integrador 1, 2026-2 · OriginPass · Emmanuel
+          Hernández Melo</span
+        ><span
+          >The screenshots and the figures above were taken on 5 November
+          2026.</span
+        >
+      </footer>
+    </div>
+  </body>
+</html>

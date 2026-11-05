@@ -11,9 +11,9 @@ flowchart LR
     NAV["Browser"]
     subgraph EC2["Scenario A: AWS EC2, Ubuntu 26.04.1 LTS"]
         NG["nginx :80 and :443<br/>TLS with Let's Encrypt<br/>/media/ served from disk"]
-        GU["gunicorn 127.0.0.1:8000<br/>2 workers, Python 3.12"]
+        GU["gunicorn 127.0.0.1:8000<br/>2 workers, Python 3 of Ubuntu 26.04"]
         APP["Django application<br/>WhiteNoise serves /static/"]
-        PG["PostgreSQL 16<br/>127.0.0.1:5432"]
+        PG["PostgreSQL of Ubuntu 26.04<br/>127.0.0.1:5432"]
         MED["media/ on the instance disk"]
         ENV["/etc/originpass.env<br/>SECRET_KEY, DATABASE_URL, ALLOWED_HOSTS,<br/>CSRF_TRUSTED_ORIGINS, BEHIND_TLS_PROXY"]
     end

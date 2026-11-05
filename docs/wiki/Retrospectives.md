@@ -115,6 +115,57 @@ is on the [Sprint 3 Review](Sprint-3-Review) page.
 
 ---
 
+## Sprint 4 — 14 October to 10 November 2026
+
+Written on 5 November, before the Sprint Review; what the review brings up is added
+below it. The application is deployed on AWS EC2 with HTTPS. Four requirements were added
+and built (FR59 to FR62), the five defects of the external audit were fixed with a
+regression test each, and the suite reached 349 tests. FR27, FR34, FR56 and UR05 remain
+open. The detail is on the [Deliverable 4](Deliverable-4) page.
+
+**Continue**
+
+- Writing the test that fails before the fix. Each of the five audit defects has one, and
+  it was run without the fix to see it fail.
+- Using the product the way its users would. Printing the QR sheet and claiming a product
+  on a phone found what no test had: a QR far too large for a hat, a passport code nobody
+  would type, photos that did not load and a file button that only opened the camera.
+- Turning every repeated step into a script: the update of the instance, the QR sheets,
+  the diagrams and the infographic are rebuilt by a command, not by hand.
+- Writing a limitation down the day it is found, with the reason: the scans that carry no
+  region without a CDN, the photographs of a screen that are not read.
+
+**Start**
+
+- Deploying in the first week of a sprint. The deployment is what exposed the uploaded
+  images, the camera that needs HTTPS and the mixed languages, all cheap to fix earlier.
+- Giving a deployment a fixed address from its first day, an Elastic IP or a domain, so
+  the address written in the documentation does not go stale.
+- Testing browser code in a browser. The tests of the QR reader check the HTML of the
+  page, so none of them saw that the message for a refused camera is hidden.
+- Taking a copy of the database, the uploaded files and the key before any change to the
+  instance.
+
+**Stop**
+
+- Letting weeks pass without a commit. Nothing reached `main` from 16 October to
+  3 November, and the sprint's work landed in its last days for the fourth time.
+- Carrying the primary research. Fifth sprint carried: the course ends with the product
+  built and deployed and no producer or buyer consulted.
+- Writing a version or a status in a document before checking it. Two documents gave the
+  server's PostgreSQL as 16, and the deployment guide called itself pending after the
+  deployment had run.
+
+**Carried into the next sprint**
+
+- FR56, publishing the head of the integrity chain outside the server, with Monad as the
+  target; FR27, FR34 and UR05.
+- The findings of the external audit that remain open: signatures of custody transfers,
+  concurrency, the installer.
+- The producer interviews, the buyer survey and the usability protocol.
+
+---
+
 ## Template for later sprints
 
 ```

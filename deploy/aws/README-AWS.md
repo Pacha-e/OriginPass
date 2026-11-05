@@ -1,15 +1,15 @@
 # Despliegue en AWS EC2 (AWS Academy Learner Lab)
 
 Despliegue del entregable 4. Sustituye al despliegue de Azure, que se retiró.
-Estado: **pendiente de ejecución**. Ninguna URL existe hasta completar estos pasos.
+Estado: **desplegado** el 5 de noviembre de 2026, con HTTPS (sección HTTPS). La dirección pública cambia si la instancia se detiene y se vuelve a iniciar; la vigente está en la sección "Entregable 4" del README.
 
 ## Arquitectura
 
 - Una instancia EC2 con Ubuntu Server 26.04.1 LTS. El script de instalación se escribió para 24.04 y se instaló sin cambios en 26.04.1.
-- nginx escucha en el puerto 80 y reenvía a gunicorn en `127.0.0.1:8000` (Django).
-- PostgreSQL 16 local, escuchando solo en `127.0.0.1`. No queda expuesto a Internet.
+- nginx escucha en los puertos 80 y 443 y reenvía a gunicorn en `127.0.0.1:8000` (Django). El puerto 80 redirige a HTTPS.
+- PostgreSQL local del paquete `postgresql` de Ubuntu 26.04, escuchando solo en `127.0.0.1`. No queda expuesto a Internet. Python es el `python3` del sistema. Para ver las versiones exactas en la instancia: `python3 --version; psql --version`.
 - Código: clon público de este repositorio (rama `main`).
-- Sin HTTPS. Los datos viajan sin cifrar; es una limitación declarada.
+- HTTPS con un certificado de Let's Encrypt para el nombre sslip.io de la instancia.
 - Archivos subidos (`media/`) en disco local de la instancia.
 
 ## 1. Especificaciones de la instancia
@@ -136,9 +136,11 @@ Se cargaron una vez con `seed_demo`, con `DEBUG=1` solo para ese comando. Las cu
 
 ## Limitaciones conocidas
 
-- **La IP cambia** si paras y arrancas la instancia (no hay Elastic IP). Si cambia, edita `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS` en `/etc/originpass.env` y ejecuta `sudo systemctl restart originpass`.
-- **Sin HTTPS.** Pendiente: dominio y certificado (Let's Encrypt), y `BEHIND_TLS_PROXY=1`.
-- **Sin ensayo previo** de este procedimiento en EC2. Lo que se verifica es lo que devuelve el comando.
+- **La IP cambia** si paras y arrancas la instancia (no hay Elastic IP). Con ella cambia el nombre sslip.io: hay que emitir el certificado para el nombre nuevo (sección HTTPS, paso 3), poner el nombre nuevo en `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS` de `/etc/originpass.env` y ejecutar `sudo systemctl restart originpass`. Una Elastic IP, si el Learner Lab la permite, evita todo esto.
+- **Sin copia de seguridad.** La base de datos y `media/` viven en el disco de la instancia; terminarla los borra.
+- **Correo sin SMTP.** Las notificaciones y el enlace de restablecimiento de contraseña no salen de la instancia mientras no se configure `EMAIL_BACKEND` con un servicio SMTP.
+- **Región de los escaneos.** Sin un CDN delante, `TRUST_GEO_HEADERS` queda apagado: los escaneos nuevos no registran región y la alerta de copia no se dispara. La alerta que se ve en el panel viene de los datos de demostración.
+- **No volver a ejecutar `instalar-ec2.sh`** sobre una instancia con datos: genera una `SECRET_KEY` nueva y las firmas existentes dejarían de validar. Para actualizar, `actualizar-ec2.sh`.
 
 ## Coste y limpieza
 

@@ -246,11 +246,16 @@ its scans by day, region and product, compared with the period before, exports t
 and is alerted when one passport is scanned from two regions within a day. Logins lock
 after five failures in fifteen minutes, and scans are capped per address per hour.
 
-Sprint 4 work already in place: revocation by the company and by the administrator with
-a stored reason and an email to the holder, suspension and reactivation of a company, a
-public profile per approved company, password reset by email and the audit log filtered
-by actor, action and date. Bulk registration from CSV, the language switch and publishing
-the head of the integrity chain externally remain open.
+Sprint 4 puts the application on AWS EC2 with HTTPS. Built ahead of it, in Sprint 3:
+revocation by the company and by the administrator with a stored reason and an email to
+the holder, suspension and reactivation of a company, a public profile per approved
+company, password reset by email and the audit log filtered by actor, action and date.
+Added in Sprint 4: password change (FR59), the claim page that reads the passport QR with
+the camera or from a photo (FR60), printable QR sheets for every passport (FR61), and the
+verdict Altered for a record that no longer matches its signature (FR62). Bulk
+registration from CSV, the per-minute verification limit, the language switch and
+publishing the head of the integrity chain externally remain open. The full account is
+on the [Deliverable 4](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-4) page.
 
 ## Licence
 
@@ -295,7 +300,7 @@ python manage.py runserver            # http://127.0.0.1:8000/
 python manage.py seed_demo            # demo data; requires DEBUG on
 ```
 
-Entregable 4 documentation, draft: [docs/d4/](docs/d4/)
+Entregable 4: the [Deliverable 4 page of the wiki](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-4) and the [executive infographic](docs/d4/images/infographic.pdf). Working documents in [docs/d4/](docs/d4/):
 
 - [Pending backlog](docs/d4/backlog.md)
 - [Limitations and future work](docs/d4/limitaciones.md)

@@ -128,6 +128,17 @@ FR57 exists because FR03 and FR04 describe what a correct login and a wrong one 
 
 FR58 exists because the public verification page is the one address in the system that must answer a stranger with no account, and FR28 to FR31 describe what it answers without bounding how often. DBR07 has it store a record of every scan, including the ones that matched no product, which is the signal FR49 needs to notice one code being scanned in two places. Unbounded, that same record is a way for anyone to grow the table at will. The verdict is still answered past the limit; only the record is dropped, because a buyer holding a real product must never be refused an answer.
 
+### Added in Sprint 4
+
+| ID | Requirement | Priority | Sprint |
+|---|---|---|---|
+| FR59 | THE OriginPass system SHOULD PROVIDE a signed-in user WITH THE ABILITY TO change the password of the account by entering the current password and the new one, keeping the session open after the change | Should | 4 |
+| FR60 | THE OriginPass system SHOULD PROVIDE an account claiming a product WITH THE ABILITY TO fill in the passport code by reading the product's QR code with the camera of the device or from an uploaded photograph, keeping typed entry as an alternative | Should | 4 |
+| FR61 | THE OriginPass system SHOULD PROVIDE the operator WITH THE ABILITY TO export the QR code of every passport, revoked ones included and labelled with their status, as images printable at 300 dpi and as US Letter sheets of twelve codes | Should | 4 |
+| FR62 | IF the signed fields of a product record do not match their signature THEN THE OriginPass system SHALL answer the verification with the verdict Altered, showing no data of the product | Must | 4 |
+
+FR59 to FR62 were added on 4 and 5 November 2026, while the application was being deployed. FR59 lets the demonstration accounts change the password they were created with once the application is public. FR60 and FR61 came from trying the product with a printed label: a passport code is too long to type on a phone, and a QR the size of a page does not fit on a hat. FR62 came from the external audit: a product whose record had been changed directly in the database still answered Genuine, and now answers Altered without showing the changed data.
+
 ---
 
 ## 2.2 Usability requirements
@@ -170,9 +181,9 @@ FR58 exists because the public verification page is the one address in the syste
 
 | Category | Must | Should | Could | Total |
 |---|---|---|---|---|
-| Functional | 41 | 14 | 3 | 58 |
+| Functional | 42 | 17 | 3 | 62 |
 | Usability | 6 | 3 | 1 | 10 |
 | Logical database | 11 | 1 | 0 | 12 |
-| **Total** | **58** | **18** | **4** | **80** |
+| **Total** | **59** | **21** | **4** | **84** |
 
 The course template asks for at least 27 functional, 6 usability and 6 logical database requirements for a team of three. This specification covers the product as a whole rather than a target count, and exceeds the largest team size defined in the template.

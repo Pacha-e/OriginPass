@@ -22,6 +22,7 @@ No commit reached `main` between 16 October and 3 November, so this entry starts
 - HTTPS with a Let's Encrypt certificate on the instance, nginx serving uploaded images, an update script that installs dependencies, applies migrations and checks HTTPS (`dcca1e8`, `1e66caf`, `64990f9`).
 - Strings added since the last catalogue are translated and the `.mo` is rebuilt (`047089f`).
 - Full test suite: 349 tests passed on PostgreSQL 17 (last full run).
+- Documentation for Deliverable 4: screenshots of the deployed instance, the three UML models updated to the AWS deployment and to Sprint 4, the executive infographic, FR59 to FR62 in the specification, the [Deliverable 4](Deliverable-4) page and the Sprint 4 retrospective.
 
 **What comes next**
 

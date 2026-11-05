@@ -23,7 +23,7 @@ The project is being built for ST0251 Proyecto Integrador 1, 2026-2, at Universi
 | [Deliverable 1 Video](Deliverable-1-Video) | Script, timing and the walkthrough to record |
 | [Deliverable 2](Deliverable-2) | Solution design and functionality preview |
 | [Deliverable 3](Deliverable-3) | The MVP: architecture, corporate image, repository, video and project management |
-| [Deliverable 4](Deliverable-4) | The deployment on AWS EC2 with HTTPS, the changes since Deliverable 3, the evidence and the open items |
+| [Deliverable 4](Deliverable-4) | The PMV and its documentation: validation against the vision and the requirements, the deployment on AWS, the design, usability, the infographic, limitations and project management |
 | [Videos](Videos) | The Deliverable 3 walkthrough and the five launch videos, narrated by Emmanuel |
 | [Daily Log](Daily-Log) | The individual day-by-day log the professor asked for in place of meeting minutes |
 | [Sprint 1 Review](Sprint-1-Review) | What was committed, what was delivered and how it was verified |
@@ -36,11 +36,11 @@ The project is being built for ST0251 Proyecto Integrador 1, 2026-2, at Universi
 
 ## Current status
 
-Sprint 3 is closed and merged into `main`: twenty-two of twenty-two requirements, and fourteen of the eighteen planned for Sprint 4, verified by 349 automated tests on PostgreSQL 17 in the last full run (5 November 2026). [Deliverable 3](Deliverable-3) holds the architecture, the corporate image, the repository, the video and the project management, and the [Sprint 3 Review](Sprint-3-Review) what was delivered and how it was verified.
+Sprint 4 is the last sprint of the course. The application is deployed on AWS EC2 with HTTPS, and of its 62 functional requirements 54 are developed, 5 in part and 3 not, verified by 349 automated tests on PostgreSQL 17 in the last full run (5 November 2026). [Deliverable 4](Deliverable-4) holds the validation against the vision and the requirements, the deployment, the design, the usability analysis, the infographic, the limitations and the project management.
 
-A formal company or an informal workshop registers each unit and gets its QR passport, with a photo. The product passes from hand to hand along a signed chain of custody; a buyer scans the code and reads the verdict and the journey without an account; and the company sees where its products are verified and is warned when one of its codes turns up in two places at once. A verdict certifies the state of the record, not by itself the physical piece, and anchoring the integrity chain on Monad is the Sprint 4 goal.
+A formal company or an informal workshop registers each unit and prints its QR passport, with a photo. The product passes from hand to hand along a signed chain of custody; a buyer scans the code and reads the verdict and the journey without an account; a new holder claims the piece by reading its QR with the phone's camera; and the company sees where its products are verified and is warned when one of its codes turns up in two places at once. A verdict certifies the state of the record, not by itself the physical piece. Anchoring the integrity chain on Monad (FR56) was the Sprint 4 goal and is not built.
 
-The largest open item is the primary research on the [Problem Validation](Problem-Validation) page, which has now been carried for four sprints and has not been carried out.
+The largest open item is the primary research on the [Problem Validation](Problem-Validation) page, carried for five sprints and not carried out, so no part of the product has been validated with its users.
 
 The sprint calendar set by the course is:
 

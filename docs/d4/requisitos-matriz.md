@@ -1,5 +1,7 @@
 # Functional requirements matrix (Deliverable 4, section 1.3)
 
+> **Superseded on 5 November 2026** by section 1.3 of the [Deliverable 4 wiki page](https://github.com/Pacha-e/OriginPass/wiki/Deliverable-4), which covers FR01 to FR62 with their full text: 54 developed, 5 in part (FR33, FR45, FR49, FR57, FR60), 3 not developed (FR27, FR34, FR56). This file keeps the code and test evidence for FR01 to FR58.
+
 **Scope:** the 58 functional requirements, FR01 to FR58. Usability requirements (UR01 to UR10) and database requirements (DBR01 to DBR12) are not part of this matrix.
 
 **Origin:**

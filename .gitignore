@@ -61,14 +61,6 @@ tools/video/hf-launch/
 tools/video/videos/
 *TEMP_MPY_*
 
-# The presentation kit is built from the tracked source by
-# `python delivery/build_portable.py` and carries the rendered video, so it is
-# published as a GitHub Release asset, like the video, rather than committed.
-delivery/OriginPass-Portatil.zip
-delivery/SHA256SUMS.txt
-delivery/build/
-delivery/ABRIR-DEMO.html
-
 # The presentation is built from tools/presentation/deck_content.py.
 tools/presentation/build/
 

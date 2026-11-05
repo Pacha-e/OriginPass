@@ -3,7 +3,7 @@
 One file, start to finish. Follow it in order. Every step says what you should see, so a
 step that went wrong is caught here rather than in front of the room.
 
-For the Windows Deliverable 3 kit, use [the current portable guide](../delivery/LEEME-PORTATIL.md).
+The Windows Deliverable 3 kit was retired from `main` on 2026-11-04. Its last version stays in the [release originpass-kit-portatil-2026-10-15](https://github.com/Pacha-e/OriginPass/releases/tag/originpass-kit-portatil-2026-10-15), with its own guide inside the ZIP.
 Extract the release ZIP, open `ABRIR-KIT.html`, run `Setup-Portatil.ps1` once with internet,
 then `Start-OriginPass.ps1` on presentation day. The instructions below describe the
 manual developer setup on `main`.

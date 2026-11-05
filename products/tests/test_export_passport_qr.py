@@ -11,8 +11,10 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from django.urls import reverse
+from PIL import Image
 
 # ---- Internal imports ----
+from products.management.commands.export_passport_qr import QR_SIZE
 from products.models import ProductStatus
 from test_support.factories import make_admin, make_company, make_product, make_user
 
@@ -49,13 +51,23 @@ class ExportPassportQrTests(TestCase):
         self.assertTrue((self.output / "hoja-qr.png").is_file())
 
     def test_each_code_encodes_the_public_address_of_its_passport(self):
-        real_make = qrcode.make
-        with patch("products.management.commands.export_passport_qr.qrcode.make") as make:
-            make.side_effect = real_make
+        created = []
+        real_qrcode = qrcode.QRCode
+
+        def remember(*args, **kwargs):
+            code = real_qrcode(*args, **kwargs)
+            created.append(code)
+            return code
+
+        with patch(
+            "products.management.commands.export_passport_qr.qrcode.QRCode",
+            side_effect=remember,
+        ):
             self._export()
 
         address = BASE + reverse("verification:verify", args=[self.product.passport_code])
-        make.assert_called_once_with(address)
+        self.assertEqual(len(created), 1)
+        self.assertEqual(created[0].data_list[0].data, address.encode())
 
     def test_a_revoked_passport_gets_a_code_too(self):
         self.product.revoke(actor=make_admin(), reason="Counterfeit reports")
@@ -69,6 +81,15 @@ class ExportPassportQrTests(TestCase):
 
         with self.assertRaises(CommandError):
             self._export()
+
+    def test_each_code_is_small_and_carries_the_originpass_mark(self):
+        self._export()
+
+        code = Image.open(self.output / f"qr-{self.product.passport_code}.png").convert("RGB")
+        self.assertEqual(code.size, (QR_SIZE, QR_SIZE))
+        centre = code.crop((QR_SIZE // 3, QR_SIZE // 3, 2 * QR_SIZE // 3, 2 * QR_SIZE // 3))
+        navy = (0x1E, 0x2B, 0x58)
+        self.assertTrue(any(colour == navy for _, colour in centre.getcolors(1 << 20)))
 
     def test_refuses_an_address_without_scheme_or_host(self):
         with self.assertRaises(CommandError):

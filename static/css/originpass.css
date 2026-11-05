@@ -1727,3 +1727,13 @@ tbody tr:hover {
     background: #fff;
   }
 }
+
+/* Photo upload on the claim page: the native file control is hidden and its label
+   is styled as a button; the keyboard focus ring moves to the label. */
+.photo-upload {
+  display: inline-block;
+}
+.photo-upload:focus-within .btn {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}

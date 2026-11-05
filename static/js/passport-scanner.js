@@ -28,6 +28,27 @@
     return result ? codeFrom(result.data) : null;
   }
 
+  // jsQR reads a code at some widths and misses it at others, and which width works
+  // depends on how big the code is in the photo. Try several, the full size last,
+  // and keep the first that reads.
+  var WIDTHS = [1000, 1600, 900, 1200, 700, 2400];
+
+  function decodeAtSeveralSizes(image) {
+    var natural = image.naturalWidth;
+    var widths = WIDTHS.filter(function (width) {
+      return width < natural;
+    });
+    widths.push(natural);
+    for (var i = 0; i < widths.length; i++) {
+      var height = Math.round((image.naturalHeight * widths[i]) / natural);
+      var code = decode(image, widths[i], height);
+      if (code) {
+        return code;
+      }
+    }
+    return null;
+  }
+
   function uploadPhotos(block) {
     var field = document.getElementById(
       block.getAttribute("data-scanner-field"),
@@ -50,16 +71,7 @@
 
       image.onload = function () {
         URL.revokeObjectURL(url);
-        // Phone photos are large; a 1600 px side is plenty to read a label.
-        var scale = Math.min(
-          1,
-          1600 / Math.max(image.naturalWidth, image.naturalHeight),
-        );
-        var code = decode(
-          image,
-          Math.round(image.naturalWidth * scale),
-          Math.round(image.naturalHeight * scale),
-        );
+        var code = decodeAtSeveralSizes(image);
         if (!code) {
           failed();
           return;

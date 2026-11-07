@@ -8,6 +8,7 @@ when it is allowed, is decided by the model.
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
@@ -19,7 +20,8 @@ from accounts.models import Role
 from audit.models import Action, AuditEntry
 
 from .forms import CompanyApplicationForm, RejectionForm, SuspensionForm
-from .models import Company, CompanyStatus, TransitionNotAllowed
+from .models import Company, CompanyStatus, CompanyType, TransitionNotAllowed
+from .wizard import SESSION_KEY, STEP_FIELDS, build_form, step_errors, steps_for
 
 # ---- Public API ----
 
@@ -33,30 +35,7 @@ def application_create(request):
     if request.method == "POST":
         form = CompanyApplicationForm(request.POST)
         if form.is_valid():
-            company = form.save(commit=False)
-            company.owner = request.user
-            company.status = CompanyStatus.PENDING
-            try:
-                # In its own block, so that the refused write is the only thing
-                # rolled back and the request can go on to answer.
-                with transaction.atomic():
-                    company.save()
-            except IntegrityError:
-                # A double-clicked submit button sends the form twice, and the
-                # check above ran before either write landed. The database says
-                # what that check meant to say, one company per account, so the
-                # answer is the one already written for it a few lines up.
-                return redirect("companies:application_detail")
-
-            request.user.role = Role.COMPANY
-            request.user.save(update_fields=["role"])
-
-            AuditEntry.record(actor=request.user, action=Action.COMPANY_SUBMITTED, target=company)
-            messages.success(
-                request,
-                _("Your application has been submitted and is now pending review."),
-            )
-            return redirect("companies:application_detail")
+            return _submit_application(request, form)
     else:
         form = CompanyApplicationForm()
 
@@ -64,11 +43,59 @@ def application_create(request):
 
 
 @login_required
+def application_wizard(request, step):
+    """FR07 in small steps: one question per screen, the same application at the end."""
+    if Company.objects.owned_by(request.user) is not None:
+        return redirect("companies:application_detail")
+
+    answers = request.session.get(SESSION_KEY, {})
+    steps = steps_for(answers.get("company_type"))
+    if step not in steps:
+        raise Http404
+    position = steps.index(step)
+
+    if request.method == "POST":
+        if step == "consent":
+            if "publish_consent" in request.POST:
+                answers["publish_consent"] = "on"
+            else:
+                answers.pop("publish_consent", None)
+        else:
+            for name in STEP_FIELDS[step]:
+                answers[name] = request.POST.get(name, "")
+        request.session[SESSION_KEY] = answers
+        steps = steps_for(answers.get("company_type"))
+
+        if "back" in request.POST:
+            return redirect("companies:application_wizard", step=steps[max(position - 1, 0)])
+
+        data = _collected(answers, steps)
+        if step_errors(data, step):
+            form = build_form(data)
+            form.is_valid()
+            return _render_step(request, form, step, steps)
+        if position < len(steps) - 1:
+            return redirect("companies:application_wizard", step=steps[position + 1])
+
+        form = build_form(data)
+        if not form.is_valid():
+            first = next(
+                (s for s in steps if any(name in form.errors for name in STEP_FIELDS[s])),
+                steps[-1],
+            )
+            return redirect("companies:application_wizard", step=first)
+        request.session.pop(SESSION_KEY, None)
+        return _submit_application(request, form)
+
+    return _render_step(request, build_form(initial=_collected(answers, steps)), step, steps)
+
+
+@login_required
 def application_detail(request):
     """FR17: the owner sees the status and, for a negative decision, the reason."""
     company = Company.objects.owned_by(request.user)
     if company is None:
-        return redirect("companies:application_create")
+        return redirect("companies:application_wizard", step="kind")
     return render(request, "companies/application_detail.html", {"company": company})
 
 
@@ -234,3 +261,55 @@ def suspend_company(request, pk):
     else:
         messages.success(request, _("%(company)s has been suspended.") % {"company": company})
     return redirect("companies:review_detail", pk=company.pk)
+
+
+# ---- Private helpers ----
+
+
+def _collected(answers, steps):
+    """The answers of this path's screens; answers left by the other path are dropped."""
+    return {name: answers[name] for step in steps for name in STEP_FIELDS[step] if name in answers}
+
+
+def _render_step(request, form, step, steps):
+    return render(
+        request,
+        "companies/wizard_step.html",
+        {
+            "form": form,
+            "step": step,
+            "fields": [form[name] for name in STEP_FIELDS[step]],
+            "position": steps.index(step) + 1,
+            "total": len(steps),
+            "artisan": CompanyType.ARTISAN,
+            "commercial": CompanyType.COMMERCIAL,
+        },
+    )
+
+
+def _submit_application(request, form):
+    """FR07: the application is stored as Pending, once per account."""
+    company = form.save(commit=False)
+    company.owner = request.user
+    company.status = CompanyStatus.PENDING
+    try:
+        # In its own block, so that the refused write is the only thing
+        # rolled back and the request can go on to answer.
+        with transaction.atomic():
+            company.save()
+    except IntegrityError:
+        # A double-clicked submit button sends the form twice, and the
+        # check above ran before either write landed. The database says
+        # what that check meant to say, one company per account, so the
+        # answer is the one already written for it a few lines up.
+        return redirect("companies:application_detail")
+
+    request.user.role = Role.COMPANY
+    request.user.save(update_fields=["role"])
+
+    AuditEntry.record(actor=request.user, action=Action.COMPANY_SUBMITTED, target=company)
+    messages.success(
+        request,
+        _("Your application has been submitted and is now pending review."),
+    )
+    return redirect("companies:application_detail")

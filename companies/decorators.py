@@ -22,7 +22,7 @@ def owned_company_required(view):
     def wrapper(request, *args, **kwargs):
         company = Company.objects.owned_by(request.user)
         if company is None:
-            return redirect("companies:application_create")
+            return redirect("companies:application_wizard", step="kind")
         return view(request, company, *args, **kwargs)
 
     return wrapper

@@ -11,6 +11,7 @@ app_name = "companies"
 urlpatterns = [
     path("application/", views.application_detail, name="application_detail"),
     path("application/new/", views.application_create, name="application_create"),
+    path("inscripcion/<str:step>/", views.application_wizard, name="application_wizard"),
     path("application/edit/", views.application_edit, name="application_edit"),
     path("review/", views.review_list, name="review_list"),
     path("review/<int:pk>/", views.review_detail, name="review_detail"),

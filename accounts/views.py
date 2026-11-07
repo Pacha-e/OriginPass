@@ -85,7 +85,7 @@ def register(request):
             login(request, user)
             messages.success(request, _("Your account has been created."))
             if form.cleaned_data["kind"] == AccountKind.BUSINESS:
-                return redirect("companies:application_create")
+                return redirect("companies:application_wizard", step="kind")
             return redirect("products:custody")
     else:
         # The home page links here already knowing which door the visitor took.

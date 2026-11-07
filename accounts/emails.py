@@ -62,19 +62,6 @@ def notify_revocation(product, holder_email):
     )
 
 
-def notify_transfer(transfer):
-    """FR54: the receiver is told a transfer is waiting for their answer."""
-    _send(
-        _("A product is waiting for your answer"),
-        "products/email/transfer_offered.txt",
-        {
-            "product_name": transfer.product.name,
-            "sender": transfer.from_holder.email,
-        },
-        transfer.to_holder.email,
-    )
-
-
 # ---- Private helpers ----
 
 

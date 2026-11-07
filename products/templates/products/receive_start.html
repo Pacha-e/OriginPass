@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% translate "Receive a product" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Receive a product" %}</h1>
+    <p>{% translate "Read the QR of the product you are receiving: the one on its label, or the one on the screen of the person handing it to you." %}</p>
+  </div>
+
+  <button type="button" class="btn btn--primary btn--block" data-scanner-start hidden>{% translate "Read the QR with the camera" %}</button>
+  <div data-scanner-photo data-scanner-field="id_code" hidden
+       data-msg-found="{% translate 'Code read from the photo. Press Next.' %}"
+       data-msg-none="{% translate 'No QR code was found in that photo. Try a closer, sharper photo, or type the code.' %}">
+    <p>{% translate "Or upload a photo of the QR" %}</p>
+    <label class="photo-upload">
+      <span class="btn">{% translate "Choose a photo" %}</span>
+      <input class="visually-hidden" type="file" accept="image/*" data-scanner-photo-input>
+    </label>
+    <p class="scanner__status" data-scanner-photo-status role="status"></p>
+  </div>
+  <div data-scanner data-scanner-field="id_code" hidden
+       data-msg-aim="{% translate 'Point the camera at the QR.' %}"
+       data-msg-found="{% translate 'Code read. Press Next.' %}"
+       data-msg-denied="{% translate 'The camera is not available. Type the passport code instead.' %}">
+    <video class="scanner__video" width="320" playsinline muted></video>
+    <canvas hidden></canvas>
+    <p class="scanner__status" data-scanner-status role="status"></p>
+    <button type="button" class="btn" data-scanner-stop>{% translate "Close the camera" %}</button>
+  </div>
+
+  {% if error %}
+    <p class="notice notice--danger" role="alert">{{ error }}</p>
+  {% endif %}
+
+  <form method="get" class="receive__form">
+    <label for="id_code">{% translate "Passport code" %}</label>
+    <p class="muted">{% translate "It is printed under the QR, on the label." %}</p>
+    <input id="id_code" name="code" value="{{ typed }}" autocomplete="off" required>
+    <button type="submit" class="btn btn--primary btn--block">{% translate "Next" %}</button>
+  </form>
+</div>
+<script src="{% static 'vendor/jsqr/jsQR.js' %}"></script>
+<script src="{% static 'js/passport-scanner.js' %}"></script>
+{% endblock %}

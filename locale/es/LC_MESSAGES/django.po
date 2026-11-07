@@ -1784,3 +1784,39 @@ msgstr "Entregar en persona"
 
 msgid "Show the QR and the code on your phone to the person receiving it: a distributor, a shop or the buyer."
 msgstr "Muestra el QR y el código en tu celular a quien la recibe: un distribuidor, una tienda o quien compra."
+
+msgid "No product has that code. Check each letter, or read the QR again."
+msgstr "Ningún producto tiene ese código. Revisa cada letra o vuelve a leer el QR."
+
+msgid "The products you have now, and how to receive or hand over one."
+msgstr "Los productos que tienes ahora, y cómo recibir o entregar uno."
+
+msgid "Receive a product"
+msgstr "Recibir un producto"
+
+msgid "Read the QR of the product someone is handing you, then type the code they tell you."
+msgstr "Lee el QR del producto que te entregan y escribe el código que te dicen."
+
+msgid "The products that are in your name now."
+msgstr "Los productos que están a tu nombre ahora."
+
+msgid "You have no products yet. When someone hands you one, it appears here."
+msgstr "Todavía no tienes productos. Cuando alguien te entregue uno, aparece aquí."
+
+msgid "Read the QR of the product you are receiving: the one on its label, or the one on the screen of the person handing it to you."
+msgstr "Lee el QR del producto que recibes: el de su etiqueta o el que te muestra en su celular quien te lo entrega."
+
+msgid "Code read from the photo. Press Next."
+msgstr "Código leído de la foto. Oprime Siguiente."
+
+msgid "Point the camera at the QR."
+msgstr "Apunta la cámara al QR."
+
+msgid "Code read. Press Next."
+msgstr "Código leído. Oprime Siguiente."
+
+msgid "It is printed under the QR, on the label."
+msgstr "Está impreso debajo del QR, en la etiqueta."
+
+msgid "Next"
+msgstr "Siguiente"

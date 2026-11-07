@@ -77,6 +77,20 @@ def handover_code_json(request, pk):
 
 
 @login_required
+def receive_start(request):
+    """Where a receiver starts: read the product's QR with the camera, or type its code."""
+    typed = request.GET.get("code", "").strip()
+    error = None
+    if typed:
+        # The QR holds the whole verification address; keep only its last part.
+        code = typed.rstrip("/").rsplit("/", 1)[-1]
+        if Product.objects.filter(passport_code=code).exists():
+            return redirect("products:receive", passport_code=code)
+        error = _("No product has that code. Check each letter, or read the QR again.")
+    return render(request, "products/receive_start.html", {"typed": typed, "error": error})
+
+
+@login_required
 def receive(request, passport_code):
     """The receiver's screen: the piece they are about to receive, and the code box."""
     product = get_object_or_404(

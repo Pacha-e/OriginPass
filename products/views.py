@@ -14,7 +14,6 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDay
 from django.http import HttpResponse
@@ -26,20 +25,18 @@ from django.utils.translation import gettext_lazy
 
 # ---- Internal imports ----
 from accounts.decorators import admin_required
-from accounts.emails import notify_revocation, notify_transfer
+from accounts.emails import notify_revocation
 from audit.models import Action, AuditEntry
 from companies.decorators import owned_company_required
 from companies.models import Company, CompanyStatus
 from verification.models import ScanEvent
 
-from .forms import ProductForm, RevocationForm, TransferClaimForm, TransferInitiateForm
+from .forms import ProductForm, RevocationForm
 from .models import (
     PRODUCT_TYPE_BY_COMPANY_TYPE,
     Alert,
-    CustodyTransfer,
     Product,
     ProductStatus,
-    TransferState,
 )
 from .qr import PRINT_DPI, passport_qr_image
 
@@ -238,26 +235,13 @@ def company_analytics_csv(request, company):
 
 @login_required
 def custody(request):
-    """Everything about custody for one account: what it holds, what is offered
-    to it, and what it is offering. Open to every account, with or without a
-    company, because a distributor or a buyer holds products too.
+    """What one account holds now, with the ways to receive and hand over.
+
+    Open to every account, with or without a company, because a distributor or
+    a buyer holds products too.
     """
     held = Product.objects.held_by(request.user).select_related("company").order_by("name")
-    incoming = (
-        CustodyTransfer.objects.filter(to_holder=request.user, state=TransferState.INITIATED)
-        .select_related("product", "from_holder")
-        .order_by("-created_at")
-    )
-    outgoing = (
-        CustodyTransfer.objects.filter(from_holder=request.user, state=TransferState.INITIATED)
-        .select_related("product", "to_holder")
-        .order_by("-created_at")
-    )
-    return render(
-        request,
-        "products/custody.html",
-        {"held": held, "incoming": incoming, "outgoing": outgoing},
-    )
+    return render(request, "products/custody.html", {"held": held})
 
 
 @login_required
@@ -311,11 +295,6 @@ def product_detail(request, pk):
     company = Company.objects.owned_by(request.user)
     product = get_object_or_404(Product.objects.select_related("company"), pk=pk, company=company)
     holder = product.current_holder
-    open_offer = (
-        product.custody_transfers.filter(state=TransferState.INITIATED)
-        .select_related("to_holder")
-        .first()
-    )
     return render(
         request,
         "products/product_detail.html",
@@ -323,7 +302,6 @@ def product_detail(request, pk):
             "product": product,
             "holder": holder,
             "is_holder": holder == request.user,
-            "open_offer": open_offer,
             "scan_count": product.scan_events.count(),
             "verification_url": request.build_absolute_uri(
                 reverse("verification:verify", args=[product.passport_code])
@@ -461,130 +439,6 @@ def qr_download(request, pk):
         f'attachment; filename="originpass-{product.passport_code}.png"'
     )
     return response
-
-
-@login_required
-def transfer_claim(request):
-    """FR40: the buyer claims the product with its passport code and the transfer code."""
-    if request.method == "POST":
-        form = TransferClaimForm(request.POST, claimant=request.user)
-        if form.is_valid():
-            transfer = form.cleaned_data["transfer"]
-            try:
-                transfer.accept(actor=request.user)
-            except ValueError:
-                messages.info(request, _("This transfer had already been answered."))
-            else:
-                messages.success(
-                    request, _("You now hold %(product)s.") % {"product": transfer.product.name}
-                )
-            return redirect("products:custody")
-    else:
-        form = TransferClaimForm(claimant=request.user)
-
-    return render(request, "products/transfer_claim.html", {"form": form})
-
-
-@login_required
-def transfer_initiate(request, pk):
-    """FR35: the current holder offers the product to another account.
-
-    FR38 and FR39 are refusals with a reason, so a holder who cannot transfer
-    gets a page that says why rather than a missing page.
-    """
-    product = get_object_or_404(Product.objects.select_related("company"), pk=pk)
-
-    if product.status == ProductStatus.REVOKED:
-        return _refuse(
-            request,
-            None,
-            heading=_("This product cannot change hands"),
-            reason=_("Its passport was revoked, and a revoked product accepts no transfer."),
-        )
-    if product.current_holder != request.user:
-        return _refuse(
-            request,
-            None,
-            heading=_("This product cannot change hands"),
-            reason=_(
-                "Only the current holder can transfer it, and your account does not hold it now."
-            ),
-        )
-
-    if request.method == "POST":
-        form = TransferInitiateForm(request.POST, product=product, holder=request.user)
-        if form.is_valid():
-            try:
-                transfer = form.save()
-            except IntegrityError:
-                # Another offer for this product was saved between the check and
-                # this write; the database constraint is what caught it.
-                form.add_error(
-                    None,
-                    _("This product already has an open offer. It has to be answered first."),
-                )
-            else:
-                notify_transfer(transfer)
-                messages.success(
-                    request,
-                    _(
-                        "Offer sent to %(who)s. Give them the transfer code when you hand "
-                        "the product over."
-                    )
-                    % {"who": transfer.to_holder.email},
-                )
-                return redirect("products:custody")
-    else:
-        form = TransferInitiateForm(product=product, holder=request.user)
-
-    return render(
-        request,
-        "products/transfer_initiate.html",
-        {"form": form, "product": product},
-    )
-
-
-@login_required
-def transfer_respond(request, pk):
-    """FR36: the receiver accepts or declines. FR37: an acceptance joins the chain."""
-    transfer = get_object_or_404(
-        CustodyTransfer.objects.select_related("product__company", "from_holder"),
-        pk=pk,
-        to_holder=request.user,
-    )
-
-    if transfer.state != TransferState.INITIATED:
-        messages.info(request, _("This transfer had already been answered."))
-        return redirect("products:custody")
-
-    if request.method == "POST":
-        action = request.POST.get("action")
-        if action not in {"accept", "decline"}:
-            return redirect("products:transfer_respond", pk=transfer.pk)
-        if action == "accept" and transfer.product.status == ProductStatus.REVOKED:
-            messages.error(
-                request,
-                _("This product was revoked after the offer was made, so it cannot be accepted."),
-            )
-            return redirect("products:custody")
-        try:
-            if action == "accept":
-                transfer.accept(actor=request.user)
-            else:
-                transfer.decline(actor=request.user)
-        except ValueError:
-            # Answered meanwhile, possibly in another tab: that answer stands.
-            messages.info(request, _("This transfer had already been answered."))
-        else:
-            template = (
-                _("You now hold %(product)s.")
-                if action == "accept"
-                else _("You declined %(product)s.")
-            )
-            messages.success(request, template % {"product": transfer.product.name})
-        return redirect("products:custody")
-
-    return render(request, "products/transfer_respond.html", {"transfer": transfer})
 
 
 # ---- Private helpers ----

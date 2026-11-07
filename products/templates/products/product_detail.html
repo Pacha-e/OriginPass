@@ -85,15 +85,7 @@
     <dd>{% if is_holder %}{% translate "Your company" %}{% elif holder.company.status == "APPROVED" %}{{ holder.company.legal_name }}{% else %}{% translate "Private holder" %}{% endif %}</dd>
   </dl>
 
-  {% if open_offer %}
-    <div class="notice notice--warning spaced">
-      <p class="notice__title">
-        {% blocktranslate trimmed with who=open_offer.to_holder.email %}Offered to {{ who }}, waiting for an answer.{% endblocktranslate %}
-      </p>
-      <p>{% translate "Give this transfer code to the buyer at the moment of the sale. With it and the passport code they claim the piece." %}</p>
-      <p><span class="code-chip">{{ open_offer.transfer_code }}</span></p>
-    </div>
-  {% elif product.status == "ACTIVE" and is_holder %}
+  {% if product.status == "ACTIVE" and is_holder %}
     <div class="action-bar">
       <span class="tip tip--start">
         <a class="btn btn--primary" href="{% url 'products:handover' product.pk %}" aria-describedby="tip-transfer">{% translate "Hand over in person" %}</a>

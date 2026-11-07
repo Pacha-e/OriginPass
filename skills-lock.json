@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "skills": {
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "skillPath": "skills/accessibility/SKILL.md",
+      "computedHash": "612f913bcb03f0787b103c848cd7664b676a9aaf31f25d3270cc69cf5caaab95"
+    },
+    "better-accessibility": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-accessibility/SKILL.md",
+      "computedHash": "7fe3f3727dc1c15b5148e1b8d47f1b025f9886348ec8a33f4c4536aa5372cbbe"
+    },
+    "better-interface": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-interface/SKILL.md",
+      "computedHash": "c4f8a7862c00e63ae0df73fa29137f01a7fdd16354919e718dcf7e9f1a3f9445"
+    },
+    "better-writing": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-writing/SKILL.md",
+      "computedHash": "5dcd97f7df29f92ef99901601b2a63e2c709f49f9748fd6b61c751b667468564"
+    },
+    "django-security": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/django-security/SKILL.md",
+      "computedHash": "05e6a45afc8b4e994b0e99808b9407d95dca19638986543b88d68c8ce8eb0331"
+    },
+    "django-tdd": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/django-tdd/SKILL.md",
+      "computedHash": "65809c76dd072aa8d59c32d9119987429e15047b5ea4708003de145327710db4"
+    },
+    "error-handling-ux": {
+      "source": "owl-listener/designer-skills",
+      "sourceType": "github",
+      "skillPath": "interaction-design/skills/error-handling-ux/SKILL.md",
+      "computedHash": "152e18dd60ddddddd73f82b3429b7e2949e5c1033315df0a806abd953f00536f"
+    },
+    "form-design": {
+      "source": "owl-listener/designer-skills",
+      "sourceType": "github",
+      "skillPath": "interaction-design/skills/form-design/SKILL.md",
+      "computedHash": "5502def7c0c6647fdcf824b0dedfdf1e70caed50b57c262af322595b1be357eb"
+    },
+    "icon-system": {
+      "source": "owl-listener/designer-skills",
+      "sourceType": "github",
+      "skillPath": "design-systems/skills/icon-system/SKILL.md",
+      "computedHash": "5f70ea40e829246d5122af8d3487f9ac2a84474361779267a7f6d3d096d17b9d"
+    },
+    "interface-review": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/interface-review/SKILL.md",
+      "computedHash": "3b04fd6eb5fef3b49c76b6af2b0bb542bbadcdbd88beed7ca11ab54d5a207750"
+    },
+    "navigation-patterns": {
+      "source": "owl-listener/designer-skills",
+      "sourceType": "github",
+      "skillPath": "interaction-design/skills/navigation-patterns/SKILL.md",
+      "computedHash": "4bf813b26fa9109e5438f992a61875264000cd0b2265ebf4e35bdbc410c478b2"
+    },
+    "onboarding-design": {
+      "source": "owl-listener/designer-skills",
+      "sourceType": "github",
+      "skillPath": "interaction-design/skills/onboarding-design/SKILL.md",
+      "computedHash": "d975ecaf9c104a56a5c7f82db44433be86945417ae8544910c451ed9297d8e3e"
+    },
+    "playwright-best-practices": {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "sourceType": "github",
+      "skillPath": "playwright-best-practices/SKILL.md",
+      "computedHash": "7eb144f734450fee649dc1d209114775ddda07cbf45be84fe969d3d4f3971dce"
+    }
+  }
+}

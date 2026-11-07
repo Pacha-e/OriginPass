@@ -91,3 +91,7 @@ docs/sprint-2-demo-runbook.md
 
 # SSH keys for the EC2 instance: never commit them
 *.pem
+
+# Agent skills installed with `npx skills` (pinned in skills-lock.json)
+.agents/
+.claude/skills/

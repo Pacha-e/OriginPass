@@ -32,6 +32,7 @@ from companies.models import Company, CompanyStatus
 from verification.models import ScanEvent
 
 from .forms import ProductForm, RevocationForm
+from .handover_views import waiting_by_email
 from .models import (
     PRODUCT_TYPE_BY_COMPANY_TYPE,
     Alert,
@@ -241,7 +242,11 @@ def custody(request):
     a buyer holds products too.
     """
     held = Product.objects.held_by(request.user).select_related("company").order_by("name")
-    return render(request, "products/custody.html", {"held": held})
+    return render(
+        request,
+        "products/custody.html",
+        {"held": held, "waiting_by_email": waiting_by_email(request.user)},
+    )
 
 
 @login_required

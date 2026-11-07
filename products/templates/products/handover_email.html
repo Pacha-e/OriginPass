@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Hand over by email" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    {% if correcting %}
+      <h1>{% translate "Correct the email" %}</h1>
+      <p>{% blocktranslate trimmed with email=correcting %}You handed {{ product }} to {{ email }}. Write the right email: the link already sent stops working.{% endblocktranslate %}</p>
+    {% else %}
+      <h1>{% blocktranslate with product=product.name %}Hand over by email: {{ product }}{% endblocktranslate %}</h1>
+      <p>{% translate "For a person who has no OriginPass account. The product goes to their email, and they receive a message to keep it." %}</p>
+    {% endif %}
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+      <p class="notice notice--danger" role="alert">{{ error }}</p>
+    {% endfor %}
+    {% include "partials/field.html" with field=form.email %}
+    {% include "partials/field.html" with field=form.email_again %}
+    <button type="submit" class="btn btn--primary btn--block">{% if correcting %}{% translate "Correct and send again" %}{% else %}{% translate "Hand over and send" %}{% endif %}</button>
+  </form>
+  <p><a class="btn" href="{% url 'products:custody' %}">{% translate "Cancel" %}</a></p>
+</div>
+{% endblock %}

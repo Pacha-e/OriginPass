@@ -62,6 +62,21 @@ def notify_revocation(product, holder_email):
     )
 
 
+def notify_possession(transfer, claim_url, giver_name):
+    """A product was handed to a person without an account: tell them, with the link."""
+    _send(
+        _("A product is now in your name"),
+        "products/email/possession.txt",
+        {
+            "product_name": transfer.product.name,
+            "maker": transfer.product.company.legal_name,
+            "giver_name": giver_name,
+            "claim_url": claim_url,
+        },
+        transfer.to_email,
+    )
+
+
 # ---- Private helpers ----
 
 

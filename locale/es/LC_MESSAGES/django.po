@@ -1297,7 +1297,7 @@ msgid "Issued the passport"
 msgstr "Sacó el pasaporte"
 
 msgid "Private holder"
-msgstr "Comprador particular"
+msgstr "Una persona"
 
 msgid "Received the piece"
 msgstr "Lo recibió"
@@ -1820,3 +1820,93 @@ msgstr "Está impreso debajo del QR, en la etiqueta."
 
 msgid "Next"
 msgstr "Siguiente"
+
+msgid "A product is now in your name"
+msgstr "Un producto quedó a tu nombre"
+
+msgid "Email of the person receiving it"
+msgstr "Correo de quien lo recibe"
+
+msgid "Write it again"
+msgstr "Escríbelo otra vez"
+
+msgid "The two emails are not the same. Check them."
+msgstr "Los dos correos no son iguales. Revísalos."
+
+msgid "Sent again to %(email)s."
+msgstr "Se envió otra vez a %(email)s."
+
+msgid "Done. We sent %(email)s a message with the product."
+msgstr "Listo. Le enviamos a %(email)s un mensaje con el producto."
+
+msgid "Email corrected by whoever handed it over."
+msgstr "Correo corregido por quien lo entregó."
+
+msgid "Corrected. We sent %(email)s a message with the product."
+msgstr "Corregido. Le enviamos a %(email)s un mensaje con el producto."
+
+msgid "Keep your product"
+msgstr "Guarda tu producto"
+
+msgid "It is older than 30 days, or the product was already kept or handed over again. Ask whoever gave it to you to send it again."
+msgstr "Tiene más de 30 días, o el producto ya se guardó o se entregó otra vez. Pídele a quien te lo dio que lo envíe de nuevo."
+
+msgid "%(product)s was handed to %(email)s."
+msgstr "%(product)s se entregó a %(email)s."
+
+msgid "To keep it, enter with your account of %(email)s. If you have none, create it with that email and then open this link again."
+msgstr "Para guardarlo, entra con tu cuenta de %(email)s. Si no tienes, créala con ese correo y después abre otra vez este enlace."
+
+msgid "Enter"
+msgstr "Entrar"
+
+msgid "Create my account"
+msgstr "Crear mi cuenta"
+
+msgid "This product was handed to %(email)s. Leave this account and enter with that one."
+msgstr "Este producto se entregó a %(email)s. Sal de esta cuenta y entra con esa."
+
+msgid "Keep it in my account"
+msgstr "Guardarlo en mi cuenta"
+
+msgid "%(giver_name)s handed you %(product_name)s, made by %(maker)s. It is now in your name on OriginPass."
+msgstr "%(giver_name)s te entregó %(product_name)s, hecho por %(maker)s. Ya está a tu nombre en OriginPass."
+
+msgid "To see it and keep it in your account, open this link and enter with an account of this same email. If you have none, create it there:"
+msgstr "Para verlo y guardarlo en tu cuenta, abre este enlace y entra con una cuenta de este mismo correo. Si no tienes, créala ahí:"
+
+msgid "The link works for 30 days. If you were not expecting this product, you can ignore this message."
+msgstr "El enlace sirve 30 días. Si no esperabas este producto, puedes ignorar este mensaje."
+
+msgid "Hand over by email"
+msgstr "Entregar por correo"
+
+msgid "Correct the email"
+msgstr "Corregir el correo"
+
+msgid "You handed %(product)s to %(email)s. Write the right email: the link already sent stops working."
+msgstr "Entregaste %(product)s a %(email)s. Escribe el correo correcto: el enlace que ya se envió deja de servir."
+
+msgid "Hand over by email: %(product)s"
+msgstr "Entregar por correo: %(product)s"
+
+msgid "For a person who has no OriginPass account. The product goes to their email, and they receive a message to keep it."
+msgstr "Para una persona que no tiene cuenta en OriginPass. El producto queda a su correo y le llega un mensaje para guardarlo."
+
+msgid "Correct and send again"
+msgstr "Corregir y enviar otra vez"
+
+msgid "Hand over and send"
+msgstr "Entregar y enviar"
+
+msgid "Sent by email, not kept yet"
+msgstr "Enviados por correo, sin guardar todavía"
+
+msgid "The person still has to open the link in the message. If the email was wrong, correct it."
+msgstr "La persona todavía tiene que abrir el enlace del mensaje. Si el correo estaba mal, corrígelo."
+
+msgid "Send again"
+msgstr "Enviar otra vez"
+
+msgid "Does the person have no OriginPass account?"
+msgstr "¿La persona no tiene cuenta en OriginPass?"

@@ -31,7 +31,9 @@
     <p class="muted" data-handover-hint>{% blocktranslate trimmed %}The code changes every 2 minutes and stops working as soon as the piece is handed over.{% endblocktranslate %}</p>
   </div>
 
-  <p><a class="btn" href="{% url 'products:product_detail' product.pk %}">{% translate "Back" %}</a></p>
+  <p>{% translate "Does the person have no OriginPass account?" %}
+     <a href="{% url 'products:handover_email' product.pk %}">{% translate "Hand over by email" %}</a></p>
+  <p><a class="btn" href="{% url 'products:custody' %}">{% translate "Back" %}</a></p>
 </div>
 <script src="{% static 'js/handover-ring.js' %}" defer></script>
 {% endblock %}

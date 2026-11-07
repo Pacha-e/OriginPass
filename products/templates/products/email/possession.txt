@@ -1,0 +1,8 @@
+{% load i18n %}{% translate "Hello," %}
+
+{% blocktranslate trimmed %}{{ giver_name }} handed you {{ product_name }}, made by {{ maker }}. It is now in your name on OriginPass.{% endblocktranslate %}
+
+{% translate "To see it and keep it in your account, open this link and enter with an account of this same email. If you have none, create it there:" %}
+{{ claim_url }}
+
+{% translate "The link works for 30 days. If you were not expecting this product, you can ignore this message." %}

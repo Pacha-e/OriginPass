@@ -5,8 +5,10 @@ from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase, TransactionTestCase
 
 from audit.integrity import sign
-from products.models import Product, ProductLine
-from test_support.factories import make_approved_company, make_product
+from audit.models import Action, AuditEntry
+from companies.models import CompanyStatus
+from products.models import PRODUCT_TYPE_BY_COMPANY_TYPE, Product, ProductLine
+from test_support.factories import make_approved_company, make_company, make_product
 
 BEFORE = [("products", "0008_resign_products_with_status")]
 AFTER = [("products", "0011_product_line_required")]
@@ -61,6 +63,59 @@ class ExistingProductsMigrationTests(TransactionTestCase):
             self.assertEqual(product.line.name, product.name)
             self.assertEqual(product.line.company_id, product.company_id)
             self.assertTrue(product.is_intact)
+
+
+def make_line(company=None, **overrides):
+    company = company or make_approved_company()
+    fields = {
+        "product_type": PRODUCT_TYPE_BY_COMPANY_TYPE[company.company_type],
+        "name": "Sombrero vueltiao 24 vueltas",
+        "description": "Tejido en caña flecha.",
+        "category": "Sombreros",
+        "origin": "Tuchín, Córdoba",
+    }
+    fields.update(overrides)
+    return ProductLine.objects.create(company=company, **fields)
+
+
+class IssuePassportsTests(TestCase):
+    def test_issue_twenty_passports_copies_the_line(self):
+        line = make_line()
+
+        passports = line.issue_passports(20, actor=line.company.owner)
+
+        self.assertEqual(len(passports), 20)
+        self.assertEqual(len({passport.passport_code for passport in passports}), 20)
+        for passport in passports:
+            passport.refresh_from_db()
+            self.assertEqual(passport.line_id, line.pk)
+            self.assertEqual(passport.name, line.name)
+            self.assertEqual(passport.origin, line.origin)
+            self.assertTrue(passport.is_intact)
+        self.assertEqual(AuditEntry.objects.filter(action=Action.PRODUCT_REGISTERED).count(), 20)
+
+    def test_issue_rejects_zero_and_201(self):
+        line = make_line()
+        for count in (0, 201):
+            with self.assertRaises(ValueError):
+                line.issue_passports(count, actor=line.company.owner)
+        self.assertFalse(line.passports.exists())
+
+    def test_issue_refused_for_unapproved_company(self):
+        line = make_line(make_company(status=CompanyStatus.SUSPENDED))
+        with self.assertRaises(ValueError):
+            line.issue_passports(1, actor=line.company.owner)
+
+    def test_editing_line_does_not_alter_issued_passports(self):
+        line = make_line()
+        [passport] = line.issue_passports(1, actor=line.company.owner)
+
+        line.name = "Sombrero vueltiao 27 vueltas"
+        line.save()
+
+        passport.refresh_from_db()
+        self.assertEqual(passport.name, "Sombrero vueltiao 24 vueltas")
+        self.assertTrue(passport.is_intact)
 
 
 class LineOfNewProductTests(TestCase):

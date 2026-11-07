@@ -1910,3 +1910,95 @@ msgstr "Enviar otra vez"
 
 msgid "Does the person have no OriginPass account?"
 msgstr "¿La persona no tiene cuenta en OriginPass?"
+
+msgid "That code does not work. Ask for the code shown right now on the screen of whoever is giving you the products."
+msgstr "Ese código no sirve. Pídele a quien te entrega los productos el código que ve ahora en su pantalla."
+
+msgid "Choose at least one product."
+msgstr "Elige al menos un producto."
+
+msgid "Too many wrong codes for this batch. Try again in 15 minutes."
+msgstr "Se escribieron muchos códigos equivocados para este lote. Intenta otra vez en 15 minutos."
+
+msgid "This batch can no longer be cancelled."
+msgstr "Este lote ya no se puede cancelar."
+
+msgid "A personal account hands over at most %(limit)s products at a time."
+msgstr "Una cuenta de persona entrega como máximo %(limit)s productos a la vez."
+
+msgid "Some of these products are already in another open batch."
+msgstr "Algunos de estos productos ya están en otro lote sin entregar."
+
+msgid "%(product)s was revoked, so the batch cannot be handed over."
+msgstr "%(product)s fue anulado. El lote no se puede entregar."
+
+msgid "%(product)s is not in the name of whoever is handing over the batch."
+msgstr "%(product)s no está a nombre de quien entrega el lote."
+
+msgid "The batch was cancelled. Its products are free again."
+msgstr "El lote se canceló. Sus productos quedan libres otra vez."
+
+msgid "They are yours now: %(count)s products."
+msgstr "Ya son tuyos: %(count)s productos."
+
+msgid "Open"
+msgstr "Abierto"
+
+msgid "Handed over"
+msgstr "Entregado"
+
+msgid "Cancelled"
+msgstr "Cancelado"
+
+msgid "The code changes every 2 minutes and stops working as soon as you hand it over."
+msgstr "El código cambia cada 2 minutos y deja de servir apenas lo entregas."
+
+msgid "Hand over a batch"
+msgstr "Entregar un lote"
+
+msgid "Hand over %(total)s product"
+msgid_plural "Hand over %(total)s products"
+msgstr[0] "Entregar %(total)s producto"
+msgstr[1] "Entregar %(total)s productos"
+
+msgid "Show this screen to the person receiving them. With one QR and one code, all of them pass at once."
+msgstr "Muéstrale esta pantalla a quien los recibe. Con un QR y un código pasan todos a la vez."
+
+msgid "QR code of this batch"
+msgstr "Código QR de este lote"
+
+msgid "Cancel this batch"
+msgstr "Cancelar este lote"
+
+msgid "Hand over several at once"
+msgstr "Entregar varios a la vez"
+
+msgid "Mark the products you are handing over. They will share one QR and one code."
+msgstr "Marca los productos que vas a entregar. Tendrán un solo QR y un solo código."
+
+msgid "With a personal account you can hand over up to %(limit)s at a time."
+msgstr "Con una cuenta de persona puedes entregar hasta %(limit)s a la vez."
+
+msgid "Make the batch"
+msgstr "Armar el lote"
+
+msgid "You have no products to hand over now."
+msgstr "Ahora no tienes productos para entregar."
+
+msgid "Receive a batch"
+msgstr "Recibir un lote"
+
+msgid "Receive these products?"
+msgstr "¿Recibir estos productos?"
+
+msgid "Check that they are the products in front of you."
+msgstr "Revisa que sean los productos que tienes al frente."
+
+msgid "Yes, receive them"
+msgstr "Sí, recibirlos"
+
+msgid "This batch was already handed over or cancelled."
+msgstr "Este lote ya se entregó o se canceló."
+
+msgid "Choose several of your products: they share one QR and one code, and all pass at once."
+msgstr "Elige varios de tus productos: tienen un QR y un código, y pasan todos a la vez."

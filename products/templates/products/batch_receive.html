@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Receive a batch" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Receive these products?" %}</h1>
+    <p>{% translate "Check that they are the products in front of you." %}</p>
+  </div>
+  <ul class="batch-lines">
+    {% for line in lines %}<li><strong>{{ line.count }} × {{ line.name }}</strong> <span class="muted">{{ line.maker }}</span></li>{% endfor %}
+  </ul>
+  {% if error %}<p class="notice notice--danger" role="alert">{{ error }}</p>{% endif %}
+  {% if open %}
+    <form method="post" class="receive__form">
+      {% csrf_token %}
+      <label for="id_code">{% translate "Code the other person tells you" %}</label>
+      <input id="id_code" name="code" class="receive__code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000 000" required>
+      <button type="submit" class="btn btn--primary btn--block">{% translate "Yes, receive them" %}</button>
+    </form>
+  {% else %}
+    <p class="notice notice--warning">{% translate "This batch was already handed over or cancelled." %}</p>
+  {% endif %}
+</div>
+{% endblock %}

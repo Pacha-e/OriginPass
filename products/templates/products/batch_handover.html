@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% translate "Hand over a batch" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow handover">
+  <div class="card__head">
+    <h1>{% blocktranslate count total=items|length %}Hand over {{ total }} product{% plural %}Hand over {{ total }} products{% endblocktranslate %}</h1>
+    <p>{% translate "Show this screen to the person receiving them. With one QR and one code, all of them pass at once." %}</p>
+  </div>
+  <ul class="batch-lines">
+    {% for line in lines %}<li>{{ line.count }} × {{ line.name }}</li>{% endfor %}
+  </ul>
+  <img class="handover__qr" src="{{ qr_data_uri }}" width="240" height="240" alt="{% translate 'QR code of this batch' %}">
+  {% include "products/_handover_code.html" %}
+  <form method="post" action="{% url 'products:batch_cancel' batch.public_code %}">
+    {% csrf_token %}
+    <button type="submit" class="btn">{% translate "Cancel this batch" %}</button>
+  </form>
+</div>
+<script src="{% static 'js/handover-ring.js' %}" defer></script>
+{% endblock %}

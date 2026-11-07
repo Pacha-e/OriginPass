@@ -9,14 +9,15 @@
     <h1>{% blocktranslate with name=company.legal_name %}Products of {{ name }}{% endblocktranslate %}</h1>
     <p>{% translate "Every passport this company has issued." %}</p>
   </div>
-  {% if can_register %}
-    <div class="page-head__actions">
+  <div class="page-head__actions">
+    <a class="btn" href="{% url 'products:print_qr' %}">{% translate "Print QR codes" %}</a>
+    {% if can_register %}
       <span class="tip">
         <a class="btn btn--primary" href="{% url 'products:product_create' %}" aria-describedby="tip-new">{% translate "Register a product" %}</a>
         <span class="tip__text" id="tip-new" role="tooltip">{% translate "Give a new product its passport: write its name and where it was made, add a photo, and you get its QR code." %}</span>
       </span>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
 </div>
 
 {# FR24: filter by status. #}

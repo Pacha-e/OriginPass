@@ -10,6 +10,8 @@ model; these views ask and then explain the answer.
 import csv
 import io
 from datetime import timedelta
+from itertools import groupby
+from operator import attrgetter
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -40,8 +42,12 @@ from .models import (
     ProductStatus,
 )
 from .qr import PRINT_DPI, passport_qr_image
+from .sheets import qr_sheets_pdf
 
 # ---- Constants ----
+
+#: Fifty Letter sheets of twelve: more than any workshop prints at once.
+MAX_PRINT_PER_REQUEST = 600
 
 #: The ranges a company can pick, in days. Anything else falls back to 30.
 ANALYTICS_RANGES = (7, 30, 90, 365)
@@ -446,6 +452,35 @@ def qr_download(request, pk):
     return response
 
 
+@login_required
+def print_qr(request):
+    """The active passports grouped by line; the chosen ones come back as a PDF of QR sheets."""
+    products = _printable_products(request.user)
+    error = ""
+
+    if request.method == "POST":
+        # Bounded: a primary key fits in 18 digits, and one request prints at
+        # most MAX_PRINT_PER_REQUEST passports.
+        ids = [
+            value
+            for value in request.POST.getlist("product")[:MAX_PRINT_PER_REQUEST]
+            if value.isdigit() and len(value) <= 18
+        ]
+        chosen = list(products.filter(pk__in=ids))
+        if chosen:
+            base_url = request.build_absolute_uri("/").rstrip("/")
+            response = HttpResponse(qr_sheets_pdf(chosen, base_url), content_type="application/pdf")
+            response["Content-Disposition"] = 'attachment; filename="originpass-qr.pdf"'
+            return response
+        error = _("Choose at least one product to print.")
+
+    return render(
+        request,
+        "products/print_qr.html",
+        {"groups": _groups_by_line(products), "error": error},
+    )
+
+
 # ---- Private helpers ----
 
 
@@ -453,6 +488,22 @@ def _csv_cell(value):
     """A cell a spreadsheet shows as text instead of running it (CSV injection)."""
     text = "" if value is None else str(value)
     return "'" + text if text.startswith(_FORMULA_PREFIXES) else text
+
+
+def _groups_by_line(products):
+    """(line, its products) pairs, lines in name order, so each line is one heading."""
+    ordered = products.order_by("line__name", "line_id", "pk")
+    return [(line, list(items)) for line, items in groupby(ordered, key=attrgetter("line"))]
+
+
+def _printable_products(user):
+    """The active passports the account may print: its company's, or else those it holds."""
+    company = Company.objects.owned_by(user)
+    if company is None:
+        products = Product.objects.held_by(user)
+    else:
+        products = Product.objects.filter(company=company)
+    return products.filter(status=ProductStatus.ACTIVE).select_related("line")
 
 
 def _refuse(request, company, heading, reason):

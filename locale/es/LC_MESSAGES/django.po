@@ -2002,3 +2002,24 @@ msgstr "Este lote ya se entregó o se canceló."
 
 msgid "Choose several of your products: they share one QR and one code, and all pass at once."
 msgstr "Elige varios de tus productos: tienen un QR y un código, y pasan todos a la vez."
+
+msgid "Print QR codes"
+msgstr "Imprimir QR"
+
+msgid "Choose the products whose codes you want. You get a PDF with 12 codes on each Letter page."
+msgstr "Marca los productos cuyos códigos quieres. El PDF trae 12 códigos en cada hoja carta."
+
+msgid "Mark all of this product"
+msgstr "Marcar todos los de este producto"
+
+msgid "Download the PDF"
+msgstr "Descargar el PDF"
+
+msgid "You have no active passports to print."
+msgstr "No tienes productos activos para imprimir."
+
+msgid "Print on sheets"
+msgstr "Imprimir en hojas"
+
+msgid "Choose at least one product to print."
+msgstr "Marca al menos un producto para imprimir."

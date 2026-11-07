@@ -26,6 +26,10 @@ urlpatterns = [
         handover_views.handover_code_json,
         name="handover_code",
     ),
+    path("<int:pk>/entregar/correo/", handover_views.handover_email, name="handover_email"),
+    path("<int:pk>/entregar/corregir/", handover_views.correct_email, name="correct_email"),
+    path("<int:pk>/entregar/reenviar/", handover_views.resend_email, name="resend_email"),
+    path("reclamar/<str:token>/", handover_views.claim_email, name="claim_email"),
     path("recibir/", handover_views.receive_start, name="receive_start"),
     path("recibir/<str:passport_code>/", handover_views.receive, name="receive"),
 ]

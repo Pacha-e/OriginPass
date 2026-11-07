@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Keep your product" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  {% if dead %}
+    <div class="card__head">
+      <h1>{% translate "This link no longer works" %}</h1>
+      <p>{% translate "It is older than 30 days, or the product was already kept or handed over again. Ask whoever gave it to you to send it again." %}</p>
+    </div>
+  {% else %}
+    <div class="card__head">
+      <h1>{% translate "Keep your product" %}</h1>
+      <p>{% blocktranslate trimmed with email=transfer.to_email %}{{ product }} was handed to {{ email }}.{% endblocktranslate %}</p>
+    </div>
+    <dl class="receive__facts">
+      <dt>{% translate "Product" %}</dt><dd>{{ product.name }}</dd>
+      <dt>{% translate "Made by" %}</dt><dd>{{ product.company.legal_name }}</dd>
+    </dl>
+
+    {% if not user.is_authenticated %}
+      <p>{% blocktranslate trimmed with email=transfer.to_email %}To keep it, enter with your account of {{ email }}. If you have none, create it with that email and then open this link again.{% endblocktranslate %}</p>
+      <p><a class="btn btn--primary btn--block" href="{% url 'accounts:login' %}?next={{ next|urlencode }}">{% translate "Enter" %}</a></p>
+      <p><a class="btn btn--block" href="{% url 'accounts:register' %}">{% translate "Create my account" %}</a></p>
+    {% elif wrong_account %}
+      <p class="notice notice--warning" role="alert">{% blocktranslate trimmed with email=transfer.to_email %}This product was handed to {{ email }}. Leave this account and enter with that one.{% endblocktranslate %}</p>
+    {% else %}
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--primary btn--block">{% translate "Keep it in my account" %}</button>
+      </form>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

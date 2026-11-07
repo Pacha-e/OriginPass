@@ -91,7 +91,7 @@ class VerifyPageTests(TestCase):
         response = self.client.get(self._url())
         self.assertContains(response, "Recorrido de este producto")
         self.assertContains(response, "Sacó el pasaporte")
-        self.assertContains(response, "Comprador particular")
+        self.assertContains(response, "Una persona")
         self.assertContains(response, "Sold in Montería")
         self.assertNotContains(response, "buyer@example.com")
         self.assertNotContains(response, "maker@tuchin.co")

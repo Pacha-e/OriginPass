@@ -1779,6 +1779,29 @@ tbody tr:hover {
   color: var(--anil);
 }
 
+/* Handovers to an address that are waiting for the person to keep them. */
+.waiting-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.waiting-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--cana-soft);
+}
+.waiting-list__item .muted {
+  overflow-wrap: anywhere;
+}
+.waiting-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 /* The receiver's screen: the piece first, then the box for the code. */
 .receive__piece {
   display: flex;

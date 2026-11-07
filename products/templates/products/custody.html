@@ -59,4 +59,27 @@
     </table>
   </div>
 </div>
+{% if waiting_by_email %}
+  <div class="card">
+    <div class="card__head">
+      <h2>{% translate "Sent by email, not kept yet" %}</h2>
+      <p>{% translate "The person still has to open the link in the message. If the email was wrong, correct it." %}</p>
+    </div>
+    <ul class="waiting-list">
+      {% for transfer in waiting_by_email %}
+        <li class="waiting-list__item">
+          <strong>{{ transfer.product.name }}</strong>
+          <span class="muted">{{ transfer.to_email }}</span>
+          <span class="waiting-list__actions">
+            <form method="post" action="{% url 'products:resend_email' transfer.product.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn">{% translate "Send again" %}</button>
+            </form>
+            <a class="btn" href="{% url 'products:correct_email' transfer.product.pk %}">{% translate "Correct the email" %}</a>
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
 {% endblock %}

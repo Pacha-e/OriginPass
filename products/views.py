@@ -281,7 +281,7 @@ def product_create(request, company):
             product.product_type = PRODUCT_TYPE_BY_COMPANY_TYPE[company.company_type]
             try:
                 # The model owns the rule; the view only reports what it says.
-                product.full_clean(exclude=["passport_code", "integrity_hash"])
+                product.full_clean(exclude=["passport_code", "integrity_hash", "line"])
             except ValidationError as error:
                 form.add_error(None, error)
             else:

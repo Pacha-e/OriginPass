@@ -93,10 +93,39 @@ class ProductQuerySet(models.QuerySet):
         )
 
 
+class ProductLine(models.Model):
+    """What a company makes, registered once: "Sombrero vueltiao 21 vueltas".
+
+    Each physical unit still gets its own passport (`Product`), which copies the
+    line's identifying fields when it is issued. The copy is deliberate: the
+    passport's signature covers what a buyer reads, so editing the line later
+    changes the passports issued after the edit and never the ones already out.
+    """
+
+    company = models.ForeignKey("companies.Company", on_delete=models.PROTECT, related_name="lines")
+    product_type = models.CharField(max_length=32, choices=ProductType.choices)
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=100)
+    origin = models.CharField(max_length=200, help_text=_("Place of manufacture."))
+    image = models.ImageField(upload_to="product-images/", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     company = models.ForeignKey(
         "companies.Company", on_delete=models.PROTECT, related_name="products"
     )
+    # Outside the signature: which line a passport was issued from is
+    # bookkeeping for the company, not something a buyer relies on.
+    line = models.ForeignKey(ProductLine, on_delete=models.PROTECT, related_name="passports")
     passport_code = models.CharField(
         max_length=64, unique=True, db_index=True, default=generate_passport_code
     )
@@ -139,6 +168,22 @@ class Product(models.Model):
         registration an extra UPDATE.
         """
         self.integrity_hash = self.compute_integrity_hash()
+
+        if self.line_id is None:
+            # A passport registered on its own, the way every product was
+            # before lines existed, becomes a line of one unit.
+            with transaction.atomic():
+                self.line = ProductLine.objects.create(
+                    company=self.company,
+                    product_type=self.product_type,
+                    name=self.name,
+                    description=self.description,
+                    category=self.category,
+                    origin=self.origin,
+                    image=self.image,
+                )
+                super().save(*args, **kwargs)
+            return
 
         # A caller changing one column still needs the signature to follow it,
         # or an edit through `update_fields` would leave the row looking

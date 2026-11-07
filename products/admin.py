@@ -39,6 +39,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ["status", "product_type", "category"]
     readonly_fields = [
         "passport_code",
+        "line",
         "status",
         "revocation_reason",
         "integrity_hash",

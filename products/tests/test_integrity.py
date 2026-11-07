@@ -5,6 +5,7 @@ import hashlib
 
 from django.db import connection
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 
 # ---- Internal imports ----
 from products.models import Product
@@ -73,8 +74,16 @@ class IntegrityHashTests(TestCase):
         Every field it covers is known before the row reaches the database, so
         a second UPDATE per registration buys nothing.
         """
-        with self.assertNumQueries(1):
+        with CaptureQueriesContext(connection) as queries:
             make_product(self.company)
+
+        product_writes = [
+            query["sql"]
+            for query in queries.captured_queries
+            if '"products_product"' in query["sql"].split(" WHERE ")[0]
+            and query["sql"].lstrip().upper().startswith(("INSERT", "UPDATE"))
+        ]
+        self.assertEqual(len(product_writes), 1, product_writes)
 
     def test_the_signature_does_not_verify_under_another_key(self):
         product = make_product(self.company)

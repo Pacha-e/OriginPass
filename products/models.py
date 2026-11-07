@@ -49,6 +49,10 @@ class TransferState(models.TextChoices):
 
 # ---- Constants ----
 
+#: Enough for a week of a large workshop's output; a mistyped count of 2000
+#: is refused rather than issued.
+MAX_PASSPORTS_PER_ISSUE = 200
+
 #: A commercial company issues commercial originals, an artisan workshop issues
 #: artisan pieces. Crossing them is the TipoProductoInvalido error of the
 #: prototype contract.
@@ -117,6 +121,34 @@ class ProductLine(models.Model):
 
     def __str__(self):
         return self.name
+
+    def issue_passports(self, count, actor):
+        """Give `count` finished units of this line a passport each, all or none.
+
+        Every passport copies the line's identifying fields and is signed on its
+        own, and every one is recorded in the trail, the same as a passport
+        registered by hand.
+        """
+        if not 1 <= count <= MAX_PASSPORTS_PER_ISSUE:
+            raise ValueError(f"Between 1 and {MAX_PASSPORTS_PER_ISSUE} passports at a time.")
+        if self.company.status != CompanyStatus.APPROVED:
+            raise ValueError("Only an approved company can issue passports.")
+
+        with transaction.atomic():
+            passports = []
+            for _unit in range(count):
+                passport = Product.objects.create(
+                    company=self.company,
+                    line=self,
+                    product_type=self.product_type,
+                    name=self.name,
+                    description=self.description,
+                    category=self.category,
+                    origin=self.origin,
+                )
+                AuditEntry.record(actor=actor, action=Action.PRODUCT_REGISTERED, target=passport)
+                passports.append(passport)
+        return passports
 
 
 class Product(models.Model):

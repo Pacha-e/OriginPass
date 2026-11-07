@@ -14,8 +14,8 @@ from django.urls import reverse
 from PIL import Image
 
 # ---- Internal imports ----
-from products.management.commands.export_passport_qr import QR_SIZE
 from products.models import ProductStatus
+from products.qr import QR_SIZE
 from test_support.factories import make_admin, make_company, make_product, make_user
 
 BASE = "http://54.12.34.56"

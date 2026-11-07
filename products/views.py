@@ -609,12 +609,13 @@ def _refuse(request, company, heading, reason):
 def _revoke(request, product, form):
     """Revoke, tell the holder (FR55) and report. Shared by company and admin."""
     holder = product.current_holder
+    holder_email = holder.email if holder else product.holder_email
     try:
         product.revoke(actor=request.user, reason=form.cleaned_data["reason"])
     except ValueError:
         messages.info(request, _("This passport had already been revoked."))
         return
-    notify_revocation(product, holder)
+    notify_revocation(product, holder_email)
     messages.success(request, _("%(product)s has been revoked.") % {"product": product.name})
 
 

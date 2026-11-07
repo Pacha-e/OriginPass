@@ -558,6 +558,24 @@ class CustodyTransfer(models.Model):
             AuditEntry.record(actor=actor or self.to_holder, action=action, target=self)
 
 
+class HandoverAttempt(models.Model):
+    """One wrong handover code typed for a piece or a batch (see products.handover).
+
+    Kept in the database rather than in a cache, so every worker process of the
+    server counts the same failures.
+    """
+
+    subject = models.CharField(max_length=16)
+    subject_id = models.PositiveIntegerField()
+    failed_at = models.DateTimeField()
+
+    class Meta:
+        indexes = [models.Index(fields=["subject", "subject_id", "failed_at"])]
+
+    def __str__(self):
+        return f"{self.subject} #{self.subject_id} at {self.failed_at:%Y-%m-%d %H:%M}"
+
+
 # ---- Private helpers ----
 
 

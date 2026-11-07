@@ -162,6 +162,16 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 # deployment names its SMTP or transactional backend in the environment.
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "OriginPass <no-reply@originpass.co>")
+# The SMTP connection, used when EMAIL_BACKEND names the SMTP backend. The
+# password is an app password kept in the deployment's environment file, never
+# in the repository. With Gmail the sender is the account's own address, shown
+# with the name given in DEFAULT_FROM_EMAIL.
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_flag("EMAIL_USE_TLS", "True")
+EMAIL_TIMEOUT = 15
 
 # ---- Scan geolocation ----
 

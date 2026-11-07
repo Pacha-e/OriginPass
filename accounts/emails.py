@@ -47,17 +47,18 @@ def notify_company_decision(company):
     )
 
 
-def notify_revocation(product, holder):
+def notify_revocation(product, holder_email):
     """FR55: the holder at the moment of revocation is told why.
 
-    The holder is passed in rather than read from the product, because it has to
-    be the one who held the product when it was revoked.
+    The address is passed in rather than read from the product, because it has
+    to be the one that held the product when it was revoked. It is an account's
+    address or, for a person without an account, the address holding the piece.
     """
     _send(
         _("A product you hold has been revoked"),
         "products/email/product_revoked.txt",
         {"product_name": product.name, "reason": product.revocation_reason},
-        holder.email,
+        holder_email,
     )
 
 

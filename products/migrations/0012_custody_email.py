@@ -35,6 +35,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='custodytransfer',
+            constraint=models.CheckConstraint(condition=models.Q(('from_email', ''), models.Q(('from_email', models.F('to_email')), _negated=True), _connector='OR'), name='custody_transfer_changes_email'),
+        ),
+        migrations.AddConstraint(
+            model_name='custodytransfer',
             constraint=models.CheckConstraint(condition=models.Q(models.Q(('from_holder__isnull', False), ('from_email', '')), models.Q(('from_holder__isnull', True), models.Q(('from_email', ''), _negated=True)), _connector='OR'), name='custody_transfer_one_sender'),
         ),
         migrations.AddConstraint(

@@ -26,7 +26,7 @@ def decline_open_offers(apps, schema_editor):
         now = timezone.now()
         CustodyTransfer.objects.filter(pk=offer.pk).update(state="DECLINED", resolved_at=now)
 
-        last = AuditEntry.objects.order_by("-id").first()
+        last = AuditEntry.objects.select_for_update().order_by("-id").first()
         previous = last.entry_hash if last else GENESIS
         entry = AuditEntry(
             actor_id=None,

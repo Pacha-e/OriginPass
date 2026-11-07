@@ -409,6 +409,10 @@ class CustodyTransfer(models.Model):
                 name="custody_transfer_changes_holder",
             ),
             models.CheckConstraint(
+                condition=Q(from_email="") | ~Q(from_email=models.F("to_email")),
+                name="custody_transfer_changes_email",
+            ),
+            models.CheckConstraint(
                 condition=(Q(from_holder__isnull=False) & Q(from_email=""))
                 | (Q(from_holder__isnull=True) & ~Q(from_email="")),
                 name="custody_transfer_one_sender",
@@ -465,10 +469,9 @@ class CustodyTransfer(models.Model):
         """FR38 and FR39, with the reason a person can act on."""
         if self.product_id and self.product.status == ProductStatus.REVOKED:
             raise ValidationError(_("A revoked product cannot change hands."))
-        if self.from_holder_id == self.to_holder_id:
+        if (self.from_holder_id, self.from_email) == (self.to_holder_id, self.to_email):
             raise ValidationError(_("A product cannot be transferred to its current holder."))
-        holder = self.product.current_holder if self.product_id else None
-        if self.product_id and (holder is None or self.from_holder_id != holder.pk):
+        if self.product_id and not self._sender_holds_product():
             raise ValidationError(_("Only the current holder can transfer this product."))
         if (
             self.product_id
@@ -480,6 +483,13 @@ class CustodyTransfer(models.Model):
             raise ValidationError(
                 _("This product already has an open offer. It has to be answered first.")
             )
+
+    def _sender_holds_product(self):
+        """The sending end, account or address, is the one holding the product now."""
+        if self.from_holder_id is not None:
+            holder = self.product.current_holder
+            return holder is not None and holder.pk == self.from_holder_id
+        return self.product.current_holder is None and self.from_email == self.product.holder_email
 
     def decline(self, actor=None):
         self._resolve(TransferState.DECLINED, Action.CUSTODY_DECLINED, actor)

@@ -1,8 +1,11 @@
 """Custody can rest on an email address, and the old chains survive the change."""
 
+from django.core import mail
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, transaction
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase, TransactionTestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from audit.integrity import GENESIS, sign
@@ -111,3 +114,65 @@ class MigrationTests(TransactionTestCase):
         self.assertEqual(AuditEntry.verify_chain(), (True, None))
         product = Product.objects.get(pk=self.product_id)
         self.assertEqual(CustodyTransfer.verify_chain(product), (True, None))
+
+
+class EmailHolderEdgeTests(TestCase):
+    """Found by review: paths where an end of the handover is an address."""
+
+    def setUp(self):
+        self.product = make_product()
+        self.maker = self.product.company.owner
+        CustodyTransfer.objects.create(
+            product=self.product,
+            from_holder=self.maker,
+            to_email="ana@correo.co",
+            state=TransferState.ACCEPTED,
+            resolved_at=timezone.now(),
+        )
+
+    def test_revoking_a_piece_held_by_an_address_tells_that_address(self):
+        self.client.force_login(self.maker)
+
+        response = self.client.post(
+            reverse("products:product_revoke", args=[self.product.pk]),
+            {"reason": "Se perdió en el viaje."},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual([message.to for message in mail.outbox], [["ana@correo.co"]])
+
+    def test_address_holder_may_hand_over_to_another_address(self):
+        transfer = CustodyTransfer(
+            product=self.product, from_email="ana@correo.co", to_email="luis@correo.co"
+        )
+        transfer.clean()
+
+    def test_an_address_that_does_not_hold_the_piece_cannot_hand_it_over(self):
+        transfer = CustodyTransfer(
+            product=self.product, from_email="otra@correo.co", to_email="luis@correo.co"
+        )
+        with self.assertRaises(ValidationError):
+            transfer.clean()
+
+    def test_check_refuses_handing_from_an_address_to_itself(self):
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            CustodyTransfer.objects.create(
+                product=self.product, from_email="ana@correo.co", to_email="ana@correo.co"
+            )
+
+
+class ResignRefusesAlteredChainTests(MigrationTests):
+    def test_resign_refuses_a_chain_already_altered(self):
+        self.OldTransfer.objects.filter(pk=self.accepted_id).update(note="cambiado a mano")
+
+        with self.assertRaisesMessage(RuntimeError, f"#{self.accepted_id}"):
+            self._migrate(AFTER_RESIGN)
+
+        # Undo the tampering so tearDown can migrate forward again.
+        self.OldTransfer.objects.filter(pk=self.accepted_id).update(note="")
+
+    def test_old_chains_verify_after_resign(self):
+        """Inherited; runs once in the parent."""
+
+    def test_open_offers_are_declined_with_note(self):
+        """Inherited; runs once in the parent."""

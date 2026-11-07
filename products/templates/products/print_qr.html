@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Print QR codes" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Print QR codes" %}</h1>
+    <p>{% translate "Choose the products whose codes you want. You get a PDF with 12 codes on each Letter page." %}</p>
+  </div>
+  {% if error %}<p class="notice notice--danger" role="alert">{{ error }}</p>{% endif %}
+  {% if groups %}
+    <form method="post">
+      {% csrf_token %}
+      {% for line, products in groups %}
+        <section class="spaced" data-group>
+          <h2>{{ line.name }}</h2>
+          <button type="button" class="btn btn--block" data-mark-group>{% translate "Mark all of this product" %}</button>
+          <ul class="pick-list">
+            {% for product in products %}
+              <li><label class="pick-list__item"><input type="checkbox" name="product" value="{{ product.pk }}"> <span>{{ product.name }}</span></label></li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+      <button type="submit" class="btn btn--primary btn--block">{% translate "Download the PDF" %}</button>
+    </form>
+  {% else %}
+    <p class="muted">{% translate "You have no active passports to print." %}</p>
+  {% endif %}
+  <p class="spaced"><a class="btn" href="{% url 'products:custody' %}">{% translate "Back" %}</a></p>
+</div>
+
+<script>
+  document.querySelectorAll("[data-mark-group]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      button.closest("[data-group]").querySelectorAll("input[name=product]").forEach(function (box) {
+        box.checked = true;
+      });
+    });
+  });
+</script>
+{% endblock %}

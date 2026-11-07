@@ -2,7 +2,7 @@
 from django.urls import path
 
 # ---- Internal imports ----
-from . import views
+from . import handover_views, views
 
 # ---- Constants ----
 
@@ -23,4 +23,11 @@ urlpatterns = [
     path("<int:pk>/qr/", views.qr_download, name="qr_download"),
     path("<int:pk>/transfer/", views.transfer_initiate, name="transfer_initiate"),
     path("<int:pk>/revoke/", views.product_revoke, name="product_revoke"),
+    path("<int:pk>/entregar/", handover_views.handover, name="handover"),
+    path(
+        "<int:pk>/entregar/codigo.json",
+        handover_views.handover_code_json,
+        name="handover_code",
+    ),
+    path("recibir/<str:passport_code>/", handover_views.receive, name="receive"),
 ]

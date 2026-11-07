@@ -96,8 +96,8 @@
   {% elif product.status == "ACTIVE" and is_holder %}
     <div class="action-bar">
       <span class="tip tip--start">
-        <a class="btn btn--primary" href="{% url 'products:transfer_initiate' product.pk %}" aria-describedby="tip-transfer">{% translate "Transfer this piece" %}</a>
-        <span class="tip__text" id="tip-transfer" role="tooltip">{% translate "Hand this product to another person or business: a distributor, a shop or the buyer." %}</span>
+        <a class="btn btn--primary" href="{% url 'products:handover' product.pk %}" aria-describedby="tip-transfer">{% translate "Hand over in person" %}</a>
+        <span class="tip__text" id="tip-transfer" role="tooltip">{% translate "Show the QR and the code on your phone to the person receiving it: a distributor, a shop or the buyer." %}</span>
       </span>
     </div>
   {% endif %}

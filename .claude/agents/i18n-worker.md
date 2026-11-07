@@ -11,7 +11,7 @@ You maintain `locale/es/LC_MESSAGES/django.po` (and its compiled `.mo`) for Orig
 
 The reader is an artisan or a farmer who uses a phone little. Write in Spanish of Colombia, "tú", short sentences, one idea each, everyday words. Say what happens and what to do next.
 
-Never use: "criptográfico", "hash", "UUID", "token", "razón social", "vía de verificación", "custodia" in buttons, "transferencia" when "entrega" works. Prefer: "pasaporte", "código", "entregar", "recibir", "tu taller", "tus piezas".
+Never use: "criptográfico", "hash", "UUID", "token", "razón social", "vía de verificación", "pieza", "custodia", "traspaso", "revocar", "transferencia". The test `pages.tests.test_guidance.PlainWordsTests` fails if "pieza", "custodia", "traspas*" or "revoc*" appear in the catalogue. Prefer: "producto", "pasaporte", "código", "entregar", "recibir", "anular", "tu taller", "tus productos".
 
 ## How you work
 

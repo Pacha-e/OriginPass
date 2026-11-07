@@ -491,6 +491,36 @@ class CustodyTransfer(models.Model):
             return holder is not None and holder.pk == self.from_holder_id
         return self.product.current_holder is None and self.from_email == self.product.holder_email
 
+    @classmethod
+    def record_handover(cls, product, *, actor, to_holder=None, to_email="", note=""):
+        """Write a handover that already happened in person, as one accepted link.
+
+        The piece is locked first, so two receivers typing the same code at once
+        are answered one after the other and the second finds the holder changed.
+        Whoever holds it now, account or address, is the sender.
+        """
+        with transaction.atomic():
+            product = Product.objects.select_for_update().get(pk=product.pk)
+            if product.status == ProductStatus.REVOKED:
+                raise ValidationError(_("A revoked product cannot change hands."))
+            holder = product.current_holder
+            now = timezone.now()
+            transfer = cls(
+                product=product,
+                from_holder=holder,
+                from_email="" if holder is not None else product.holder_email,
+                to_holder=to_holder,
+                to_email=to_email,
+                note=note,
+                state=TransferState.ACCEPTED,
+                created_at=now,
+                resolved_at=now,
+            )
+            transfer.clean()
+            transfer.save()
+            AuditEntry.record(actor=actor, action=Action.CUSTODY_ACCEPTED, target=transfer)
+            return transfer
+
     def decline(self, actor=None):
         self._resolve(TransferState.DECLINED, Action.CUSTODY_DECLINED, actor)
 

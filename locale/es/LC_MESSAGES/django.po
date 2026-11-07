@@ -1706,3 +1706,81 @@ msgstr "Este producto fue anulado después de hacerse la oferta, así que no se 
 
 msgid "Your password was saved. You stay signed in on this device."
 msgstr "Tu contraseña fue guardada. Sigues con la sesión iniciada en este dispositivo."
+
+msgid "That code does not work. Ask for the code shown right now on the screen of whoever is giving you the piece."
+msgstr "Ese código no sirve. Pídele a quien te entrega el producto el código que ve ahora en su pantalla."
+
+msgid "A person"
+msgstr "Una persona"
+
+msgid "This passport was revoked, so this piece cannot change hands."
+msgstr "Este pasaporte fue anulado. Este producto ya no se puede entregar."
+
+msgid "Too many wrong codes for this piece. Try again in 15 minutes."
+msgstr "Se escribieron muchos códigos equivocados para este producto. Intenta otra vez en 15 minutos."
+
+msgid "It is yours already: %(product)s."
+msgstr "Ya es tuyo: %(product)s."
+
+msgid "It is yours now: %(product)s."
+msgstr "Ya es tuyo: %(product)s."
+
+msgid "Hand over"
+msgstr "Entregar"
+
+msgid "Hand over: %(product)s"
+msgstr "Entregar: %(product)s"
+
+msgid "Show this screen to the person receiving the piece."
+msgstr "Muéstrale esta pantalla a quien recibe el producto."
+
+msgid "They read this QR with their phone, or the one on the label."
+msgstr "Esa persona lee este QR con su celular, o el de la etiqueta."
+
+msgid "Tell them the code below. Only you can see it."
+msgstr "Dile el código de abajo. Solo tú lo ves."
+
+msgid "QR code of this piece"
+msgstr "Código QR de este producto"
+
+msgid "Handover code"
+msgstr "Código de entrega"
+
+msgid "The code changes every 2 minutes and stops working as soon as the piece is handed over."
+msgstr "El código cambia cada 2 minutos y deja de servir apenas entregas el producto."
+
+msgid "Back"
+msgstr "Volver"
+
+msgid "Receive a piece"
+msgstr "Recibir un producto"
+
+msgid "Receive this piece?"
+msgstr "¿Recibir este producto?"
+
+msgid "Check that it is the piece you have in your hand."
+msgstr "Revisa que sea el producto que tienes en la mano."
+
+msgid "Piece"
+msgstr "Producto"
+
+msgid "Has it now"
+msgstr "Lo tiene ahora"
+
+msgid "Code the other person tells you"
+msgstr "Código que te dice la otra persona"
+
+msgid "Yes, receive it"
+msgstr "Sí, recibirlo"
+
+msgid "Receive this piece"
+msgstr "Recibir este producto"
+
+msgid "Only if the person who has it is handing it to you now."
+msgstr "Solo si quien lo tiene te lo está entregando ahora."
+
+msgid "Hand over in person"
+msgstr "Entregar en persona"
+
+msgid "Show the QR and the code on your phone to the person receiving it: a distributor, a shop or the buyer."
+msgstr "Muestra el QR y el código en tu celular a quien la recibe: un distribuidor, una tienda o quien compra."

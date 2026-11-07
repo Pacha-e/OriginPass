@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 # ---- Internal imports ----
@@ -47,7 +48,22 @@ class LoginForm(forms.Form):
         return self.user
 
 
+class AccountKind(models.TextChoices):
+    """What the new account is for. It only decides where the account goes next:
+    a business applies, a person holds products. The role stays HOLDER until a
+    business sends its application."""
+
+    BUSINESS = "business", _("I make or sell products")
+    PERSON = "person", _("I buy or keep products")
+
+
 class RegistrationForm(forms.ModelForm):
+    kind = forms.ChoiceField(
+        label=_("What will you use OriginPass for?"),
+        choices=AccountKind.choices,
+        widget=forms.RadioSelect,
+        error_messages={"required": _("Choose one of the two options.")},
+    )
     password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput, strip=False)
     password2 = forms.CharField(
         label=_("Confirm password"), widget=forms.PasswordInput, strip=False

@@ -5,7 +5,7 @@
 
 {% block auth %}
 <h1>{% translate "Create an account" %}</h1>
-<p class="muted">{% translate "An account lets you apply as a company and manage your passports." %}</p>
+<p class="muted">{% translate "It takes one minute. Afterwards you go straight in." %}</p>
 
 <form method="post" novalidate>
   {% csrf_token %}
@@ -13,6 +13,31 @@
   {% for error in form.non_field_errors %}
     <div class="form-error" role="alert">{{ error }}</div>
   {% endfor %}
+
+  {% comment %}
+  The two kinds of account, as two big cards that are touched whole. The radio
+  stays a real radio, so the keyboard and screen readers work as usual.
+  {% endcomment %}
+  <fieldset class="kind-choice{% if form.kind.errors %} field-row--invalid{% endif %}">
+    <legend>{{ form.kind.label }}</legend>
+    {% for option in form.kind %}
+      <label class="kind-choice__card" for="{{ option.id_for_label }}">
+        {{ option.tag }}
+        <span class="choice__icon" aria-hidden="true">
+          {% if option.data.value == "business" %}
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="16" rx="10" ry="4"/><path d="M7 15V9a5 5 0 0 1 10 0v6"/><path d="M7 11.5h10"/></svg>
+          {% else %}
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>
+          {% endif %}
+        </span>
+        <span class="kind-choice__text">
+          <strong>{{ option.choice_label }}</strong>
+          <span>{% if option.data.value == "business" %}{% translate "A workshop, a company or a shop. You will register it next." %}{% else %}{% translate "You receive products and can check or pass them on." %}{% endif %}</span>
+        </span>
+      </label>
+    {% endfor %}
+    {% for error in form.kind.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </fieldset>
 
   {% include "partials/field.html" with field=form.email %}
   {% include "partials/field.html" with field=form.password1 %}

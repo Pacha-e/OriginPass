@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 # ---- Internal imports ----
-from .forms import AUTHENTICATION_ERROR, LoginForm, RegistrationForm
+from .forms import AUTHENTICATION_ERROR, AccountKind, LoginForm, RegistrationForm
 from .models import LoginAttempt
 
 # ---- Public API ----
@@ -81,11 +81,16 @@ def register(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, _("Your account has been created. You can now log in."))
-            return redirect("accounts:login")
+            user = form.save()
+            login(request, user)
+            messages.success(request, _("Your account has been created."))
+            if form.cleaned_data["kind"] == AccountKind.BUSINESS:
+                return redirect("companies:application_create")
+            return redirect("products:custody")
     else:
-        form = RegistrationForm()
+        # The home page links here already knowing which door the visitor took.
+        kind = request.GET.get("kind")
+        form = RegistrationForm(initial={"kind": kind} if kind in AccountKind.values else None)
 
     return render(request, "accounts/register.html", {"form": form})
 

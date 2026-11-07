@@ -2023,3 +2023,27 @@ msgstr "Imprimir en hojas"
 
 msgid "Choose at least one product to print."
 msgstr "Marca al menos un producto para imprimir."
+
+msgid "I make or sell products"
+msgstr "Hago o vendo productos"
+
+msgid "I buy or keep products"
+msgstr "Compro o guardo productos"
+
+msgid "What will you use OriginPass for?"
+msgstr "¿Para qué vas a usar OriginPass?"
+
+msgid "Choose one of the two options."
+msgstr "Elige una de las dos opciones."
+
+msgid "It takes one minute. Afterwards you go straight in."
+msgstr "Toma un minuto. Al terminar, entras de una vez."
+
+msgid "A workshop, a company or a shop. You will register it next."
+msgstr "Un taller, una empresa o una tienda. Después la inscribes."
+
+msgid "You receive products and can check or pass them on."
+msgstr "Recibes productos y puedes revisarlos o entregarlos a otra persona."
+
+msgid "Your account has been created."
+msgstr "Tu cuenta quedó creada."

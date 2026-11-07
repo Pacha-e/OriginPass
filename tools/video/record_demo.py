@@ -86,6 +86,7 @@ def main():
         # --- the company applies -------------------------------------------
         page.goto(f"{BASE}/accounts/register/")
         beat(page, 1.4)
+        page.check("input[name=kind][value=business]")
         type_slowly(page, "#id_email", EMAIL)
         type_slowly(page, "#id_password1", PASSWORD)
         type_slowly(page, "#id_password2", PASSWORD)
@@ -98,12 +99,7 @@ def main():
                 + page.locator(".form-error").all_inner_texts()
             )
             raise SystemExit(f"registration was refused: {errors or page.inner_text('form')}")
-        beat(page, 1.0)
-
-        type_slowly(page, "#id_email", EMAIL)
-        type_slowly(page, "#id_password", PASSWORD)
-        submit(page)
-        page.wait_for_load_state("networkidle")
+        # registration signs the account in and opens the application form
         beat(page, 1.6)
 
         # the two verification tracks

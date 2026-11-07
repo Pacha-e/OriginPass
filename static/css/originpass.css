@@ -1005,6 +1005,52 @@ tbody tr:hover {
   color: var(--ink-soft);
 }
 
+/* The account kind at registration: two cards touched whole, the radio inside. */
+.kind-choice {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  border: 0;
+}
+.kind-choice legend {
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+.kind-choice__card {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  min-height: 72px;
+  padding: var(--space-4);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-doc);
+  background: var(--surface);
+  cursor: pointer;
+}
+.kind-choice__card input {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  accent-color: var(--anil);
+}
+.kind-choice__card:has(input:checked) {
+  border-color: var(--anil);
+  background: var(--anil-wash);
+}
+.kind-choice__card:has(input:focus-visible) {
+  outline: 3px solid var(--anil);
+  outline-offset: 2px;
+}
+.kind-choice__text strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+.kind-choice__text span {
+  color: var(--ink-soft);
+}
+
 .thumb {
   display: block;
   width: 56px;

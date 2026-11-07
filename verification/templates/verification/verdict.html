@@ -45,6 +45,12 @@ distinguish these colours reads the same answer as everyone else.
       {{ product.revocation_reason }}
     </p>
   {% endif %}
+  {% if verdict == "GENUINE" %}
+    <p class="verdict__action">
+      <a class="btn btn--primary" href="{% url 'products:receive' product.passport_code %}">{% translate "Receive this piece" %}</a>
+      <span class="muted">{% translate "Only if the person who has it is handing it to you now." %}</span>
+    </p>
+  {% endif %}
 </section>
 
 {% if product %}

@@ -25,7 +25,7 @@
 - **Migraciones con restricciones.** Antes de un `CHECK` o `UNIQUE` nuevo, contar las filas que lo violan. Si hay alguna, la migración se hace en tres pasos: permisivo, corregir datos, endurecer.
 - **Textos.**
   - Todo texto visible va en `{% translate %}` o `_()`, con el msgid en inglés y la traducción en `locale/es/LC_MESSAGES/django.po`.
-  - La traducción tiene que tutear, usar frases cortas y ningún tecnicismo. Quedan prohibidas en la interfaz: «criptográfico», «hash», «UUID», «token», «razón social» y «vía de verificación».
+  - La traducción tiene que tutear, usar frases cortas y ningún tecnicismo. Quedan prohibidas en la interfaz: «criptográfico», «hash», «UUID», «token», «razón social», «vía de verificación», y además «pieza», «custodia», «traspaso» y «revocar» (la prueba `pages.tests.test_guidance.PlainWordsTests` falla si aparecen en el catálogo). Se dice «producto», «entregar», «recibir» y «anular».
 - **Íconos.** Nada de emojis ni librerías de íconos. Solo el sprite propio de la Tarea 12.
 - **Código de entrega.**
   - 6 dígitos que cambian cada **120 s**, con **15 s** de gracia.
@@ -353,7 +353,7 @@ El orquestador revisa cada tarea de un worker antes de hacer commit.
 
 **Interfaces:**
 - `RegistrationForm` recibe el campo `kind` con las opciones `"business"` y `"person"`, presentadas como dos tarjetas grandes con ícono.
-- Después de guardar se llama a `login()`. Si `kind == "business"`, redirige a `companies:application_wizard`; si es `"person"`, a `products:custody` («Mis piezas»).
+- Después de guardar se llama a `login()`. Si `kind == "business"`, redirige a `companies:application_wizard`; si es `"person"`, a `products:custody` («Mis productos»).
 - El rol sigue siendo `HOLDER` hasta que se envía la solicitud, como hoy en `companies/views.py:51`.
 
 - [ ] **Paso 1:** Escribir las pruebas:
@@ -409,7 +409,7 @@ El orquestador revisa cada tarea de un worker antes de hacer commit.
   - Motivos: anillos y trenza del logo, sombrero, manos.
   - Se usan como `<svg aria-hidden="true"><use href="#icon-…"/></svg>`, siempre acompañados de su palabra.
 - Pestañas de empresa: Productos (`products:product_list`), Imprimir QR (`products:print_qr`), Entregas (`products:custody`) y Mi taller (`companies:application_detail`).
-- Pestañas de persona: Mis piezas (`products:custody`), Recibir (`verification:lookup`, el lector de QR) y Mi cuenta.
+- Pestañas de persona: Mis productos (`products:custody`), Recibir (`verification:lookup`, el lector de QR) y Mi cuenta.
 - Visitante: sin barra.
 - En pantallas de 768 px o más, la barra pasa a ser el menú superior. El correo y «Cambiar contraseña» salen de la cabecera y van dentro de Mi taller o Mi cuenta.
 - La pestaña activa lleva `aria-current="page"`.

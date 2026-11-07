@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Receive a piece" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <div class="card__head">
+    <h1>{% translate "Receive this piece?" %}</h1>
+    <p>{% translate "Check that it is the piece you have in your hand." %}</p>
+  </div>
+
+  <div class="receive__piece">
+    {% if product.line.image %}
+      <img class="receive__photo" src="{{ product.line.image.url }}" alt="{{ product.name }}" width="96" height="96">
+    {% elif product.image %}
+      <img class="receive__photo" src="{{ product.image.url }}" alt="{{ product.name }}" width="96" height="96">
+    {% endif %}
+    <dl class="receive__facts">
+      <dt>{% translate "Piece" %}</dt><dd>{{ product.name }}</dd>
+      <dt>{% translate "Made by" %}</dt><dd>{{ product.company.legal_name }}</dd>
+      <dt>{% translate "Has it now" %}</dt><dd>{{ holder_name }}</dd>
+    </dl>
+  </div>
+
+  {% if error %}
+    <p class="notice notice--danger" role="alert">{{ error }}</p>
+  {% endif %}
+
+  {% if product.status != "REVOKED" %}
+    <form method="post" class="receive__form">
+      {% csrf_token %}
+      <label for="id_code">{% translate "Code the other person tells you" %}</label>
+      <input id="id_code" name="code" class="receive__code" inputmode="numeric" autocomplete="one-time-code"
+             maxlength="7" placeholder="000 000" required>
+      <button type="submit" class="btn btn--primary btn--block">{% translate "Yes, receive it" %}</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

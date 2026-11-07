@@ -43,6 +43,16 @@ def handover_code(subject, subject_id, holder_key, counter, at):
     return _code(subject, subject_id, holder_key, counter, _window(at))
 
 
+def product_code_args(product):
+    """What a piece's code is made from: its id, its holder now and its handovers so far."""
+    from products.models import TransferState
+
+    holder = product.current_holder
+    holder_key = str(holder.pk) if holder is not None else f"email:{product.holder_email}"
+    counter = product.custody_transfers.filter(state=TransferState.ACCEPTED).count()
+    return ("product", product.pk, holder_key, counter)
+
+
 def seconds_left(at):
     """Seconds until the code shown at `at` changes, from WINDOW_SECONDS down to 1."""
     return WINDOW_SECONDS - int(at.timestamp()) % WINDOW_SECONDS

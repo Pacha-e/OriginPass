@@ -9,7 +9,7 @@ You implement ONE task of `docs/superpowers/plans/2026-11-07-originpass-para-art
 
 ## Rules that are never negotiable
 
-- Plain Spanish for the user, through `{% translate %}` / `_()` with the msgid in English. Short sentences, "tú", one idea each. Never "criptográfico", "hash", "UUID", "token", "razón social", "vía de verificación".
+- Plain Spanish for the user, through `{% translate %}` / `_()` with the msgid in English. Short sentences, "tú", one idea each. Never "criptográfico", "hash", "UUID", "token", "razón social", "vía de verificación", "pieza", "custodia", "traspaso", "revocar" (a test fails on the last four): say "producto", "entregar", "recibir", "anular".
 - No emojis and no icon libraries. Icons come only from `templates/partials/icons.html` (`<svg aria-hidden="true"><use href="#icon-…"/></svg>`) and always sit next to their word.
 - Mobile first at 390 px: nothing overflows horizontally, touch targets at least 44 px, no tables wider than the screen (use cards).
 - Brand: añil `#1E2B58` for headings and primary actions, caña flecha `#D9C28A` only as fill or accent, never as text. Use the CSS custom properties already in `static/css/originpass.css`.

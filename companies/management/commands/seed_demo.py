@@ -139,8 +139,7 @@ APPLICATIONS = [
 BUYER_EMAIL = "comprador@correo.co"
 
 #: The custody story the demo tells, for the passport named here: the workshop
-#: hands it to the distributor, the distributor sells it to a buyer. The second
-#: passport is left with an open offer, so its transfer code can be shown.
+#: hands it to the distributor, the distributor sells it to a buyer.
 CUSTODY_STORY = {
     "product": "Sombrero vueltiao 21 vueltas",
     "handovers": [
@@ -148,8 +147,6 @@ CUSTODY_STORY = {
         ("contacto@labonga.co", BUYER_EMAIL, "Vendido en la tienda de Cartagena."),
     ],
 }
-
-OPEN_OFFER = ("Sombrero vueltiao 15 vueltas", "taller@tuchin.co", "contacto@labonga.co")
 
 #: Passports for the two approved companies. Sprint 2 is about products, so a
 #: demo dataset without them shows none of what the sprint built.
@@ -434,7 +431,7 @@ class Command(BaseCommand):
             product.save()
 
     def _tell_the_custody_story(self):
-        """Hand one passport along a chain, and leave another with an open offer."""
+        """Hand one passport along a chain: workshop, distributor, buyer."""
         product = Product.objects.filter(name=CUSTODY_STORY["product"]).first()
         if product is not None and not product.custody_transfers.exists():
             buyer = User.objects.filter(email=BUYER_EMAIL).first()
@@ -449,16 +446,3 @@ class Command(BaseCommand):
                 )
                 transfer.accept(actor=transfer.to_holder)
             self.stdout.write(f"  custody chain of {product.name}: workshop, distributor, buyer")
-
-        name, giver, receiver = OPEN_OFFER
-        offered = Product.objects.filter(name=name).first()
-        if offered is not None and not offered.custody_transfers.exists():
-            transfer = CustodyTransfer.objects.create(
-                product=offered,
-                from_holder=User.objects.get(email=giver),
-                to_holder=User.objects.get(email=receiver),
-                note="Lote para la feria de Cartagena.",
-            )
-            self.stdout.write(
-                f"  open offer of {offered.name}, transfer code {transfer.transfer_code}"
-            )

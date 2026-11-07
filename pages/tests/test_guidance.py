@@ -19,7 +19,7 @@ from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from products.models import CustodyTransfer, Product
+from products.models import Product
 from test_support.factories import OWNER_PASSWORD, make_company, make_product, make_user
 
 
@@ -81,8 +81,7 @@ class ActionsExplainThemselvesTests(TestCase):
             reverse("products:product_list"),
             reverse("products:custody"),
             reverse("products:product_create"),
-            reverse("products:transfer_initiate", args=[self.product.pk]),
-            reverse("products:transfer_claim"),
+            reverse("products:receive_start"),
             reverse("products:product_revoke", args=[self.product.pk]),
             reverse("products:analytics"),
         ):
@@ -107,11 +106,9 @@ class ActionsExplainThemselvesTests(TestCase):
         self.assertIn('accept="image/*"', body)
 
     def test_a_handover_code_is_explained_where_it_is_shown(self):
-        CustodyTransfer.objects.create(
-            product=self.product, from_holder=self.owner, to_holder=make_user(email="b@x.co")
-        )
-        response = self.client.get(reverse("products:custody"))
-        self.assertContains(response, "Un código secreto solo para esta entrega")
+        response = self.client.get(reverse("products:handover", args=[self.product.pk]))
+        self.assertContains(response, "Solo tú lo ves")
+        self.assertContains(response, "deja de servir apenas entregas el producto")
 
 
 class PublicPagesTests(TestCase):

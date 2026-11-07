@@ -92,9 +92,15 @@ class ProductQuerySet(models.QuerySet):
             .order_by("-resolved_at")
             .values("to_holder")[:1]
         )
-        return self.annotate(last_receiver=models.Subquery(last_receiver)).filter(
-            Q(last_receiver=user.pk) | Q(last_receiver__isnull=True, company__owner=user)
+        handed_over = CustodyTransfer.objects.filter(
+            product=models.OuterRef("pk"), state=TransferState.ACCEPTED
         )
+        # A product last handed to an email address has no account holder at
+        # all, so "no receiver" alone must not send it back to the maker.
+        return self.annotate(
+            last_receiver=models.Subquery(last_receiver),
+            handed_over=models.Exists(handed_over),
+        ).filter(Q(last_receiver=user.pk) | Q(handed_over=False, company__owner=user))
 
 
 class ProductLine(models.Model):
@@ -257,13 +263,24 @@ class Product(models.Model):
 
     @property
     def current_holder(self):
-        """The to_holder of the most recent accepted transfer, or the company owner."""
-        last = (
+        """The account holding the product: the receiver of the latest accepted
+        transfer, the company owner before any, or None while an email address
+        holds it (see `holder_email`)."""
+        last = self._last_handover()
+        return last.to_holder if last else self.company.owner
+
+    @property
+    def holder_email(self):
+        """The email address holding the product, or "" when an account does."""
+        last = self._last_handover()
+        return last.to_email if last else ""
+
+    def _last_handover(self):
+        return (
             self.custody_transfers.filter(state=TransferState.ACCEPTED)
             .order_by("-resolved_at")
             .first()
         )
-        return last.to_holder if last else self.company.owner
 
     @property
     def is_intact(self):
@@ -351,12 +368,24 @@ class CustodyTransfer(models.Model):
     """
 
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="custody_transfers")
+    # Each end is an account or, for a person who has none yet, an email
+    # address: exactly one of the two, which the constraints below hold.
     from_holder = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="transfers_sent"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="transfers_sent",
+        null=True,
+        blank=True,
     )
+    from_email = models.EmailField(blank=True)
     to_holder = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="transfers_received"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="transfers_received",
+        null=True,
+        blank=True,
     )
+    to_email = models.EmailField(blank=True)
     # A random code the seller keeps private and hands over in person. The buyer
     # claims ownership by producing it together with the passport code (FR40).
     transfer_code = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -378,6 +407,16 @@ class CustodyTransfer(models.Model):
             models.CheckConstraint(
                 condition=~Q(from_holder=models.F("to_holder")),
                 name="custody_transfer_changes_holder",
+            ),
+            models.CheckConstraint(
+                condition=(Q(from_holder__isnull=False) & Q(from_email=""))
+                | (Q(from_holder__isnull=True) & ~Q(from_email="")),
+                name="custody_transfer_one_sender",
+            ),
+            models.CheckConstraint(
+                condition=(Q(to_holder__isnull=False) & Q(to_email=""))
+                | (Q(to_holder__isnull=True) & ~Q(to_email="")),
+                name="custody_transfer_one_receiver",
             ),
             # One chain per product, and a chain is linear: within a product no
             # handover is the predecessor of two others. The lock in `_append`
@@ -428,7 +467,8 @@ class CustodyTransfer(models.Model):
             raise ValidationError(_("A revoked product cannot change hands."))
         if self.from_holder_id == self.to_holder_id:
             raise ValidationError(_("A product cannot be transferred to its current holder."))
-        if self.product_id and self.from_holder_id != self.product.current_holder.pk:
+        holder = self.product.current_holder if self.product_id else None
+        if self.product_id and (holder is None or self.from_holder_id != holder.pk):
             raise ValidationError(_("Only the current holder can transfer this product."))
         if (
             self.product_id
@@ -456,7 +496,9 @@ class CustodyTransfer(models.Model):
         return (
             self.product_id,
             self.from_holder_id,
+            self.from_email,
             self.to_holder_id,
+            self.to_email,
             self.note,
             self.created_at.isoformat(),
         )

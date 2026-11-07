@@ -130,6 +130,27 @@ sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 44-206-186-9.sslip.io
 
 El script instala dependencias, aplica migraciones, copia los archivos estáticos, reinicia el servicio y comprueba `/healthz/` por HTTPS con el certificado validado. Si un paso falla, se detiene.
 
+## Correo (SMTP con Gmail)
+
+Los avisos, el enlace para recuperar la contraseña y el mensaje de un producto entregado por correo salen por SMTP cuando el entorno lo dice. Con Gmail:
+
+1. En la cuenta de Google que enviará los correos, activa la verificación en dos pasos y crea una **contraseña de aplicación** (Cuenta de Google → Seguridad → Contraseñas de aplicaciones). Nunca la contraseña de la cuenta.
+2. En la instancia, añade a `/etc/originpass.env` (con `sudo nano /etc/originpass.env`):
+
+   ```
+   EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USE_TLS=True
+   EMAIL_HOST_USER=la-cuenta@gmail.com
+   EMAIL_HOST_PASSWORD=la-contraseña-de-aplicación
+   DEFAULT_FROM_EMAIL=OriginPass <la-cuenta@gmail.com>
+   ```
+
+3. `sudo systemctl restart originpass` y prueba con «¿Olvidaste tu contraseña?».
+
+El remitente que ve quien recibe es la dirección de esa cuenta de Gmail, con el nombre «OriginPass». El puerto 25 de EC2 está bloqueado por AWS; el 587 no.
+
 ## Datos de demostración
 
 Se cargaron una vez con `seed_demo`, con `DEBUG=1` solo para ese comando. Las cuentas de demostración comparten una contraseña conocida. Esa decisión es del responsable del proyecto para la demostración en clase, no una práctica de producción.
@@ -138,7 +159,7 @@ Se cargaron una vez con `seed_demo`, con `DEBUG=1` solo para ese comando. Las cu
 
 - **Elastic IP.** Desde el 5 de noviembre de 2026 la instancia tiene la Elastic IP `44.206.186.9`, así que la dirección no cambia al parar y arrancar la instancia. Consume algo del presupuesto del lab, también con la instancia detenida. Si alguna vez cambia la IP, cambia con ella el nombre sslip.io: hay que emitir el certificado para el nombre nuevo (sección HTTPS, paso 3), poner el nombre nuevo en `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS` de `/etc/originpass.env`, ejecutar `actualizar-ec2.sh` con el nombre nuevo y volver a exportar los QR, que llevan la dirección dentro.
 - **Sin copia de seguridad.** La base de datos y `media/` viven en el disco de la instancia; terminarla los borra.
-- **Correo sin SMTP.** Las notificaciones y el enlace de restablecimiento de contraseña no salen de la instancia mientras no se configure `EMAIL_BACKEND` con un servicio SMTP.
+- **Correo.** Mientras `/etc/originpass.env` no tenga las variables de la sección «Correo», los mensajes no salen de la instancia: se escriben en el registro del servicio.
 - **Región de los escaneos.** Sin un CDN delante, `TRUST_GEO_HEADERS` queda apagado: los escaneos nuevos no registran región y la alerta de copia no se dispara. La alerta que se ve en el panel viene de los datos de demostración.
 - **No volver a ejecutar `instalar-ec2.sh`** sobre una instancia con datos: genera una `SECRET_KEY` nueva y las firmas existentes dejarían de validar. Para actualizar, `actualizar-ec2.sh`.
 

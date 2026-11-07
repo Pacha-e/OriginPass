@@ -14,6 +14,10 @@
       <a class="btn btn--primary" href="{% url 'products:receive_start' %}" aria-describedby="tip-claim">{% translate "Receive a product" %}</a>
       <span class="tip__text" id="tip-claim" role="tooltip">{% translate "Read the QR of the product someone is handing you, then type the code they tell you." %}</span>
     </span>
+    <span class="tip">
+      <a class="btn" href="{% url 'products:batch_new' %}" aria-describedby="tip-batch">{% translate "Hand over several at once" %}</a>
+      <span class="tip__text" id="tip-batch" role="tooltip">{% translate "Choose several of your products: they share one QR and one code, and all pass at once." %}</span>
+    </span>
   </div>
 </div>
 

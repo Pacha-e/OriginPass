@@ -108,7 +108,7 @@ class ActionsExplainThemselvesTests(TestCase):
     def test_a_handover_code_is_explained_where_it_is_shown(self):
         response = self.client.get(reverse("products:handover", args=[self.product.pk]))
         self.assertContains(response, "Solo tú lo ves")
-        self.assertContains(response, "deja de servir apenas entregas el producto")
+        self.assertContains(response, "deja de servir apenas lo entregas")
 
 
 class PublicPagesTests(TestCase):

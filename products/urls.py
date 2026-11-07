@@ -30,6 +30,19 @@ urlpatterns = [
     path("<int:pk>/entregar/corregir/", handover_views.correct_email, name="correct_email"),
     path("<int:pk>/entregar/reenviar/", handover_views.resend_email, name="resend_email"),
     path("reclamar/<str:token>/", handover_views.claim_email, name="claim_email"),
+    path("lote/nuevo/", handover_views.batch_new, name="batch_new"),
+    path("lote/<str:public_code>/", handover_views.batch_receive, name="batch_receive"),
+    path(
+        "lote/<str:public_code>/entregar/",
+        handover_views.batch_handover,
+        name="batch_handover",
+    ),
+    path(
+        "lote/<str:public_code>/codigo.json",
+        handover_views.batch_code_json,
+        name="batch_code",
+    ),
+    path("lote/<str:public_code>/cancelar/", handover_views.batch_cancel, name="batch_cancel"),
     path("recibir/", handover_views.receive_start, name="receive_start"),
     path("recibir/<str:passport_code>/", handover_views.receive, name="receive"),
 ]

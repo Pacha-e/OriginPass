@@ -27,6 +27,14 @@ from django.views.decorators.http import require_GET, require_POST
 from accounts.emails import notify_possession
 from companies.models import CompanyStatus
 
+from .batches import (
+    PERSON_BATCH_LIMIT,
+    batch_code_args,
+    cancel_batch,
+    create_batch,
+    is_company_account,
+    receive_batch,
+)
 from .email_handover import HandoverEmailForm, make_claim_token, read_claim_token
 from .handover import (
     check_handover_code,
@@ -36,7 +44,14 @@ from .handover import (
     record_failure,
     seconds_left,
 )
-from .models import CustodyTransfer, Product, ProductStatus, TransferState
+from .models import (
+    BatchState,
+    CustodyTransfer,
+    Product,
+    ProductStatus,
+    TransferBatch,
+    TransferState,
+)
 from .qr import passport_qr_image
 
 # ---- Public API ----
@@ -227,6 +242,100 @@ def waiting_by_email(user):
     return waiting
 
 
+@login_required
+def batch_new(request):
+    """Choose the products to hand over together."""
+    held = (
+        Product.objects.held_by(request.user)
+        .filter(status=ProductStatus.ACTIVE)
+        .exclude(batch_items__is_open=True)
+        .order_by("name", "pk")
+    )
+    error = None
+    if request.method == "POST":
+        chosen = held.filter(pk__in=request.POST.getlist("product"))
+        try:
+            batch = create_batch(request.user, chosen)
+        except ValidationError as refusal:
+            error = refusal.messages[0]
+        else:
+            return redirect("products:batch_handover", public_code=batch.public_code)
+    limit = None if is_company_account(request.user) else PERSON_BATCH_LIMIT
+    return render(
+        request, "products/batch_new.html", {"products": held, "error": error, "limit": limit}
+    )
+
+
+@login_required
+def batch_handover(request, public_code):
+    batch = _open_batch_of_requester(request, public_code)
+    now = timezone.now()
+    address = request.build_absolute_uri(reverse("products:batch_receive", args=[public_code]))
+    items = list(batch.items.select_related("product__company"))
+    return render(
+        request,
+        "products/batch_handover.html",
+        {
+            "batch": batch,
+            "items": items,
+            "lines": _lines(items),
+            "qr_data_uri": _png_data_uri(passport_qr_image(address)),
+            "code": handover_code(*batch_code_args(batch), now),
+            "seconds_left": seconds_left(now),
+            "code_url": reverse("products:batch_code", args=[public_code]),
+        },
+    )
+
+
+@login_required
+@require_GET
+def batch_code_json(request, public_code):
+    batch = _open_batch_of_requester(request, public_code)
+    now = timezone.now()
+    response = JsonResponse(
+        {"code": handover_code(*batch_code_args(batch), now), "seconds_left": seconds_left(now)}
+    )
+    response["Cache-Control"] = "no-store"
+    return response
+
+
+@login_required
+def batch_receive(request, public_code):
+    batch = get_object_or_404(TransferBatch, public_code=public_code)
+    if batch.owner_id == request.user.pk and batch.state == BatchState.OPEN:
+        return redirect("products:batch_handover", public_code=public_code)
+    error = None
+    if request.method == "POST" and batch.state == BatchState.OPEN:
+        try:
+            products = receive_batch(
+                batch, request.user, request.POST.get("code", ""), timezone.now()
+            )
+        except ValidationError as refusal:
+            error = refusal.messages[0]
+        else:
+            messages.success(
+                request,
+                _("They are yours now: %(count)s products.") % {"count": len(products)},
+            )
+            return redirect("products:custody")
+        batch.refresh_from_db()
+    items = list(batch.items.select_related("product__company"))
+    return render(
+        request,
+        "products/batch_receive.html",
+        {"lines": _lines(items), "error": error, "open": batch.state == BatchState.OPEN},
+    )
+
+
+@login_required
+@require_POST
+def batch_cancel(request, public_code):
+    batch = _open_batch_of_requester(request, public_code)
+    cancel_batch(batch, request.user)
+    messages.info(request, _("The batch was cancelled. Its products are free again."))
+    return redirect("products:custody")
+
+
 # ---- Private helpers ----
 
 
@@ -240,6 +349,24 @@ def _held_by_requester(request, pk):
     if product.status == ProductStatus.REVOKED or product.current_holder != request.user:
         raise Http404
     return product
+
+
+def _open_batch_of_requester(request, public_code):
+    batch = get_object_or_404(TransferBatch, public_code=public_code)
+    if batch.owner_id != request.user.pk or batch.state != BatchState.OPEN:
+        raise Http404
+    return batch
+
+
+def _lines(items):
+    """The batch as a buyer reads it: "20 × Sombrero vueltiao", one line per name."""
+    lines = {}
+    for item in items:
+        product = item.product
+        key = (product.name, product.company.legal_name)
+        lines.setdefault(key, {"name": product.name, "maker": key[1], "count": 0})
+        lines[key]["count"] += 1
+    return list(lines.values())
 
 
 def _given_by_requester(request, pk):

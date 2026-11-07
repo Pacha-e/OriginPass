@@ -41,6 +41,12 @@ class ProductType(models.TextChoices):
     ARTISAN = "ARTISAN", _("Artisan")
 
 
+class BatchState(models.TextChoices):
+    OPEN = "OPEN", _("Open")
+    HANDED = "HANDED", _("Handed over")
+    CANCELLED = "CANCELLED", _("Cancelled")
+
+
 class TransferState(models.TextChoices):
     INITIATED = "INITIATED", _("Initiated")
     ACCEPTED = "ACCEPTED", _("Accepted")
@@ -604,6 +610,49 @@ class HandoverAttempt(models.Model):
 
     def __str__(self):
         return f"{self.subject} #{self.subject_id} at {self.failed_at:%Y-%m-%d %H:%M}"
+
+
+class TransferBatch(models.Model):
+    """Several products handed over at once, with one QR and one code (products.batches).
+
+    Only a way to hand them over: each product keeps its own passport and its
+    own chain, and the batch never appears on the public page.
+    """
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="batches"
+    )
+    public_code = models.CharField(
+        max_length=64, unique=True, db_index=True, default=generate_passport_code
+    )
+    state = models.CharField(max_length=16, choices=BatchState.choices, default=BatchState.OPEN)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.public_code} ({self.get_state_display()})"
+
+
+class TransferBatchItem(models.Model):
+    batch = models.ForeignKey(TransferBatch, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="batch_items")
+    # Mirrors "the batch is open", because a unique condition cannot reach the
+    # batch's own state through the foreign key.
+    is_open = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product"],
+                condition=Q(is_open=True),
+                name="product_in_one_open_batch",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.product} in {self.batch.public_code}"
 
 
 # ---- Private helpers ----

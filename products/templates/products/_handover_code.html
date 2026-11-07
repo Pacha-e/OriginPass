@@ -1,0 +1,12 @@
+{% load i18n %}  <div class="handover__code" data-handover data-handover-url="{{ code_url }}" data-handover-seconds="{{ seconds_left }}">
+    <p class="handover__label">{% translate "Handover code" %}</p>
+    <p class="handover__digits" data-handover-code aria-live="polite">{{ code|slice:":3" }} {{ code|slice:"3:" }}</p>
+    <div class="handover__ring" aria-hidden="true">
+      <svg viewBox="0 0 44 44" width="88" height="88">
+        <circle class="handover__track" cx="22" cy="22" r="19"></circle>
+        <circle class="handover__left" cx="22" cy="22" r="19" pathLength="120" data-handover-ring></circle>
+      </svg>
+      <span class="handover__seconds" data-handover-seconds-text>{{ seconds_left }}</span>
+    </div>
+    <p class="muted" data-handover-hint>{% translate "The code changes every 2 minutes and stops working as soon as you hand it over." %}</p>
+  </div>

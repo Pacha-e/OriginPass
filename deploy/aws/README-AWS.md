@@ -128,7 +128,7 @@ Después, en cada actualización:
 sudo bash /opt/originpass/app/deploy/aws/actualizar-ec2.sh 44-206-186-9.sslip.io
 ```
 
-El script instala dependencias, aplica migraciones, copia los archivos estáticos, reinicia el servicio y comprueba `/healthz/` por HTTPS con el certificado validado. Si un paso falla, se detiene.
+El script instala dependencias, detiene el servicio mientras aplica las migraciones (algunas reescriben filas existentes), copia los archivos estáticos, vuelve a arrancar el servicio y comprueba `/healthz/` por HTTPS con el certificado validado. Si un paso falla, se detiene y el sitio queda apagado, porque el código viejo puede no cuadrar con lo que alcanzaron a cambiar las migraciones: corrige y vuelve a ejecutar el script.
 
 ## Correo (SMTP con Gmail)
 

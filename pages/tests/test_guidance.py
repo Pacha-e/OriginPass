@@ -149,13 +149,30 @@ class PlainWordsTests(TestCase):
     interface says entregar and anular, and never mixes in the other words."""
 
     JARGON = re.compile(r"\b(custodia|traspas\w*|revoc\w*|piezas?)\b", re.IGNORECASE)
+    FORMAL = re.compile(r"\b(usted|ingrese|seleccione|haga clic)\b", re.IGNORECASE)
+    PLACEHOLDER = re.compile(r"%\(\w+\)s")
 
-    def test_the_spanish_catalogue_uses_the_plain_words(self):
+    def spanish_messages(self):
         catalogue = Path(settings.BASE_DIR) / "locale" / "es" / "LC_MESSAGES" / "django.mo"
         with catalogue.open("rb") as handle:
-            messages = gettext.GNUTranslations(handle)._catalog
-        offenders = [text for text in messages.values() if self.JARGON.search(text)]
+            return gettext.GNUTranslations(handle)._catalog
+
+    def test_the_spanish_catalogue_uses_the_plain_words(self):
+        offenders = [text for text in self.spanish_messages().values() if self.JARGON.search(text)]
         self.assertEqual(offenders, [])
+
+    def test_the_catalogue_speaks_to_tu(self):
+        offenders = [text for text in self.spanish_messages().values() if self.FORMAL.search(text)]
+        self.assertEqual(offenders, [])
+
+    def test_placeholders_survive_translation(self):
+        for key, text in self.spanish_messages().items():
+            msgid = key[0] if isinstance(key, tuple) else key
+            with self.subTest(msgid=msgid):
+                self.assertEqual(
+                    set(self.PLACEHOLDER.findall(msgid)),
+                    set(self.PLACEHOLDER.findall(text)),
+                )
 
 
 class DemoPhotosTests(TestCase):

@@ -9,7 +9,8 @@
   <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
   <link rel="stylesheet" href="{% static 'css/originpass.css' %}">
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %}{% if user.is_authenticated and not user.is_platform_admin %} has-tabbar{% endif %}">
+{% include "partials/icons.html" %}
 {% with here=request.resolver_match.view_name %}
 <header class="site-header">
   <div class="site-header__inner">
@@ -43,32 +44,13 @@
             <a href="{% url 'audit:log' %}" aria-describedby="nav-audit"{% if here == 'audit:log' %} aria-current="page"{% endif %}>{% translate "Audit log" %}</a>
             <span class="tip__text" id="nav-audit" role="tooltip">{% translate "Every decision taken on the platform, signed so it cannot be erased." %}</span>
           </span>
-        {% else %}
-          {% if user.company.can_register_products or user.company.products.exists %}
-            <span class="tip tip--pointer tip--below">
-              <a href="{% url 'products:product_list' %}" aria-describedby="nav-products"{% if here == 'products:product_list' %} aria-current="page"{% endif %}>{% translate "My products" %}</a>
-              <span class="tip__text" id="nav-products" role="tooltip">{% translate "The products you made a passport for, each with its QR code." %}</span>
-            </span>
-            <span class="tip tip--pointer tip--below">
-              <a href="{% url 'products:analytics' %}" aria-describedby="nav-scans"{% if here == 'products:analytics' %} aria-current="page"{% endif %}>{% translate "Analytics" %}</a>
-              <span class="tip__text" id="nav-scans" role="tooltip">{% translate "How many times and from where your products are checked, and warnings of possible copies." %}</span>
-            </span>
-          {% endif %}
-          <span class="tip tip--pointer tip--below">
-            <a href="{% url 'products:custody' %}" aria-describedby="nav-custody"{% if here == 'products:custody' %} aria-current="page"{% endif %}>{% translate "Custody" %}</a>
-            <span class="tip__text" id="nav-custody" role="tooltip">{% translate "The products you have, the ones someone wants to hand you and the ones you are handing over." %}</span>
-          </span>
-          <span class="tip tip--pointer tip--below">
-            <a href="{% url 'companies:application_detail' %}" aria-describedby="nav-company"{% if here == 'companies:application_detail' %} aria-current="page"{% endif %}>{% translate "My company" %}</a>
-            <span class="tip__text" id="nav-company" role="tooltip">{% translate "The registration of your workshop or business, and whether it is approved." %}</span>
-          </span>
-        {% endif %}
         <span class="nav__user">{{ user.email }}</span>
         <a href="{% url 'accounts:password_change' %}"{% if here == 'accounts:password_change' %} aria-current="page"{% endif %}>{% translate "Change password" %}</a>
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
           <button type="submit" class="btn btn--link">{% translate "Log out" %}</button>
         </form>
+        {% endif %}
       {% else %}
         <a href="{% url 'accounts:login' %}"{% if here == 'accounts:login' %} aria-current="page"{% endif %}>{% translate "Log in" %}</a>
         <a class="btn btn--primary" href="{% url 'accounts:register' %}">{% translate "Create account" %}</a>
@@ -76,6 +58,7 @@
     </nav>
   </div>
 </header>
+{% include "partials/tabbar.html" %}
 {% endwith %}
 
 <main class="layout" id="content">

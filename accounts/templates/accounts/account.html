@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "My account" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>{% translate "My account" %}</h1>
+</div>
+
+{% include "partials/account_box.html" %}
+{% endblock %}

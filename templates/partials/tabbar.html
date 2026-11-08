@@ -1,0 +1,35 @@
+{% load i18n %}{% if user.is_authenticated and not user.is_platform_admin %}
+<nav class="tabbar" aria-label="{% translate 'Sections' %}">
+  {% if user.company %}
+    <a class="tabbar__tab" href="{% url 'products:product_list' %}"{% if here == 'products:product_list' or here == 'products:product_create' or here == 'products:product_detail' or here == 'products:product_edit' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-products"/></svg>
+      <span>{% translate "Products" %}</span>
+    </a>
+    <a class="tabbar__tab" href="{% url 'products:print_qr' %}"{% if here == 'products:print_qr' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-print"/></svg>
+      <span>{% translate "Print QR" %}</span>
+    </a>
+    <a class="tabbar__tab" href="{% url 'products:custody' %}"{% if here == 'products:custody' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-handover"/></svg>
+      <span>{% translate "Handovers" %}</span>
+    </a>
+    <a class="tabbar__tab" href="{% url 'companies:application_detail' %}"{% if here == 'companies:application_detail' or here == 'companies:application_wizard' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-workshop"/></svg>
+      <span>{% translate "My workshop" %}</span>
+    </a>
+  {% else %}
+    <a class="tabbar__tab" href="{% url 'products:custody' %}"{% if here == 'products:custody' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pieces"/></svg>
+      <span>{% translate "My products" %}</span>
+    </a>
+    <a class="tabbar__tab" href="{% url 'verification:lookup' %}"{% if here == 'verification:lookup' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-receive"/></svg>
+      <span>{% translate "Receive" %}</span>
+    </a>
+    <a class="tabbar__tab" href="{% url 'accounts:account' %}"{% if here == 'accounts:account' %} aria-current="page"{% endif %}>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-account"/></svg>
+      <span>{% translate "My account" %}</span>
+    </a>
+  {% endif %}
+</nav>
+{% endif %}

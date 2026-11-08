@@ -261,6 +261,98 @@ img {
   margin: 0;
 }
 
+/* ------------------------------------------------------------------ tab bar */
+
+.icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  min-height: 64px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+.tabbar__tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-1);
+  border-top: 3px solid transparent;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+.tabbar__tab:hover {
+  color: var(--anil);
+}
+.tabbar__tab[aria-current="page"] {
+  color: var(--anil);
+  font-weight: 600;
+  border-top-color: var(--cana);
+}
+.tabbar__tab:focus-visible {
+  outline: 3px solid var(--anil);
+  outline-offset: -3px;
+}
+.has-tabbar .layout {
+  padding-bottom: calc(64px + var(--space-8) + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  .tabbar {
+    position: static;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 0;
+    padding: 0 var(--space-4);
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tabbar__tab {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 0;
+    border-bottom: 3px solid transparent;
+    font-size: 0.95rem;
+  }
+  .tabbar__tab[aria-current="page"] {
+    border-bottom-color: var(--cana);
+  }
+  .has-tabbar .layout {
+    padding-bottom: var(--space-8);
+  }
+}
+
+/* ------------------------------------------------------------------ account */
+
+.account-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.account-box form {
+  margin: 0;
+}
+
 /* ------------------------------------------------------------------ layout */
 
 .layout {
@@ -1940,7 +2032,8 @@ tbody tr:hover {
 @media print {
   .site-header,
   .site-footer,
-  .nav {
+  .nav,
+  .tabbar {
     display: none;
   }
   body {

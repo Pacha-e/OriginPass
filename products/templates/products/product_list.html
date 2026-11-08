@@ -8,6 +8,7 @@
   <div>
     <h1>{% blocktranslate with name=company.legal_name %}Products of {{ name }}{% endblocktranslate %}</h1>
     <p>{% translate "Every passport this company has issued." %}</p>
+    <p><a href="{% url 'products:analytics' %}">{% translate "See how your products are checked" %}</a></p>
   </div>
   <div class="page-head__actions">
     <a class="btn" href="{% url 'products:print_qr' %}">{% translate "Print QR codes" %}</a>

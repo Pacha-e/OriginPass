@@ -89,10 +89,10 @@ class ActionsExplainThemselvesTests(TestCase):
                 self.assert_every_tooltip_says_something(url)
 
     def test_the_navigation_explains_each_entry(self):
-        found = tooltips(self.client.get(reverse("products:product_list")))
-        for entry in ("nav-verify", "nav-products", "nav-scans", "nav-custody", "nav-company"):
-            with self.subTest(entry=entry):
-                self.assertIn(entry, found.pointers)
+        html = self.client.get(reverse("products:product_list")).content.decode()
+        words = re.findall(r'class="tabbar__tab".*?</svg>\s*<span>([^<]+)</span>', html, re.S)
+        self.assertEqual(len(words), 4)
+        self.assertTrue(all(word.strip() for word in words))
 
     def test_a_field_explains_itself_before_the_input(self):
         body = self.client.get(reverse("products:product_create")).content.decode()

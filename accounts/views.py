@@ -4,6 +4,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, resolve_url
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
@@ -71,6 +72,12 @@ def log_out(request):
     logout(request)
     messages.success(request, _("You have been logged out."))
     return redirect("pages:home")
+
+
+@login_required
+def account(request):
+    """The page where a signed-in person sees the account, changes the password or leaves."""
+    return render(request, "accounts/account.html")
 
 
 def register(request):

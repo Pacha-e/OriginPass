@@ -1,0 +1,9 @@
+{% load i18n %}
+<div class="account-box">
+  <p>{% translate "Signed in as" %} <strong>{{ user.email }}</strong></p>
+  <a class="btn" href="{% url 'accounts:password_change' %}">{% translate "Change password" %}</a>
+  <form method="post" action="{% url 'accounts:logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn">{% translate "Log out" %}</button>
+  </form>
+</div>

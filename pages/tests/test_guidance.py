@@ -174,6 +174,26 @@ class PlainWordsTests(TestCase):
                     set(self.PLACEHOLDER.findall(text)),
                 )
 
+    # Each acronym an artisan reads, with the plain words that explain it somewhere
+    # it first shows up. A new acronym fails here until it is explained and listed.
+    ACRONYM = re.compile(r"\b[A-ZÁÉÍÓÚÑ]{2,}\b")
+    EXPLAINED = {
+        "QR": "el cuadrito",
+        "NIT": "número de identificación tributaria",
+    }
+
+    def test_every_acronym_is_explained(self):
+        # The empty msgid is the catalogue's own header (charset, MIME), not interface text.
+        texts = [text for key, text in self.spanish_messages().items() if key != ""]
+        found = {acronym for text in texts for acronym in self.ACRONYM.findall(text)}
+        self.assertLessEqual(found, set(self.EXPLAINED))
+        for acronym, explanation in self.EXPLAINED.items():
+            with self.subTest(acronym=acronym):
+                self.assertTrue(
+                    any(acronym in text and explanation in text for text in texts),
+                    f"{acronym} is never explained in the catalogue",
+                )
+
 
 class DemoPhotosTests(TestCase):
     @override_settings(DEBUG=True, MEDIA_ROOT=tempfile.mkdtemp(prefix="originpass-media-"))

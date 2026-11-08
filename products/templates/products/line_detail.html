@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ line.name }} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p><a href="{% url 'products:product_list' %}">{% translate "Back to my products" %}</a></p>
+    <h1>{{ line.name }}</h1>
+    <p>{{ line.category }} · {{ line.origin }}</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="line-detail">
+    {% if line.image %}
+      <img class="line-detail__photo" src="{{ line.image.url }}" alt="{% blocktranslate with name=line.name %}Photograph of {{ name }}{% endblocktranslate %}" width="220" height="220">
+    {% else %}
+      <span class="line-detail__art" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-products"/></svg></span>
+    {% endif %}
+    <div>
+      <p>{{ line.description }}</p>
+      <p class="muted">{% translate "Passports in this product:" %} {{ passports|length }}</p>
+    </div>
+  </div>
+</div>
+
+{% if company.can_register_products %}
+  <div class="card spaced">
+    <form method="post" action="{% url 'products:line_issue' line.pk %}" class="issue">
+      {% csrf_token %}
+      <label class="issue__question" for="{{ issue_form.count.id_for_label }}">{{ issue_form.count.label }}</label>
+      <p class="field-help">{% translate "Each passport is one finished piece, with its own code and QR." %}</p>
+      <div class="stepper" data-stepper>
+        <button type="button" class="stepper__btn" data-step="-1" aria-label="{% translate 'One less' %}">−</button>
+        {{ issue_form.count }}
+        <button type="button" class="stepper__btn" data-step="1" aria-label="{% translate 'One more' %}">+</button>
+      </div>
+      <span class="tip">
+        <button type="submit" class="btn btn--primary btn--block" aria-describedby="tip-issue">{% translate "Issue passports" %}</button>
+        <span class="tip__text" id="tip-issue" role="tooltip">{% translate "Creates one passport for each unit, with its own code. Then you can print their QR codes." %}</span>
+      </span>
+    </form>
+  </div>
+  <script src="{% static 'js/stepper.js' %}" defer></script>
+{% endif %}
+
+<div class="card spaced">
+  <div class="card__head">
+    <h2>{% translate "Passports" %}</h2>
+    <p>{% translate "One passport for each unit of this product." %}</p>
+  </div>
+  {% if passports %}
+    <p><a class="btn" href="{% url 'products:print_qr' %}?line={{ line.pk }}">{% translate "Print their QR codes" %}</a></p>
+  {% endif %}
+  <ul class="card-grid">
+    {% for passport in passports %}
+      <li>
+        <a class="line-card" href="{% url 'products:product_detail' passport.pk %}">
+          <span class="line-card__body">
+            <span class="mono">{{ passport.passport_code|slice:":8" }}</span>
+            <span class="pill pill--{{ passport.status|lower }}">{{ passport.get_status_display }}</span>
+            {% for transfer in passport.accepted_transfers|slice:":1" %}
+              <span class="muted">{% translate "With:" %} {{ transfer.to_holder.email|default:transfer.to_email }}</span>
+            {% endfor %}
+          </span>
+        </a>
+      </li>
+    {% empty %}
+      <li class="card-grid__empty"><p class="muted">{% translate "This product has no passports yet." %}</p></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

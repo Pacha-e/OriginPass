@@ -7,7 +7,7 @@
 <div class="page-head">
   <div>
     <h1>{% blocktranslate with name=company.legal_name %}Products of {{ name }}{% endblocktranslate %}</h1>
-    <p>{% translate "Every passport this company has issued." %}</p>
+    <p>{% translate "Each product you make, with how many passports it has and how many are already with someone." %}</p>
     <p><a href="{% url 'products:analytics' %}">{% translate "See how your products are checked" %}</a></p>
   </div>
   <div class="page-head__actions">
@@ -38,45 +38,34 @@
   {% if query %}<a class="btn btn--link" href="{% url 'products:product_list' %}">{% translate "Clear" %}</a>{% endif %}
 </form>
 
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>{% translate "Product" %}</th>
-        <th>{% translate "Category" %}</th>
-        <th>{% translate "Passport code" %}</th>
-        <th>{% translate "Registered" %}</th>
-        <th>{% translate "Status" %}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for product in products %}
-        <tr>
-          <td>
-            <a class="cell-product" href="{% url 'products:product_detail' product.pk %}">
-              {% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="" width="56" height="56" loading="lazy">{% else %}<span class="thumb" aria-hidden="true"></span>{% endif %}
-              {{ product.name }}
-            </a>
-          </td>
-          <td class="muted">{{ product.category }}</td>
-          <td class="mono">{{ product.passport_code }}</td>
-          <td class="muted">{{ product.registered_at|date:"j M Y" }}</td>
-          <td><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></td>
-        </tr>
-      {% empty %}
-        <tr>
-          <td colspan="5" class="table-empty">
-            {% if query or selected_status %}
-              {% translate "No products match this search." %}
-            {% elif can_register %}
-              {% translate "You have not registered any product yet. Start with the button Register a product." %}
-            {% else %}
-              {% translate "No passports have been issued yet." %}
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+<ul class="card-grid">
+  {% for line in lines %}
+    <li>
+      <a class="line-card" href="{% url 'products:line_detail' line.pk %}">
+        {% if line.image %}
+          <img class="line-card__photo" src="{{ line.image.url }}" alt="" width="320" height="200" loading="lazy">
+        {% else %}
+          <span class="line-card__art" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-products"/></svg></span>
+        {% endif %}
+        <span class="line-card__body">
+          <strong class="line-card__name">{{ line.name }}</strong>
+          <span class="muted">{{ line.category }}</span>
+          <span class="line-card__counts">{% blocktranslate with total=line.passport_count handed=line.handed_count trimmed %}Passports: {{ total }} · Already handed over: {{ handed }}{% endblocktranslate %}</span>
+        </span>
+      </a>
+    </li>
+  {% empty %}
+    <li class="card-grid__empty">
+      <p class="muted">
+        {% if query or selected_status %}
+          {% translate "No products match this search." %}
+        {% elif can_register %}
+          {% translate "You have not registered any product yet. Start with the button Register a product." %}
+        {% else %}
+          {% translate "No passports have been issued yet." %}
+        {% endif %}
+      </p>
+    </li>
+  {% endfor %}
+</ul>
 {% endblock %}

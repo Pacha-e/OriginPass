@@ -2050,3 +2050,163 @@ tbody tr:hover {
   outline: 3px solid currentColor;
   outline-offset: 2px;
 }
+
+/* Cards for lines, passports and custody: one card touched whole, one column on a phone. */
+.card-grid {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 560px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 960px) {
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.card-grid__empty {
+  grid-column: 1 / -1;
+}
+.line-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-doc);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+}
+.line-card:hover {
+  border-color: var(--anil);
+}
+.line-card__photo,
+.line-card__art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: var(--anil-wash);
+  border-bottom: 1px solid var(--line);
+}
+.line-card__art .icon {
+  width: 48px;
+  height: 48px;
+  fill: var(--anil);
+}
+.line-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+}
+.line-card__name {
+  color: var(--anil);
+  overflow-wrap: anywhere;
+}
+.line-card__counts {
+  margin-top: var(--space-2);
+  font-weight: 600;
+}
+.pass-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Line page: the photo or icon beside the description. */
+.line-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.line-detail__photo,
+.line-detail__art {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-doc);
+  border: 1px solid var(--line);
+}
+.line-detail__art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--anil-wash);
+}
+.line-detail__art .icon {
+  width: 64px;
+  height: 64px;
+  fill: var(--anil);
+}
+
+/* Issue form: a big number between two 48 px buttons. */
+.issue__question {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--anil);
+  margin-bottom: var(--space-2);
+}
+.stepper {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-4);
+}
+.stepper__btn {
+  flex: 0 0 48px;
+  min-height: 48px;
+  font-size: 1.5rem;
+  line-height: 1;
+  border: 1px solid var(--anil);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--anil);
+  cursor: pointer;
+}
+.stepper__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 56px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+}
+.stepper__btn:focus-visible,
+.stepper__input:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Photo picker on the registration form: the native control is hidden behind a button. */
+.photo-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.photo-pick__name {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.field-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}

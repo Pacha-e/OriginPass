@@ -44,7 +44,7 @@ class ProductRegistrationTests(TestCase):
         response = self.client.post(reverse("products:product_create"), VALID_PRODUCT)
 
         product = Product.objects.get(name=VALID_PRODUCT["name"])
-        self.assertRedirects(response, reverse("products:product_detail", args=[product.pk]))
+        self.assertRedirects(response, reverse("products:line_detail", args=[product.line_id]))
         self.assertEqual(product.company, self.company)
         self.assertEqual(product.origin, "Tuchin, Cordoba")
         self.assertEqual(product.status, ProductStatus.ACTIVE)

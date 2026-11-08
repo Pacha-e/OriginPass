@@ -2047,3 +2047,90 @@ msgstr "Recibes productos y puedes revisarlos o entregarlos a otra persona."
 
 msgid "Your account has been created."
 msgstr "Tu cuenta quedó creada."
+
+msgid "Step %(current)s of %(total)s"
+msgstr "Paso %(current)s de %(total)s"
+
+msgid "How do you work?"
+msgstr "¿Cómo trabajas?"
+
+msgid "I make products by hand"
+msgstr "Hago productos a mano"
+
+msgid "A workshop or a craft. You do not have a NIT yet, or you do not need one."
+msgstr "Un taller o un oficio. Aún no tienes NIT, o no lo necesitas."
+
+msgid "I have a company or shop with a NIT"
+msgstr "Tengo empresa o tienda con NIT"
+
+msgid "Your company is registered with the Chamber of Commerce or a registry."
+msgstr "Tu empresa está registrada en la Cámara de Comercio o en otro registro oficial."
+
+msgid "May we publish your profile?"
+msgstr "¿Podemos publicar tu perfil?"
+
+msgid "Yes, publish my profile once I am approved"
+msgstr "Sí, quiero que publiquen mi perfil cuando me aprueben"
+
+msgid "Once you are approved, your name, your town and your description are shown to buyers. Tap here to agree."
+msgstr "Cuando te aprueben, los compradores verán tu nombre, tu pueblo y tu descripción. Toca aquí para aceptar."
+
+msgid "What is the name of your workshop or business?"
+msgstr "¿Cómo se llama tu taller o negocio?"
+
+msgid "Where is your company registered?"
+msgstr "¿Dónde está registrada tu empresa?"
+
+msgid "Which town and department are you in?"
+msgstr "¿En qué pueblo y departamento estás?"
+
+msgid "What do you make, and since when?"
+msgstr "¿Qué haces y desde cuándo?"
+
+msgid "Tell us how you work"
+msgstr "Cuéntanos cómo trabajas"
+
+msgid "Do you have a web page or a social network?"
+msgstr "¿Tienes página o red social?"
+
+msgid "Name of your workshop or business"
+msgstr "Nombre de tu taller o negocio"
+
+msgid "Where your company is registered"
+msgstr "Dónde está registrada tu empresa"
+
+msgid "Number (NIT or Chamber of Commerce code)"
+msgstr "Número (NIT o código de la Cámara de Comercio)"
+
+msgid "Town and department"
+msgstr "Pueblo y departamento"
+
+msgid "What you make and since when"
+msgstr "Qué haces y desde cuándo"
+
+msgid "How you work"
+msgstr "Cómo trabajas"
+
+msgid "Web page or social network"
+msgstr "Página web o red social"
+
+msgid "As the people who buy from you know it."
+msgstr "Como te conocen quienes te compran."
+
+msgid "For example, your NIT."
+msgstr "Por ejemplo, tu NIT."
+
+msgid "For example: Tuchín, Córdoba."
+msgstr "Por ejemplo: Tuchín, Córdoba."
+
+msgid "The people who buy read this."
+msgstr "Esto lo leen quienes compran."
+
+msgid "Your materials, where you work and who knows your work. Only the person who reviews it reads this; it is never published."
+msgstr "Tus materiales, dónde trabajas y quién conoce tu trabajo. Solo lo lee la persona que revisa; nunca se publica."
+
+msgid "You can leave it empty."
+msgstr "Puedes dejarlo vacío."
+
+msgid "Choose one"
+msgstr "Elige una"

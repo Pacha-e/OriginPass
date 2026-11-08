@@ -87,7 +87,7 @@ class AccountKindTests(TestCase):
             reverse("accounts:register"), {**NEW_ACCOUNT, "kind": "business"}
         )
 
-        self.assertRedirects(response, reverse("companies:application_create"))
+        self.assertRedirects(response, reverse("companies:application_wizard", args=["kind"]))
         self.assertEqual(
             int(self.client.session["_auth_user_id"]), User.objects.get(email=EMAIL).pk
         )

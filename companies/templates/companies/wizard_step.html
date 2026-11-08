@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Apply as a company" %} — OriginPass{% endblock %}
+
+{% block content %}
+<div class="card card--narrow">
+  <p class="muted" id="wizard-progress-label">{% blocktranslate with current=position total=total trimmed %}Step {{ current }} of {{ total }}{% endblocktranslate %}</p>
+  <progress class="wizard__progress" value="{{ position }}" max="{{ total }}" aria-labelledby="wizard-progress-label"></progress>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% for error in form.non_field_errors %}
+      <div class="form-error" role="alert">{{ error }}</div>
+    {% endfor %}
+
+    {% if step == "kind" %}
+      <h1 id="wizard-question">{% translate "How do you work?" %}</h1>
+      <fieldset class="kind-choice{% if form.company_type.errors %} field-row--invalid{% endif %}" aria-labelledby="wizard-question">
+        <label class="kind-choice__card" for="kind-artisan">
+          <input type="radio" name="company_type" value="{{ artisan }}" id="kind-artisan"{% if form.company_type.value == artisan %} checked{% endif %}>
+          <span class="kind-choice__text">
+            <strong>{% translate "I make products by hand" %}</strong>
+            <span>{% translate "A workshop or a craft. You do not have a NIT yet, or you do not need one." %}</span>
+          </span>
+        </label>
+        <label class="kind-choice__card" for="kind-commercial">
+          <input type="radio" name="company_type" value="{{ commercial }}" id="kind-commercial"{% if form.company_type.value == commercial %} checked{% endif %}>
+          <span class="kind-choice__text">
+            <strong>{% translate "I have a company or shop with a NIT" %}</strong>
+            <span>{% translate "Your company is registered with the Chamber of Commerce or a registry." %}</span>
+          </span>
+        </label>
+        {% for error in form.company_type.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </fieldset>
+
+    {% elif step == "consent" %}
+      <h1 id="wizard-question">{% translate "May we publish your profile?" %}</h1>
+      <div class="kind-choice{% if form.publish_consent.errors %} field-row--invalid{% endif %}">
+        <label class="kind-choice__card" for="{{ form.publish_consent.id_for_label }}">
+          {{ form.publish_consent }}
+          <span class="kind-choice__text">
+            <strong>{% translate "Yes, publish my profile once I am approved" %}</strong>
+            <span id="{{ form.publish_consent.auto_id }}_helptext">{% translate "Once you are approved, your name, your town and your description are shown to buyers. Tap here to agree." %}</span>
+          </span>
+        </label>
+        {% for error in form.publish_consent.errors %}<p class="field-error" id="{{ form.publish_consent.auto_id }}_error">{{ error }}</p>{% endfor %}
+      </div>
+
+    {% else %}
+      {% if step == "name" %}
+        <h1 id="wizard-question">{% translate "What is the name of your workshop or business?" %}</h1>
+      {% elif step == "registry" %}
+        <h1 id="wizard-question">{% translate "Where is your company registered?" %}</h1>
+      {% elif step == "location" %}
+        <h1 id="wizard-question">{% translate "Which town and department are you in?" %}</h1>
+      {% elif step == "description" %}
+        <h1 id="wizard-question">{% translate "What do you make, and since when?" %}</h1>
+      {% elif step == "evidence" %}
+        <h1 id="wizard-question">{% translate "Tell us how you work" %}</h1>
+      {% elif step == "website" %}
+        <h1 id="wizard-question">{% translate "Do you have a web page or a social network?" %}</h1>
+      {% endif %}
+
+      {% for field in fields %}
+        {% include "partials/field.html" with field=field %}
+      {% endfor %}
+    {% endif %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">
+        {% if position == total %}{% translate "Submit application" %}{% else %}{% translate "Next" %}{% endif %}
+      </button>
+      {% if position > 1 %}
+        <button type="submit" name="back" class="btn" formnovalidate>{% translate "Back" %}</button>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

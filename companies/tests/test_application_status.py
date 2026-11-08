@@ -40,7 +40,7 @@ class ApplicationStatusVisibleToOwnerTests(TestCase):
 
         response = self.client.get(reverse("companies:application_detail"))
 
-        self.assertRedirects(response, reverse("companies:application_create"))
+        self.assertRedirects(response, reverse("companies:application_wizard", args=["kind"]))
 
     def test_the_owner_sees_the_current_status(self):
         response = self.client.get(reverse("companies:application_detail"))

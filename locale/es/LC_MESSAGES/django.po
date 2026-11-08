@@ -899,7 +899,7 @@ msgid "The workshop is verified"
 msgstr "Se verifica el taller"
 
 msgid "A company shows its chamber of commerce registry; an artisan workshop, even an informal one without a NIT, goes through a manual review of real evidence of the craft."
-msgstr "Una empresa muestra su registro de Cámara de Comercio. Un taller artesanal, aunque sea informal y no tenga NIT, pasa una revisión de una persona que mira pruebas reales de su oficio."
+msgstr "Una empresa muestra su registro de Cámara de Comercio. Un taller artesanal, aunque sea informal y no tenga NIT (el número de identificación tributaria de una empresa), pasa una revisión de una persona que mira pruebas reales de su oficio."
 
 msgid "Each piece gets a passport"
 msgstr "Cada producto recibe su pasaporte"
@@ -1282,7 +1282,7 @@ msgid "Offer sent to %(who)s. Give them the transfer code when you hand the prod
 msgstr "Listo: avisamos a %(who)s. Cuando le des el producto, dale también el código de entrega."
 
 msgid "The code is the line of letters and digits printed under the QR on the label."
-msgstr "El código es la línea de letras y números impresa bajo el QR de la etiqueta."
+msgstr "El código es la línea de letras y números impresa bajo el QR, el cuadrito de puntos negros de la etiqueta."
 
 msgid "Reason given for the revocation"
 msgstr "Motivo de la anulación"
@@ -1333,7 +1333,7 @@ msgid "The name of your workshop or business, as buyers know it."
 msgstr "El nombre de tu taller o negocio, como lo conocen quienes te compran."
 
 msgid "Artisan workshop: you make products by hand and have no commercial registry. Commercial company: you have a NIT or a Chamber of Commerce record."
-msgstr "Taller artesanal: haces productos a mano y no tienes registro oficial. Empresa comercial: tienes NIT o registro en la Cámara de Comercio."
+msgstr "Taller artesanal: haces productos a mano y no tienes registro oficial. Empresa comercial: tienes NIT (el número de identificación tributaria de tu empresa) o registro en la Cámara de Comercio."
 
 msgid "Only for a commercial company: where your registry comes from. An artisan workshop is reviewed by a person and leaves this empty."
 msgstr "Solo para empresas comerciales: dónde está tu registro. Si eres taller artesanal, déjalo vacío: una persona revisará tu taller."
@@ -1408,7 +1408,7 @@ msgid "Check a product now"
 msgstr "Revisa un producto ahora"
 
 msgid "Point your phone camera at the QR on the label. If it does not scan, type the code printed under it."
-msgstr "Apunta la cámara del celular al QR de la etiqueta. Si no lo lee, escribe el código que está debajo."
+msgstr "Apunta la cámara del celular al QR de la etiqueta, el cuadrito de puntos negros. Si no lo lee, escribe el código que está debajo."
 
 msgid "Where is the code?"
 msgstr "¿Dónde está el código?"
@@ -1519,7 +1519,7 @@ msgid "Add a photo, if you have one."
 msgstr "Agrega una foto, si tienes."
 
 msgid "Press Issue the passport: you get its code and its QR to print."
-msgstr "Oprime «Crear el pasaporte»: recibes su código y su QR para imprimir."
+msgstr "Oprime «Crear el pasaporte»: recibes su código y su QR para imprimir. El QR es el cuadrito que se lee con la cámara del celular."
 
 msgid "Saves the new name, description or photo. The code stays the same."
 msgstr "Guarda el nuevo nombre, descripción o foto. El código sigue igual."
@@ -2058,7 +2058,7 @@ msgid "I make products by hand"
 msgstr "Hago productos a mano"
 
 msgid "A workshop or a craft. You do not have a NIT yet, or you do not need one."
-msgstr "Un taller o un oficio. Aún no tienes NIT, o no lo necesitas."
+msgstr "Un taller o un oficio. Aún no tienes NIT (el número de identificación tributaria de una empresa), o no lo necesitas."
 
 msgid "I have a company or shop with a NIT"
 msgstr "Tengo empresa o tienda con NIT"
@@ -2118,7 +2118,7 @@ msgid "As the people who buy from you know it."
 msgstr "Como te conocen quienes te compran."
 
 msgid "For example, your NIT."
-msgstr "Por ejemplo, tu NIT."
+msgstr "Por ejemplo, tu NIT, el número de identificación tributaria de tu empresa."
 
 msgid "For example: Tuchín, Córdoba."
 msgstr "Por ejemplo: Tuchín, Córdoba."

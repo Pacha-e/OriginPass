@@ -2134,3 +2134,33 @@ msgstr "Puedes dejarlo vacío."
 
 msgid "Choose one"
 msgstr "Elige una"
+
+msgid "My account"
+msgstr "Mi cuenta"
+
+msgid "Your account"
+msgstr "Tu cuenta"
+
+msgid "See how your products are checked"
+msgstr "Mira cómo revisan tus productos"
+
+msgid "Signed in as"
+msgstr "Has iniciado sesión como"
+
+msgid "Sections"
+msgstr "Secciones"
+
+msgid "Products"
+msgstr "Productos"
+
+msgid "Print QR"
+msgstr "Imprimir QR"
+
+msgid "Handovers"
+msgstr "Entregas"
+
+msgid "My workshop"
+msgstr "Mi taller"
+
+msgid "Receive"
+msgstr "Recibir"

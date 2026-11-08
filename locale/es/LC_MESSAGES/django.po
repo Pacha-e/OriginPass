@@ -95,7 +95,7 @@ msgid "Official registry"
 msgstr "Registro oficial"
 
 msgid "Manual artisan review"
-msgstr "Revisión artesanal manual"
+msgstr "Revisión de una persona"
 
 msgid "Pending"
 msgstr "Pendiente"
@@ -110,10 +110,10 @@ msgid "Suspended"
 msgstr "Suspendida"
 
 msgid "Official registry code. Required for a commercial company (FR08)."
-msgstr "Código de registro oficial. Obligatorio para una empresa comercial (FR08)."
+msgstr "Código de registro oficial. Obligatorio para una empresa comercial."
 
 msgid "Why the application was rejected or the company suspended (DBR12)."
-msgstr "Por qué se rechazó la solicitud o se suspendió la empresa (DBR12)."
+msgstr "Por qué se rechazó la solicitud o se suspendió la empresa."
 
 msgid ""
 "This application cannot be edited because it is %(status)s. Contact the "
@@ -126,13 +126,13 @@ msgid "%(company)s is %(current)s, so it cannot become %(wanted)s."
 msgstr "%(company)s está %(current)s, así que no puede quedar %(wanted)s."
 
 msgid "Legal name"
-msgstr "Razón social"
+msgstr "Nombre del taller o negocio"
 
 msgid "Company type"
 msgstr "Tipo de empresa"
 
 msgid "Verification track"
-msgstr "Vía de verificación"
+msgstr "Cómo se verifica"
 
 msgid "Description"
 msgstr "Descripción"
@@ -236,7 +236,7 @@ msgid "Contact the administrator to have the company reactivated."
 msgstr "Escríbele al administrador para reactivar la empresa."
 
 msgid "Status"
-msgstr "Estado"
+msgstr "Situación"
 
 msgid "Registry code"
 msgstr "Código de registro"
@@ -248,7 +248,7 @@ msgid "Not provided"
 msgstr "No indicado"
 
 msgid "Last status change"
-msgstr "Último cambio de estado"
+msgstr "Último cambio"
 
 msgid "Edit application"
 msgstr "Editar solicitud"
@@ -260,7 +260,7 @@ msgid "Edit your application"
 msgstr "Edita tu solicitud"
 
 msgid "Saving your changes puts the application back into the review queue."
-msgstr "Al guardar los cambios, la solicitud vuelve a la fila de revisión."
+msgstr "Al guardar, la solicitud vuelve a quedar pendiente de revisión."
 
 msgid ""
 "A commercial company is verified through an official registry. An artisan "
@@ -287,7 +287,7 @@ msgid "This application cannot be edited"
 msgstr "Esta solicitud no se puede editar"
 
 msgid "Current status:"
-msgstr "Estado actual:"
+msgstr "Ahora está:"
 
 msgid "Back to my application"
 msgstr "Volver a mi solicitud"
@@ -488,7 +488,7 @@ msgstr ""
 "código."
 
 msgid "Verification address"
-msgstr "Dirección de verificación"
+msgstr "Dirección para verificar"
 
 msgid "Download the QR code"
 msgstr "Descargar el código QR"
@@ -714,7 +714,7 @@ msgid "Check your email"
 msgstr "Revisa tu correo"
 
 msgid "If that address has an OriginPass account, a link to choose a new password is on its way. It works once, and only until you change the password."
-msgstr "Si esa dirección tiene una cuenta de OriginPass, va en camino un enlace para elegir una contraseña nueva. Sirve una sola vez, y solo hasta que cambies la contraseña."
+msgstr "Si esa dirección tiene una cuenta de OriginPass, te llegará un enlace para elegir una contraseña nueva. Sirve una sola vez, y solo hasta que cambies tu contraseña."
 
 msgid "Back to log in"
 msgstr "Volver a iniciar sesión"
@@ -893,25 +893,25 @@ msgid "Product passport"
 msgstr "Pasaporte de producto"
 
 msgid "Four moments, each one recorded and signed, so that changing any of them later shows."
-msgstr "Cuatro momentos, cada uno registrado y firmado, de modo que cambiar cualquiera después deja evidencia."
+msgstr "Cuatro momentos. Cada uno queda anotado y firmado: si alguien lo cambia después, se nota."
 
 msgid "The workshop is verified"
 msgstr "Se verifica el taller"
 
 msgid "A company shows its chamber of commerce registry; an artisan workshop, even an informal one without a NIT, goes through a manual review of real evidence of the craft."
-msgstr "Una empresa muestra su registro de Cámara de Comercio; un taller artesanal, incluso informal y sin NIT, pasa una revisión humana de evidencia real del oficio."
+msgstr "Una empresa muestra su registro de Cámara de Comercio. Un taller artesanal, aunque sea informal y no tenga NIT, pasa una revisión de una persona que mira pruebas reales de su oficio."
 
 msgid "Each piece gets a passport"
 msgstr "Cada producto recibe su pasaporte"
 
 msgid "One code per unit, impossible to guess from another, printed as a QR on the label."
-msgstr "Un código por unidad, imposible de deducir de otro, impreso como QR en la etiqueta."
+msgstr "Un código por unidad. Nadie puede adivinarlo a partir de otro, y va impreso como QR en la etiqueta."
 
 msgid "Every handover is signed"
 msgstr "Cada entrega queda firmada"
 
 msgid "From the workshop to the distributor to the shop, each change of hands joins the chain."
-msgstr "Del taller al distribuidor y a la tienda, cada cambio de manos entra a la cadena."
+msgstr "Del taller al distribuidor y a la tienda, cada cambio de manos queda anotado."
 
 msgid "The buyer scans and knows"
 msgstr "Quien compra escanea y sabe"
@@ -1068,11 +1068,11 @@ msgstr "Periodo"
 
 msgid "Last %(days)s day"
 msgid_plural "Last %(days)s days"
-msgstr[0] "Último día"
+msgstr[0] "Último %(days)s día"
 msgstr[1] "Últimos %(days)s días"
 
 msgid "Export as CSV"
-msgstr "Descargar en Excel (CSV)"
+msgstr "Descargar en Excel"
 
 msgid "Scans in this period"
 msgstr "Escaneos en este periodo"
@@ -1162,7 +1162,7 @@ msgid "%(sender)s is offering you custody of %(product_name)s."
 msgstr "%(sender)s te quiere entregar %(product_name)s."
 
 msgid "Log in to OriginPass and open Custody to accept or decline it."
-msgstr "Entra a OriginPass y abre Entregas para recibirlo o rechazarlo."
+msgstr "Inicia sesión en OriginPass y abre Entregas para recibirlo o rechazarlo."
 
 msgid "See the public page"
 msgstr "Ver la página pública"
@@ -1306,7 +1306,7 @@ msgid "How to read this result"
 msgstr "Cómo leer este resultado"
 
 msgid "Genuine means the code belongs to an active passport. Revoked means its company or OriginPass withdrew it, and the reason is shown. Not found means no passport has that code: a copied or invented label looks like this."
-msgstr "Auténtico significa que el código es de un pasaporte vigente. Anulado significa que su negocio u OriginPass lo anuló, y se muestra el motivo. No encontrado significa que ningún pasaporte tiene ese código: así se ve una etiqueta copiada o inventada."
+msgstr "Auténtico quiere decir que el código es de un pasaporte vigente. Anulado quiere decir que su negocio u OriginPass lo anuló, y se muestra el motivo. No encontrado quiere decir que ningún pasaporte tiene ese código. Así se ve una etiqueta copiada o inventada."
 
 msgid "OriginPass issues a verifiable passport for each handmade piece, so a buyer can check it is genuine with the phone camera."
 msgstr "OriginPass da un pasaporte verificable a cada producto artesanal, para que quien compra confirme con la cámara del celular que es auténtico."
@@ -1333,7 +1333,7 @@ msgid "The name of your workshop or business, as buyers know it."
 msgstr "El nombre de tu taller o negocio, como lo conocen quienes te compran."
 
 msgid "Artisan workshop: you make products by hand and have no commercial registry. Commercial company: you have a NIT or a Chamber of Commerce record."
-msgstr "Taller artesanal: haces productos a mano y no tienes registro mercantil. Empresa comercial: tienes NIT o registro en la Cámara de Comercio."
+msgstr "Taller artesanal: haces productos a mano y no tienes registro oficial. Empresa comercial: tienes NIT o registro en la Cámara de Comercio."
 
 msgid "Only for a commercial company: where your registry comes from. An artisan workshop is reviewed by a person and leaves this empty."
 msgstr "Solo para empresas comerciales: dónde está tu registro. Si eres taller artesanal, déjalo vacío: una persona revisará tu taller."
@@ -1357,7 +1357,7 @@ msgid "Correct the details and send the application to be reviewed again."
 msgstr "Corrige los datos y envía la solicitud para que la revisen otra vez."
 
 msgid "A person from OriginPass reviews it. You see the answer on the page My company and by email."
-msgstr "Una persona de OriginPass la revisa. Verás la respuesta en Mi negocio y por correo."
+msgstr "Una persona de OriginPass la revisa. Verás la respuesta en Mi taller y por correo."
 
 msgid "The business can start issuing passports right away, and is told by email."
 msgstr "El negocio puede sacar pasaportes de inmediato, y le llega un correo avisándole."
@@ -1444,7 +1444,7 @@ msgid "The town or region where this product was made."
 msgstr "El municipio o la región donde se hizo este producto."
 
 msgid "Optional. Take it with your phone or choose one from your photos. Whoever scans the QR sees it."
-msgstr "Opcional. Tómala con el celular o escoge una de tus fotos. Quien escanee el QR la verá."
+msgstr "Opcional. Tómala con el celular o elige una de tus fotos. Quien escanee el QR la verá."
 
 msgid "The email of the person or business receiving the product. They need an OriginPass account."
 msgstr "El correo de la persona o el negocio que recibe el producto. Necesita una cuenta en OriginPass."
@@ -1672,10 +1672,10 @@ msgid "Close the camera"
 msgstr "Cerrar la cámara"
 
 msgid "Code read from the photo. Check it is the piece you are claiming, then press Claim the piece."
-msgstr "Código leído de la foto. Revisa que sea el producto que vas a recibir y luego pulsa «Recibir el producto»."
+msgstr "Código leído de la foto. Revisa que sea el producto que vas a recibir y luego oprime «Recibir el producto»."
 
 msgid "Code read. Check it is the piece you are claiming, then press Claim the piece."
-msgstr "Código leído. Revisa que sea el producto que vas a recibir y luego pulsa «Recibir el producto»."
+msgstr "Código leído. Revisa que sea el producto que vas a recibir y luego oprime «Recibir el producto»."
 
 msgid "No QR code was found in that photo. Try a closer, sharper photo, or type the code."
 msgstr "No se encontró ningún código QR en esa foto. Prueba con una foto más cercana y nítida, o escribe el código."
@@ -1696,7 +1696,7 @@ msgid "The camera is not available. Type the passport code instead."
 msgstr "La cámara no está disponible. Escribe el código del pasaporte."
 
 msgid "The record behind this code does not match the signature OriginPass issued for it. Do not rely on it."
-msgstr "El registro detrás de este código no coincide con la firma que OriginPass emitió para él. No confíes en él."
+msgstr "Los datos de este código fueron cambiados: no coinciden con lo que OriginPass registró. No confíes en él."
 
 msgid "The record was changed outside OriginPass, so it cannot be verified. Report the label to the company or to OriginPass."
 msgstr "El registro se cambió fuera de OriginPass, así que no se puede verificar. Reporta la etiqueta a la empresa o a OriginPass."
@@ -1855,16 +1855,16 @@ msgid "%(product)s was handed to %(email)s."
 msgstr "%(product)s se entregó a %(email)s."
 
 msgid "To keep it, enter with your account of %(email)s. If you have none, create it with that email and then open this link again."
-msgstr "Para guardarlo, entra con tu cuenta de %(email)s. Si no tienes, créala con ese correo y después abre otra vez este enlace."
+msgstr "Para guardarlo, inicia sesión con tu cuenta de %(email)s. Si no tienes una, créala con ese correo y después abre otra vez este enlace."
 
 msgid "Enter"
-msgstr "Entrar"
+msgstr "Iniciar sesión"
 
 msgid "Create my account"
 msgstr "Crear mi cuenta"
 
 msgid "This product was handed to %(email)s. Leave this account and enter with that one."
-msgstr "Este producto se entregó a %(email)s. Sal de esta cuenta y entra con esa."
+msgstr "Este producto se entregó a %(email)s. Cierra sesión e inicia sesión con esa cuenta."
 
 msgid "Keep it in my account"
 msgstr "Guardarlo en mi cuenta"
@@ -1873,7 +1873,7 @@ msgid "%(giver_name)s handed you %(product_name)s, made by %(maker)s. It is now 
 msgstr "%(giver_name)s te entregó %(product_name)s, hecho por %(maker)s. Ya está a tu nombre en OriginPass."
 
 msgid "To see it and keep it in your account, open this link and enter with an account of this same email. If you have none, create it there:"
-msgstr "Para verlo y guardarlo en tu cuenta, abre este enlace y entra con una cuenta de este mismo correo. Si no tienes, créala ahí:"
+msgstr "Para verlo y guardarlo en tu cuenta, abre este enlace e inicia sesión con una cuenta de este mismo correo. Si no tienes una, créala ahí:"
 
 msgid "The link works for 30 days. If you were not expecting this product, you can ignore this message."
 msgstr "El enlace sirve 30 días. Si no esperabas este producto, puedes ignorar este mensaje."
@@ -2007,13 +2007,13 @@ msgid "Print QR codes"
 msgstr "Imprimir QR"
 
 msgid "Choose the products whose codes you want. You get a PDF with 12 codes on each Letter page."
-msgstr "Marca los productos cuyos códigos quieres. El PDF trae 12 códigos en cada hoja carta."
+msgstr "Marca los productos cuyos códigos quieres. El archivo para imprimir trae 12 códigos en cada hoja carta."
 
 msgid "Mark all of this product"
 msgstr "Marcar todos los de este producto"
 
 msgid "Download the PDF"
-msgstr "Descargar el PDF"
+msgstr "Descargar el archivo para imprimir"
 
 msgid "You have no active passports to print."
 msgstr "No tienes productos activos para imprimir."

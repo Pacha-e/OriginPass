@@ -36,7 +36,7 @@
       {% elif user.is_authenticated %}
         <a class="choice" href="{% url 'companies:application_detail' %}">
       {% else %}
-        <a class="choice" href="{% url 'accounts:register' %}">
+        <a class="choice" href="{% url 'accounts:register' %}?kind=business">
       {% endif %}
         <span class="choice__icon" aria-hidden="true">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="16" rx="10" ry="4"/><path d="M7 15V9a5 5 0 0 1 10 0v6"/><path d="M7 11.5h10"/></svg>

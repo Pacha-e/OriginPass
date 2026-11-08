@@ -34,7 +34,12 @@ class PasswordStorageTests(TestCase):
     def test_no_plain_text_password_reaches_the_database(self):
         self.client.post(
             reverse("accounts:register"),
-            {"email": "weaver@tuchin.co", "password1": PASSWORD, "password2": PASSWORD},
+            {
+                "email": "weaver@tuchin.co",
+                "password1": PASSWORD,
+                "password2": PASSWORD,
+                "kind": "person",
+            },
         )
 
         stored = User.objects.values_list("password", flat=True)

@@ -64,7 +64,12 @@ class HandoverByEmailTests(TestCase):
 
         self.client.post(
             reverse("accounts:register"),
-            {"email": ANA, "password1": OWNER_PASSWORD, "password2": OWNER_PASSWORD},
+            {
+                "email": ANA,
+                "password1": OWNER_PASSWORD,
+                "password2": OWNER_PASSWORD,
+                "kind": "person",
+            },
         )
 
         self.assertIsNone(self.product.current_holder)

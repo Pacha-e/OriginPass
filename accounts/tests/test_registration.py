@@ -16,11 +16,12 @@ from test_support.timing import measure
 EMAIL = "weaver@tuchin.co"
 PASSWORD = "Vueltiao-2026"
 
-NEW_ACCOUNT = {"email": EMAIL, "password1": PASSWORD, "password2": PASSWORD}
+NEW_ACCOUNT = {"email": EMAIL, "password1": PASSWORD, "password2": PASSWORD, "kind": "person"}
 SAME_ADDRESS_ANOTHER_PASSWORD = {
     "email": EMAIL,
     "password1": "Another-Pass-2026",
     "password2": "Another-Pass-2026",
+    "kind": "person",
 }
 
 
@@ -33,7 +34,7 @@ class CreateAccountTests(TestCase):
             lambda: self.client.post(reverse("accounts:register"), NEW_ACCOUNT)
         )
 
-        self.assertRedirects(response, reverse("accounts:login"))
+        self.assertRedirects(response, reverse("products:custody"))
         self.assertTrue(User.objects.filter(email=EMAIL).exists())
         self.assertLess(seconds, 3, "The result must be confirmed within 3 seconds.")
 
@@ -76,3 +77,36 @@ class DuplicateEmailTests(TestCase):
 
         self.assertIn("email", response.context["form"].errors)
         self.assertContains(response, "field-row--invalid")
+
+
+class AccountKindTests(TestCase):
+    """The account kind decides where a new account goes, and the person is signed in."""
+
+    def test_register_logs_in_and_sends_business_to_application(self):
+        response = self.client.post(
+            reverse("accounts:register"), {**NEW_ACCOUNT, "kind": "business"}
+        )
+
+        self.assertRedirects(response, reverse("companies:application_create"))
+        self.assertEqual(
+            int(self.client.session["_auth_user_id"]), User.objects.get(email=EMAIL).pk
+        )
+        self.assertEqual(User.objects.get(email=EMAIL).role, Role.HOLDER)
+
+    def test_register_person_lands_on_my_products(self):
+        response = self.client.post(reverse("accounts:register"), NEW_ACCOUNT)
+
+        self.assertRedirects(response, reverse("products:custody"))
+        self.assertIn("_auth_user_id", self.client.session)
+
+    def test_kind_is_required(self):
+        response = self.client.post(reverse("accounts:register"), {**NEW_ACCOUNT, "kind": ""})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("kind", response.context["form"].errors)
+        self.assertFalse(User.objects.filter(email=EMAIL).exists())
+
+    def test_link_can_preselect_the_kind(self):
+        response = self.client.get(reverse("accounts:register") + "?kind=business")
+
+        self.assertEqual(response.context["form"]["kind"].value(), "business")

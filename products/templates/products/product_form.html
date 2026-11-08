@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% if product %}{% translate "Edit passport" %}{% else %}{% translate "Register a product" %}{% endif %} — OriginPass{% endblock %}
 
@@ -41,7 +41,23 @@
     {% include "partials/field.html" with field=form.description %}
     {% include "partials/field.html" with field=form.category %}
     {% include "partials/field.html" with field=form.origin %}
-    {% include "partials/field.html" with field=form.image %}
+    {% if product %}
+      {% include "partials/field.html" with field=form.image %}
+    {% else %}
+      <div class="field-row{% if form.image.errors %} field-row--invalid{% endif %}">
+        <span class="field-title">{{ form.image.label }}</span>
+        <p class="field-help" id="id_image_helptext">{{ form.image.help_text }}</p>
+        <div class="photo-pick" data-photo-pick>
+          <label class="photo-upload">
+            <span class="btn"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-products"/></svg> {% translate "Take or choose a photo" %}</span>
+            <input class="visually-hidden" type="file" name="image" id="id_image" accept="image/*" aria-describedby="id_image_helptext">
+          </label>
+          <span class="photo-pick__name" data-photo-name data-empty="{% translate 'No photo chosen yet.' %}" aria-live="polite">{% translate "No photo chosen yet." %}</span>
+        </div>
+        {% for error in form.image.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <script src="{% static 'js/photo-button.js' %}" defer></script>
+    {% endif %}
 
     <div class="form-actions">
       <span class="tip tip--start">

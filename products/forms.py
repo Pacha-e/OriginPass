@@ -15,7 +15,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 # ---- Internal imports ----
-from .models import Product
+from .models import MAX_PASSPORTS_PER_ISSUE, Product
 
 # ---- Public API ----
 
@@ -93,3 +93,14 @@ class RevocationForm(forms.Form):
         if not reason:
             raise ValidationError(_("A revocation needs a reason."))
         return reason
+
+
+class IssueForm(forms.Form):
+    """How many passports to issue from a line, at once."""
+
+    count = forms.IntegerField(
+        label=_("How many passports do you want to issue?"),
+        min_value=1,
+        max_value=MAX_PASSPORTS_PER_ISSUE,
+        widget=forms.NumberInput(attrs={"inputmode": "numeric", "class": "stepper__input"}),
+    )

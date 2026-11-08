@@ -16,7 +16,7 @@ from operator import attrgetter
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 from django.db.models.functions import TruncDay
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
+from django.views.decorators.http import require_POST
 
 # ---- Internal imports ----
 from accounts.decorators import admin_required
@@ -33,13 +34,17 @@ from companies.decorators import owned_company_required
 from companies.models import Company, CompanyStatus
 from verification.models import ScanEvent
 
-from .forms import ProductForm, RevocationForm
+from .forms import IssueForm, ProductForm, RevocationForm
 from .handover_views import waiting_by_email
 from .models import (
+    MAX_PASSPORTS_PER_ISSUE,
     PRODUCT_TYPE_BY_COMPANY_TYPE,
     Alert,
+    CustodyTransfer,
     Product,
+    ProductLine,
     ProductStatus,
+    TransferState,
 )
 from .qr import PRINT_DPI, passport_qr_image
 from .sheets import qr_sheets_pdf
@@ -289,9 +294,9 @@ def product_create(request, company):
                     _("%(product)s now has a passport. Its code is %(code)s.")
                     % {"product": product.name, "code": product.passport_code},
                 )
-                return redirect("products:product_detail", pk=product.pk)
+                return redirect("products:line_detail", pk=product.line_id)
     else:
-        form = ProductForm()
+        form = ProductForm(initial={"origin": company.location})
 
     return render(
         request,
@@ -370,35 +375,100 @@ def product_edit(request, pk):
 @login_required
 @owned_company_required
 def product_list(request, company):
-    """FR24 filtered by status, FR25 searched by name, category or passport code."""
-    products = Product.objects.filter(company=company)
+    """The company's lines, one card each, filtered by a passport's status and searched
+    by line name, category or any passport code.
+    """
+    lines = ProductLine.objects.filter(company=company)
 
     selected = request.GET.get("status", "")
     if selected in {value for value, label in ProductStatus.choices}:
-        products = products.filter(status=selected)
+        lines = lines.filter(Exists(Product.objects.filter(line=OuterRef("pk"), status=selected)))
     else:
         selected = ""
 
     query = request.GET.get("q", "").strip()
     if query:
-        products = products.filter(
+        lines = lines.filter(
             Q(name__icontains=query)
             | Q(category__icontains=query)
-            | Q(passport_code__icontains=query)
+            | Q(Exists(Product.objects.filter(line=OuterRef("pk"), passport_code__icontains=query)))
         )
+
+    lines = lines.annotate(
+        passport_count=Count("passports", distinct=True),
+        handed_count=Count(
+            "passports",
+            filter=Q(passports__custody_transfers__state=TransferState.ACCEPTED),
+            distinct=True,
+        ),
+    )
 
     return render(
         request,
         "products/product_list.html",
         {
             "company": company,
-            "products": products,
+            "lines": lines,
             "statuses": ProductStatus.choices,
             "selected_status": selected,
             "query": query,
             "can_register": company.can_register_products,
         },
     )
+
+
+@login_required
+@owned_company_required
+def line_detail(request, company, pk):
+    """A line as its company sees it: its passports, and the form to issue more."""
+    line = get_object_or_404(ProductLine, pk=pk, company=company)
+    passports = line.passports.prefetch_related(
+        Prefetch(
+            "custody_transfers",
+            queryset=CustodyTransfer.objects.filter(state=TransferState.ACCEPTED)
+            .select_related("to_holder")
+            .order_by("-resolved_at"),
+            to_attr="accepted_transfers",
+        )
+    )
+    return render(
+        request,
+        "products/line_detail.html",
+        {
+            "company": company,
+            "line": line,
+            "passports": passports,
+            "issue_form": IssueForm(initial={"count": 1}),
+        },
+    )
+
+
+@login_required
+@owned_company_required
+@require_POST
+def line_issue(request, company, pk):
+    """FR19 for a whole line: issue between 1 and MAX_PASSPORTS_PER_ISSUE passports."""
+    line = get_object_or_404(ProductLine, pk=pk, company=company)
+    form = IssueForm(request.POST)
+    if not form.is_valid():
+        messages.error(
+            request,
+            _("Choose between 1 and %(max)s passports at a time.")
+            % {"max": MAX_PASSPORTS_PER_ISSUE},
+        )
+        return redirect("products:line_detail", pk=line.pk)
+
+    try:
+        passports = line.issue_passports(form.cleaned_data["count"], request.user)
+    except ValueError:
+        messages.error(request, REFUSAL_BY_STATUS[company.status])
+        return redirect("products:line_detail", pk=line.pk)
+
+    messages.success(
+        request,
+        _("Done: %(count)s new passports.") % {"count": len(passports)},
+    )
+    return redirect("products:line_detail", pk=line.pk)
 
 
 @login_required
@@ -477,7 +547,11 @@ def print_qr(request):
     return render(
         request,
         "products/print_qr.html",
-        {"groups": _groups_by_line(products), "error": error},
+        {
+            "groups": _groups_by_line(products),
+            "error": error,
+            "preselect_line": _line_from_query(request),
+        },
     )
 
 
@@ -494,6 +568,12 @@ def _groups_by_line(products):
     """(line, its products) pairs, lines in name order, so each line is one heading."""
     ordered = products.order_by("line__name", "line_id", "pk")
     return [(line, list(items)) for line, items in groupby(ordered, key=attrgetter("line"))]
+
+
+def _line_from_query(request):
+    """The line the page was asked to preselect, if the query names one."""
+    value = request.GET.get("line", "")
+    return int(value) if value.isdigit() and len(value) <= 18 else None
 
 
 def _printable_products(user):

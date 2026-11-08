@@ -2164,3 +2164,63 @@ msgstr "Mi taller"
 
 msgid "Receive"
 msgstr "Recibir"
+
+msgid "How many passports do you want to issue?"
+msgstr "¿Cuántos pasaportes quieres sacar?"
+
+msgid "Passports in this product:"
+msgstr "Pasaportes de este producto:"
+
+msgid "Each passport is one finished piece, with its own code and QR."
+msgstr "Cada pasaporte es una unidad terminada, con su propio código y su QR."
+
+msgid "One less"
+msgstr "Uno menos"
+
+msgid "One more"
+msgstr "Uno más"
+
+msgid "Issue passports"
+msgstr "Sacar pasaportes"
+
+msgid "Creates one passport for each unit, with its own code. Then you can print their QR codes."
+msgstr "Crea un pasaporte por cada unidad, con su propio código. Después puedes imprimir sus QR."
+
+msgid "Passports"
+msgstr "Pasaportes"
+
+msgid "One passport for each unit of this product."
+msgstr "Un pasaporte por cada unidad de este producto."
+
+msgid "Print their QR codes"
+msgstr "Imprimir sus QR"
+
+msgid "With:"
+msgstr "Con:"
+
+msgid "This product has no passports yet."
+msgstr "Este producto todavía no tiene pasaportes."
+
+msgid "This code identifies one physical unit. It cannot be worked out from another code."
+msgstr "Este código identifica una unidad física. Nadie puede deducirlo a partir de otro código."
+
+msgid "Take or choose a photo"
+msgstr "Tomar o elegir foto"
+
+msgid "No photo chosen yet."
+msgstr "Todavía no has elegido una foto."
+
+msgid "Each product you make, with how many passports it has and how many are already with someone."
+msgstr "Cada producto que haces, con cuántos pasaportes tiene y cuántos ya están con alguien."
+
+msgid "Active: %(active)s · Handed over: %(handed)s"
+msgstr "Activos: %(active)s · Entregados: %(handed)s"
+
+msgid "Done: %(count)s new passports."
+msgstr "Listo: %(count)s pasaportes nuevos."
+
+msgid "Choose between 1 and %(max)s passports at a time."
+msgstr "Elige entre 1 y %(max)s pasaportes a la vez."
+
+msgid "Passports: %(total)s · Already handed over: %(handed)s"
+msgstr "Pasaportes: %(total)s · Ya entregados: %(handed)s"

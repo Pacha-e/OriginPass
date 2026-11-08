@@ -26,42 +26,33 @@
     <h2>{% translate "In your hands" %}</h2>
     <p>{% translate "The products that are in your name now." %}</p>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>{% translate "Product" %}</th>
-          <th>{% translate "Made by" %}</th>
-          <th>{% translate "Status" %}</th>
-          <th><span class="visually-hidden">{% translate "Actions" %}</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for product in held %}
-          <tr>
-            <td>
-              <a class="cell-product" href="{% url 'verification:verify' product.passport_code %}">
-                {% if product.image %}<img class="thumb" src="{{ product.image.url }}" alt="" width="56" height="56" loading="lazy">{% else %}<span class="thumb" aria-hidden="true"></span>{% endif %}
-                {{ product.name }}
-              </a>
-            </td>
-            <td class="muted">{{ product.company.legal_name }}</td>
-            <td><span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span></td>
-            <td>
-              {% if product.status == "ACTIVE" %}
-                <span class="tip">
-                  <a class="btn" href="{% url 'products:handover' product.pk %}" aria-describedby="tip-give-{{ forloop.counter }}">{% translate "Hand over in person" %}</a>
-                  <span class="tip__text" id="tip-give-{{ forloop.counter }}" role="tooltip">{% translate "Show the QR and the code on your phone to the person receiving it: a distributor, a shop or the buyer." %}</span>
-                </span>
-              {% endif %}
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="4" class="table-empty">{% translate "You have no products yet. When someone hands you one, it appears here." %}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <ul class="card-grid">
+    {% for product in held %}
+      <li class="pass-card">
+        <a class="line-card" href="{% url 'verification:verify' product.passport_code %}">
+          {% if product.image %}
+            <img class="line-card__photo" src="{{ product.image.url }}" alt="" width="320" height="200" loading="lazy">
+          {% else %}
+            <span class="line-card__art" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pieces"/></svg></span>
+          {% endif %}
+          <span class="line-card__body">
+            <strong class="line-card__name">{{ product.name }}</strong>
+            <span class="muted">{{ product.company.legal_name }}</span>
+            <span class="mono">{{ product.passport_code|slice:":8" }}</span>
+            <span class="pill pill--{{ product.status|lower }}">{{ product.get_status_display }}</span>
+          </span>
+        </a>
+        {% if product.status == "ACTIVE" %}
+          <span class="tip">
+            <a class="btn btn--block" href="{% url 'products:handover' product.pk %}" aria-describedby="tip-give-{{ forloop.counter }}">{% translate "Hand over in person" %}</a>
+            <span class="tip__text" id="tip-give-{{ forloop.counter }}" role="tooltip">{% translate "Show the QR and the code on your phone to the person receiving it: a distributor, a shop or the buyer." %}</span>
+          </span>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li class="card-grid__empty"><p class="muted">{% translate "You have no products yet. When someone hands you one, it appears here." %}</p></li>
+    {% endfor %}
+  </ul>
 </div>
 {% if waiting_by_email %}
   <div class="card">

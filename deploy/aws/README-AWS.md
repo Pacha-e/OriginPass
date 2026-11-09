@@ -144,8 +144,10 @@ Los avisos, el enlace para recuperar la contraseña y el mensaje de un producto 
    EMAIL_USE_TLS=True
    EMAIL_HOST_USER=la-cuenta@gmail.com
    EMAIL_HOST_PASSWORD=la-contraseña-de-aplicación
-   DEFAULT_FROM_EMAIL=OriginPass <la-cuenta@gmail.com>
+   DEFAULT_FROM_EMAIL="OriginPass <la-cuenta@gmail.com>"
    ```
+
+   Las comillas de `DEFAULT_FROM_EMAIL` son obligatorias: `actualizar-ec2.sh` carga este archivo con bash, y sin ellas bash lee `<` y `>` como redirecciones y el script se detiene. Escribe la contraseña de aplicación sin los espacios con que Google la muestra.
 
 3. `sudo systemctl restart originpass` y prueba con «¿Olvidaste tu contraseña?».
 

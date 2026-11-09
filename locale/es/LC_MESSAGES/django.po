@@ -2224,3 +2224,9 @@ msgstr "Elige entre 1 y %(max)s pasaportes a la vez."
 
 msgid "Passports: %(total)s · Already handed over: %(handed)s"
 msgstr "Pasaportes: %(total)s · Ya entregados: %(handed)s"
+
+msgid "Choose a password different from the one you had."
+msgstr "Elige una contraseña distinta de la que tenías."
+
+msgid "It must be different from your current password."
+msgstr "Debe ser distinta de tu contraseña actual."
